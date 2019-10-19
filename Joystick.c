@@ -234,17 +234,30 @@ void HID_Task(void) {
 	}
 }
 
+int wait_time = 0;
+// @progmem: This will hold the state of the button packet. We'll set this a little later.
+uint16_t btn_toggle = 0;
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
-	// Make sure ReportData is initialized to all zeroes!
 	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
-	// We'll center the axes and the HAT...
-	ReportData->LX  = 128;
-	ReportData->LY  = 128;
-	ReportData->RX  = 128;
-	ReportData->RY  = 128;
+	ReportData->LX = 128;
+	ReportData->LY = 128;
+	ReportData->RX = 128;
+	ReportData->RY = 128;
 	ReportData->HAT = 0x08;
-	// ...and hold our A button down!
-	ReportData->Button |= SWITCH_A;
+	// @progmem: Note that we're always setting Button to what's in our btn_toggle.
+	// I've removed the OR operand, since we'll be setting btn_toggle later, and Button should always match btn_toggle. 
+	ReportData->Button = btn_toggle;
+	// @progmem: We're also still waiting for a period, then returning if we're under a certain time.
+	if (wait_time < 100) {
+		wait_time++;
+		return;
+	}
+
+	// @progmem: If we haven't returned, then we're going to toggle the A button. This gives us our 'blinking'.
+	// This is doing an XOR operand, taking the current state of btn_toggle and XORing the SWITCH_A bit onto it.
+	// If A is held, this will release it. If A is not held, this will press it.
+	btn_toggle ^= SWITCH_A;
+	wait_time = 0;
 }
 
