@@ -25,6 +25,32 @@ these buttons for our use.
  */
 
 #include "Joystick.h"
+#include <stdlib.h>
+#include <avr/io.h>
+
+#define BAUD 9600                                   // define baud
+#define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)            // set baud rate value for UBRR
+
+void usart_init() {
+	UBRRH = (BAUDRATE>>8);                      // shift the register right by 8 bits
+    UBRRL = BAUDRATE;                           // set baud rate
+    UCSRB|= (1<<TXEN)|(1<<RXEN);                // enable receiver and transmitter
+    UCSRC|= (1<<URSEL)|(1<<UCSZ0)|(1<<UCSZ1);   // 8bit data format
+}
+
+// function to send data
+void uart_transmit (unsigned char data)
+{
+    while (!( UCSRA & (1<<UDRE)));                // wait while register is free
+    UDR = data;                                   // load data in the register
+}
+
+// function to receive data
+unsigned char uart_recieve (void)
+{
+    while(!(UCSRA) & (1<<RXC));                   // wait while data is being received
+    return UDR;                                   // return 8-bit data
+}
 
 /*
 The following ButtonMap variable defines all possible buttons within the
@@ -115,6 +141,9 @@ void SetupHardware(void) {
 	// We need to disable watchdog if enabled by bootloader/fuses.
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
+	
+	usart_init();
+	usart_send_byte(8);
 
 	// We need to disable clock division before initializing the USB hardware.
 	clock_prescale_set(clock_div_1);
@@ -128,6 +157,8 @@ void SetupHardware(void) {
 	PORTB |=  0xFF;
 	// The USB stack should be initialized last.
 	USB_Init();
+	
+	
 }
 
 // Fired to indicate that the device is enumerating.
