@@ -31,26 +31,34 @@ these buttons for our use.
 #define BAUD 9600                                   // define baud
 #define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)            // set baud rate value for UBRR
 
-void usart_init() {
-	UBRRH = (BAUDRATE>>8);                      // shift the register right by 8 bits
-    UBRRL = BAUDRATE;                           // set baud rate
-    UCSRB|= (1<<TXEN)|(1<<RXEN);                // enable receiver and transmitter
-    UCSRC|= (1<<URSEL)|(1<<UCSZ0)|(1<<UCSZ1);   // 8bit data format
+#include <util/setbaud.h>
+
+void uart_init(void) {
+    UBRR1 = UBRRH_VALUE;
+    UBRR1L = UBRRL_VALUE;
+
+#if USE_2X
+    UCSR1A |= _BV(U2X1);
+#else
+    UCSR1A &= ~(_BV(U2X1));
+#endif
+
+    UCSR1C = _BV(UCSZ10) | _BV(UCSZ11); /* 8-bit data */
+    UCSR1B = _BV(RXEN1) | _BV(TXEN1);   /* Enable RX and TX */
 }
 
-// function to send data
-void uart_transmit (unsigned char data)
-{
-    while (!( UCSRA & (1<<UDRE)));                // wait while register is free
-    UDR = data;                                   // load data in the register
+void uart_putchar(char c) {
+    loop_until_bit_is_set(UCSR1A, UDRE1); /* Wait until data register empty. */
+    UDR1 = c;
 }
 
-// function to receive data
-unsigned char uart_recieve (void)
-{
-    while(!(UCSRA) & (1<<RXC));                   // wait while data is being received
-    return UDR;                                   // return 8-bit data
+char uart_getchar(void) {
+    loop_until_bit_is_set(UCSR1A, RXC1); /* Wait until data exists. */
+    return UDR1;
 }
+
+
+
 
 /*
 The following ButtonMap variable defines all possible buttons within the
@@ -142,8 +150,8 @@ void SetupHardware(void) {
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
 	
-	usart_init();
-	usart_send_byte(8);
+	uart_init();
+	
 
 	// We need to disable clock division before initializing the USB hardware.
 	clock_prescale_set(clock_div_1);
