@@ -25,6 +25,40 @@ these buttons for our use.
  */
 
 #include "Joystick.h"
+#include <stdlib.h>
+#include <avr/io.h>
+
+#define BAUD 9600                                   // define baud
+#define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)            // set baud rate value for UBRR
+
+#include <util/setbaud.h>
+
+void uart_init(void) {
+    UBRR1 = UBRRH_VALUE;
+    UBRR1L = UBRRL_VALUE;
+
+#if USE_2X
+    UCSR1A |= _BV(U2X1);
+#else
+    UCSR1A &= ~(_BV(U2X1));
+#endif
+
+    UCSR1C = _BV(UCSZ10) | _BV(UCSZ11); /* 8-bit data */
+    UCSR1B = _BV(RXEN1) | _BV(TXEN1);   /* Enable RX and TX */
+}
+
+void uart_putchar(char c) {
+    loop_until_bit_is_set(UCSR1A, UDRE1); /* Wait until data register empty. */
+    UDR1 = c;
+}
+
+char uart_getchar(void) {
+    loop_until_bit_is_set(UCSR1A, RXC1); /* Wait until data exists. */
+    return UDR1;
+}
+
+
+
 
 /*
 The following ButtonMap variable defines all possible buttons within the
@@ -115,6 +149,9 @@ void SetupHardware(void) {
 	// We need to disable watchdog if enabled by bootloader/fuses.
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
+	
+	uart_init();
+	
 
 	// We need to disable clock division before initializing the USB hardware.
 	clock_prescale_set(clock_div_1);
@@ -128,6 +165,8 @@ void SetupHardware(void) {
 	PORTB |=  0xFF;
 	// The USB stack should be initialized last.
 	USB_Init();
+	
+	
 }
 
 // Fired to indicate that the device is enumerating.
@@ -234,30 +273,43 @@ void HID_Task(void) {
 	}
 }
 
-int wait_time = 0;
-// @progmem: This will hold the state of the button packet. We'll set this a little later.
 uint16_t btn_toggle = 0;
+
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
+	// All of this code here is handled -really poorly-, and should be replaced with something a bit more production-worthy.
+
 	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
 	ReportData->LX = 128;
 	ReportData->LY = 128;
 	ReportData->RX = 128;
 	ReportData->RY = 128;
 	ReportData->HAT = 0x08;
-	// @progmem: Note that we're always setting Button to what's in our btn_toggle.
-	// I've removed the OR operand, since we'll be setting btn_toggle later, and Button should always match btn_toggle. 
-	ReportData->Button = btn_toggle;
-	// @progmem: We're also still waiting for a period, then returning if we're under a certain time.
-	if (wait_time < 100) {
-		wait_time++;
-		return;
+	
+
+	char c = uart_getchar();
+	uart_putchar(c);
+	
+	//uint8_t n = (uint8_t)c
+	
+	//uint8_t *bits = malloc(sizeof(int) * 8);
+
+	//uint8_t k;
+	//for(k=0; k<8; k++){
+	//	uint8_t mask =  1 << k;
+	//	uint8_t masked_n = n & mask;
+	//	uint8_t thebit = masked_n >> k;
+	//	bits[k] = thebit;
+	//}
+
+	if (c == 'a'){
+		btn_toggle ^= SWITCH_A;
 	}
-
-	// @progmem: If we haven't returned, then we're going to toggle the A button. This gives us our 'blinking'.
-	// This is doing an XOR operand, taking the current state of btn_toggle and XORing the SWITCH_A bit onto it.
-	// If A is held, this will release it. If A is not held, this will press it.
-	btn_toggle ^= SWITCH_A;
-	wait_time = 0;
+		
+	
+	ReportData->Button = btn_toggle;
+		
+	
+	
+	
 }
-
