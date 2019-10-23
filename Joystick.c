@@ -305,11 +305,10 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	if (c == 'a'){
 		btn_toggle ^= SWITCH_A;
 	}
-		
+
 	
 	ReportData->Button = btn_toggle;
 		
 	
-	
-	
+
 }
