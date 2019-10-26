@@ -60,6 +60,9 @@ char uart_getchar(void) {
 
 
 
+
+
+
 /*
 The following ButtonMap variable defines all possible buttons within the
 original 13 bits of space, along with attempting to investigate the remaining
@@ -273,41 +276,39 @@ void HID_Task(void) {
 	}
 }
 
-uint16_t btn_toggle = 0;
+
 
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	// All of this code here is handled -really poorly-, and should be replaced with something a bit more production-worthy.
 
 	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
-	ReportData->LX = 128;
-	ReportData->LY = 128;
-	ReportData->RX = 128;
-	ReportData->RY = 128;
 	ReportData->HAT = 0x08;
 	
-
-	char c = uart_getchar();
-	uart_putchar(c);
+	char arrC[6];
 	
-	//uint8_t n = (uint8_t)c
+	while ((uint8_t)uart_getchar() != 85){
+		uart_putchar(85);
+	};
+	uart_putchar(85);
 	
-	//uint8_t *bits = malloc(sizeof(int) * 8);
-
-	//uint8_t k;
-	//for(k=0; k<8; k++){
-	//	uint8_t mask =  1 << k;
-	//	uint8_t masked_n = n & mask;
-	//	uint8_t thebit = masked_n >> k;
-	//	bits[k] = thebit;
-	//}
-
-	if (c == 'a'){
-		btn_toggle ^= SWITCH_A;
+	for (uint8_t i = 0; i < 6; i++){
+		char c = uart_getchar();
+		uart_putchar(c);
+		arrC[i] = c;
 	}
+	
+	
+	uint16_t btn_data = (uint16_t)arrC[0] + (uint16_t)arrC[1] * 256;
+
+	ReportData->Button = btn_data;
+	
+	ReportData->LX = (uint8_t)arrC[2];
+	ReportData->LY = (uint8_t)arrC[3];
+	ReportData->RX = (uint8_t)arrC[4];
+	ReportData->RY = (uint8_t)arrC[5];
 
 	
-	ReportData->Button = btn_toggle;
 		
 	
 
