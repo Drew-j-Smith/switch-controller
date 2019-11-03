@@ -285,13 +285,24 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
 	ReportData->HAT = 0x08;
 	
-	char arrC[6];
+	uint8_t failCount = 0;
 	
 	while ((uint8_t)uart_getchar() != 85){
 		uart_putchar(85);
+		failCount++;
+		if (failCount > 50){
+			ReportData->LX = 128;
+			ReportData->LY = 128;
+			ReportData->RX = 128;
+			ReportData->RY = 128;
+			ReportData->Button = 0;
+			return;
+		}
 	};
 	uart_putchar(85);
 	
+	
+	char arrC[6];
 	for (uint8_t i = 0; i < 6; i++){
 		char c = uart_getchar();
 		uart_putchar(c);
