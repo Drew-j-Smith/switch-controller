@@ -6,7 +6,7 @@ https://github.com/progmem/Switch-Fightstick
 
 https://github.com/shinyquagsire23/Switch-Fightstick
 
-https://github.com/abcminiuser/lufa (only the file with the title LUFA is required to be in the project)
+https://github.com/abcminiuser/lufa (only the folder with the title LUFA is required to be in the project)
 
 ### Compiling and Flashing in Windows 10
 https://infernoembedded.com/products/avr-tools/release
