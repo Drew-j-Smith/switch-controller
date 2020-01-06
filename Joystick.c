@@ -26,13 +26,10 @@ these buttons for our use.
 
 #include "Joystick.h"
 #include <stdlib.h>
-#include <avr/io.h>
 
-#define BAUD 9600                                   // define baud
-#define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)            // set baud rate value for UBRR
 
-#include <util/setbaud.h>
 
+//Added by Drew Smith
 void uart_init(void) {
     UBRR1 = UBRRH_VALUE;
     UBRR1L = UBRRL_VALUE;
@@ -53,6 +50,16 @@ void uart_putchar(char c) {
 }
 
 char uart_getchar(void) {
+    loop_until_bit_is_set(UCSR1A, RXC1); /* Wait until data exists. */
+    return UDR1;
+}
+
+void uart_putint(uint8_t c) {
+    loop_until_bit_is_set(UCSR1A, UDRE1); /* Wait until data register empty. */
+    UDR1 = c;
+}
+
+uint8_t uart_getint(void) {
     loop_until_bit_is_set(UCSR1A, RXC1); /* Wait until data exists. */
     return UDR1;
 }
@@ -280,15 +287,14 @@ void HID_Task(void) {
 
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
-	// All of this code here is handled -really poorly-, and should be replaced with something a bit more production-worthy.
+	//Added by Drew
 
 	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
-	ReportData->HAT = 0x08;
 	
 	uint8_t failCount = 0;
 	
-	while ((uint8_t)uart_getchar() != 85){
-		uart_putchar(85);
+	while ((uint8_t)uart_getint() != 85){
+		uart_putint(85);
 		failCount++;
 		if (failCount > 50){
 			ReportData->LX = 128;
@@ -296,31 +302,35 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 			ReportData->RX = 128;
 			ReportData->RY = 128;
 			ReportData->Button = 0;
+			ReportData->HAT = 0x08;
 			return;
 		}
 	};
-	uart_putchar(85);
+	uart_putint(85);
 	
 	
-	char arrC[6];
-	for (uint8_t i = 0; i < 6; i++){
-		char c = uart_getchar();
-		uart_putchar(c);
-		arrC[i] = c;
+	uint8_t arrInt[7];
+	for (uint8_t i = 0; i < 7; i++){
+		uint8_t c = uart_getint();
+		uart_putint(c);
+		arrInt[i] = c;
 	}
 	
 	
-	uint16_t btn_data = (uint16_t)arrC[0] + (uint16_t)arrC[1] * 256;
+	uint16_t btn_data = (uint16_t)arrInt[0] + (uint16_t)arrInt[1] * 256;
 
 	ReportData->Button = btn_data;
 	
-	ReportData->LX = (uint8_t)arrC[2];
-	ReportData->LY = (uint8_t)arrC[3];
-	ReportData->RX = (uint8_t)arrC[4];
-	ReportData->RY = (uint8_t)arrC[5];
+	ReportData->LX = arrInt[2];
+	ReportData->LY = arrInt[3];
+	ReportData->RX = arrInt[4];
+	ReportData->RY = arrInt[5];
+	
+	if (arrInt[6] > 8){
+		arrInt[6] = 8;
+	}
+	
+	ReportData->HAT = arrInt[6];
 
-	
-		
-	
 
 }

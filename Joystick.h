@@ -43,6 +43,11 @@
 #include <avr/interrupt.h>
 #include <string.h>
 
+//Added by Drew Smith
+#define BAUD 9600                                   // define baud
+#define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)            // set baud rate value for UBRR
+#include <util/setbaud.h>
+
 
 #include <LUFA/Drivers/USB/USB.h>
 #include <LUFA/Drivers/Board/Joystick.h>
