@@ -1,7 +1,7 @@
 ## Switch-Contoller
 This is repo to help compile code for a switch controller emulator
 
-### Original code
+### Source code
 https://github.com/progmem/Switch-Fightstick
 
 https://github.com/shinyquagsire23/Switch-Fightstick
