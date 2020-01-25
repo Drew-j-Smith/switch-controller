@@ -16,3 +16,7 @@ https://www.arduino.cc/en/Hacking/DFUProgramming8U2
 https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/FLIP
 
 The drivers for dfu mode can be found in the flip program folder under \Atmel\Flip x.x.x\usb\atmel_usb_dfu.inf
+
+The serial adapter I used can be found here:
+
+https://www.adafruit.com/product/954?gclid=EAIaIQobChMIiKO1ptid5wIVk4nICh0g3wwxEAkYAiABEgIY-PD_BwE
