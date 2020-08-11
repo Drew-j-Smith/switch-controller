@@ -20,8 +20,11 @@ The drivers for dfu mode can be found in the flip program folder under \Atmel\Fl
 
 [Serial adpater I used](https://www.adafruit.com/product/954?gclid=EAIaIQobChMIiKO1ptid5wIVk4nICh0g3wwxEAkYAiABEgIY-PD_BwE)
 
-### Java libraries
-
-[JSerialComm](https://fazecast.github.io/jSerialComm/)
+### c++ libraries
 
 [OpenCV](https://opencv.org/)
+
+[SFML](https://www.sfml-dev.org/)
+
+[SerialPort](https://github.com/manashmandal/SerialPort) (with a few tweeks)
+
