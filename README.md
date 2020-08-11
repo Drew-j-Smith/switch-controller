@@ -1,22 +1,27 @@
 ## Switch-Contoller
-This is repo to help compile code for a switch controller emulator
+This is repo to help compile and run code for a switch controller emulator with image processing
 
 ### Source code
-https://github.com/progmem/Switch-Fightstick
+[Origial code](https://github.com/progmem/Switch-Fightstick)
 
-https://github.com/shinyquagsire23/Switch-Fightstick
+[Additional inspiration](https://github.com/shinyquagsire23/Switch-Fightstick)
 
-https://github.com/abcminiuser/lufa/releases (only the folder with the title LUFA is required to be in the project)
+[Lufa drivers](https://github.com/abcminiuser/lufa/releases) 
+(only the folder with the title LUFA is required to be in the project)
 
 ### Compiling and Flashing in Windows 10
-https://infernoembedded.com/products/avr-tools/release
+[Compiler](https://infernoembedded.com/products/avr-tools/release)
 
-https://www.arduino.cc/en/Hacking/DFUProgramming8U2
+[DFU mode](https://www.arduino.cc/en/Hacking/DFUProgramming8U2)
 
-https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/FLIP
+[Arduino programmer](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/FLIP)
 
 The drivers for dfu mode can be found in the flip program folder under \Atmel\Flip x.x.x\usb\atmel_usb_dfu.inf
 
-The serial adapter I used can be found here:
+[Serial adpater I used](https://www.adafruit.com/product/954?gclid=EAIaIQobChMIiKO1ptid5wIVk4nICh0g3wwxEAkYAiABEgIY-PD_BwE)
 
-https://www.adafruit.com/product/954?gclid=EAIaIQobChMIiKO1ptid5wIVk4nICh0g3wwxEAkYAiABEgIY-PD_BwE
+### Java libraries
+
+[JSerialComm](https://fazecast.github.io/jSerialComm/)
+
+[OpenCV](https://opencv.org/)
