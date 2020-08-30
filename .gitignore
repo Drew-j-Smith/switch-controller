@@ -1,8 +1,8 @@
-.bin
-.eep
-.elf
-.hex
-.lss
-.map
-.sym
+*.bin
+*.eep
+*.elf
+*.hex
+*.lss
+*.map
+*.sym
 obj
