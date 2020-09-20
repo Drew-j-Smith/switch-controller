@@ -1,5 +1,5 @@
-#ifndef VIRTUALCONTROLLER
-#define VIRTUALCONTROLLER
+#ifndef VIRTUAL_CONTROLLER_H
+#define VIRTUAL_CONTROLLER_H
 
 #include <SFML/Graphics.hpp>
 

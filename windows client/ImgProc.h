@@ -1,5 +1,5 @@
-#ifndef IMGPROC
-#define IMGPROC
+#ifndef IMGPROC_H
+#define IMGPROC_H
 
 
 #include "Loader.h"

@@ -1,5 +1,5 @@
-#ifndef LOADER
-#define LOADER
+#ifndef LOADER_H
+#define LOADER_H
 
 #include <SFML/Graphics.hpp>
 
