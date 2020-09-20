@@ -7,5 +7,6 @@
 *.sym
 obj
 
-.exe
-.out
+*.exe
+*.out
+.vscode
