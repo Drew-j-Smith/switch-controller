@@ -97,9 +97,10 @@ void Loader::loadConfig(istream &configStream, bool isDefault){
             else{
                 if(defaultConfig.size() != 0){
                     if(catagories.find(currentCatagory) == catagories.end())
-                        cerr << "The catagory " << currentCatagory << " was not in the default config but was used.\n";
-                    else if(defaultConfig.find(currentCatagory + ":" + currentElement) == defaultConfig.end())
-                        cerr << "The element " << currentElement << " was not in the default config but was used.\n";
+                        cerr << "Warning: The catagory \"" << currentCatagory << "\" was not in the default config but was used.\n";
+                    if(defaultConfig.find(currentCatagory + ":" + currentElement) == defaultConfig.end())
+                        cerr << "Warning: The element \"" << currentElement << "\" in the catagory \"" <<
+                        currentCatagory << "\" was not in the default config but was used.\n";
                 }
 
                 addElement(currentCatagory, lineString.substr(0, equalSymbolPos),
@@ -116,9 +117,19 @@ void Loader::loadConfig(istream &configStream, bool isDefault){
     }
 
     for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
-        std::vector<string>::iterator elementIt;
-        elementIt = std::unique(it->second.begin(), it->second.end());
-        it->second.resize(std::distance(it->second.begin(),elementIt));
+        std::vector<string> elements = {};
+        for(int i = 0; i < it->second.size(); i++){
+            cout << it->second[i] << endl;
+            for(int j = 0; j < elements.size() + 1; j++){
+                if (j == elements.size()){
+                    elements.push_back(it->second[i]);
+                    break;
+                }
+                if (it->second[i] == elements[j])
+                    break;
+            }
+        }
+        it->second = elements;
     }
 }
 
@@ -132,7 +143,7 @@ void Loader::addDefaultElement(string catagory, string element, string content){
 }
 
 string Loader::getElement(string catagory, string element){
-    if(currentConfig.find(catagory + ":" + element) != currentConfig.end())
+    if(currentConfig.find(catagory + ":" + element) != currentConfig.end() && currentConfig.at(catagory + ":" + element).length() != 0)
         return currentConfig.at(catagory + ":" + element);
     else if(defaultConfig.find(catagory + ":" + element) != defaultConfig.end())
         return defaultConfig.at(catagory + ":" + element);
