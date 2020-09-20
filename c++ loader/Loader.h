@@ -119,7 +119,6 @@ void Loader::loadConfig(istream &configStream, bool isDefault){
     for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         std::vector<string> elements = {};
         for(int i = 0; i < it->second.size(); i++){
-            cout << it->second[i] << endl;
             for(int j = 0; j < elements.size() + 1; j++){
                 if (j == elements.size()){
                     elements.push_back(it->second[i]);
