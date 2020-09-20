@@ -1,6 +1,7 @@
 #include <iostream>
 #include "loader.h"
 #include <sstream>
+#include "ArduinoLoader.h"
 
 
 int main(){
@@ -34,7 +35,7 @@ int main(){
     l3.loadConfig(ss, true);
     cout << l3.toString(); */
 
-    Loader l4 = Loader("test2.txt", "test1.txt");
+    //Loader l4 = Loader("test2.txt", "test1.txt");
     // cout << l4.getElement("1", "1") << std::endl;
     // cout << l4.getElement("1", "2") << std::endl;
     // cout << l4.getElement("1", "3") << std::endl;
@@ -48,11 +49,14 @@ int main(){
     // cout << l4.getElement("3", "2") << std::endl;
     // cout << l4.getElement("3", "3") << std::endl;
 
-    cout << l4.toString();
+    //cout << l4.toString();
     
+    ArduinoLoader l5 = ArduinoLoader();
+    l5.loadConfigFile("config.txt");
+    cout << l5.toString();
 
-
-
+    l5 = ArduinoLoader("config.txt");
+    cout << l5.toString();
 
     return 0;
 }

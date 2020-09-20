@@ -21,16 +21,17 @@ public:
     Loader();
     Loader(string configFilepath);
     Loader(string configFilepath, string defaultsFilepath);
-    void loadConfigFromFile(string configFilepath, bool isDefault);
-    void loadConfig(istream &configStream, bool isDefault);
 
     void addElement(string catagory, string element, string content);
-    void addDefaultElement(string catagory, string element, string content);
     string getElement(string catagory, string element);
 
-    vector<string> getCatagories();
+    map<string, vector<string>> getCatagories();
 
     string toString();
+protected:
+    void loadConfigFromFile(string configFilepath, bool isDefault);
+    void loadConfig(istream &configStream, bool isDefault);
+    void addDefaultElement(string catagory, string element, string content);
 };
 
 
@@ -172,5 +173,8 @@ string Loader::toString(){
     return result;
 }
 
+map<string, vector<string>> Loader::getCatagories(){
+    return catagories;
+}
 
 #endif
