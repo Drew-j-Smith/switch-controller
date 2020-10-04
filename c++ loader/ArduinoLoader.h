@@ -6,8 +6,12 @@
 #include <vector>
 #include <sstream>
 
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+
 using namespace std;
 
+#pragma region
 const string defaultConfigString = R"(
 [controls]
 y=
@@ -73,33 +77,91 @@ next-macro-success=
 next-macro-fail=
 next-macro-default=
 )";
+#pragma endregion
 
 class ArduinoLoader : public Loader{
 private:
-    std::vector<std::vector<std::array<char, 8>>> macros;
+    map<string,vector<array<char, 8>>> macros;
+    map<string,cv::Mat> pictures;
+
+    void loadMacros();
+    void loadPictures();
 public:
     ArduinoLoader();
     ArduinoLoader(string filepath);
 
-    void loadConfigFile(string filepath);
+    void loadConfig(string filepath);
+
+    std::vector<std::array<char, 8>> loadMacro(string filepath);
+    cv::Mat loadPicture(string filepath);
+    string getElement(string catagory, string element);
 };
 
 ArduinoLoader::ArduinoLoader(){
     stringstream ss = stringstream(defaultConfigString);
-    loadConfig(ss, true);
+    Loader::loadConfig(ss, true);
 }
 
 ArduinoLoader::ArduinoLoader(string filepath){
     stringstream ss = stringstream(defaultConfigString);
-    loadConfig(ss, true);
-    loadConfigFile(filepath);
+    Loader::loadConfig(ss, true);
+    loadConfig(filepath);
 }
 
-void ArduinoLoader::loadConfigFile(string filepath){
-    loadConfigFromFile(filepath, false);
+void ArduinoLoader::loadConfig(string filepath){
+    Loader::loadConfig(filepath, false);
+
+    loadMacros();
+    loadPictures();
 }
 
 
+std::vector<std::array<char, 8>> ArduinoLoader::loadMacro(string filepath){
+    ifstream infile;
+    string stringLine;
+    std::array<char, 8> inputArray;
+    std::vector<std::array<char, 8>> macro = {};
+
+    infile.open(filepath, ios::in);
+
+    if (infile) {
+        while (!infile.eof()) {
+            getline(infile, stringLine);
+            if (stringLine.length() != 24)
+                continue;
+            for (int i = 0; i < 8; i++) {
+                inputArray[i] = std::stoi(stringLine.substr(i * 3, 3)) - 128;
+            }
+            macro.push_back(inputArray);
+        }
+    }
+    else
+    {
+        std::cerr << "Could not open file " + filepath << "\n";
+    }
+    infile.close();
+
+    return macro;
+}
+
+cv::Mat ArduinoLoader::loadPicture(string filepath) {
+    cv::Mat image;
+    image = cv::imread(filepath, cv::IMREAD_COLOR); // Read the file
+    if (image.empty()) // Check for invalid input
+    {
+        std::cerr << "Could not open file " << filepath << "\n";
+        return cv::Mat();
+    }
+    return image;
+}
+
+void ArduinoLoader::loadMacros(){
+    
+}
+
+void ArduinoLoader::loadPictures(){
+
+}
 
 
 

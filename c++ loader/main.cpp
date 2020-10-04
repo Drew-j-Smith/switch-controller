@@ -53,7 +53,7 @@ int main(){
     // cout << l4.toString();
 
     ArduinoLoader l5 = ArduinoLoader();
-    l5.loadConfigFile("config.txt");
+    l5.loadConfig("config.txt");
     cout << l5.toString();
 
     //l5 = ArduinoLoader("config.txt");

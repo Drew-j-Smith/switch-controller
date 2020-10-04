@@ -18,13 +18,17 @@
 using namespace std;
 
 class Loader{
-private:
+protected:
     map<string, string> currentConfig;
     map<string, string> defaultConfig;
     map<string, vector<string>> catagories;
 
     void parseLine(istream &configStream, bool isDefault, string &currentCatagory);
     void removeDuplicateCatagories();
+
+    void loadConfig(string configFilepath, bool isDefault);
+    void loadConfig(istream &configStream, bool isDefault);
+    void addDefaultElement(string catagory, string element, string content);
 public:
     Loader();
     Loader(string configFilepath);
@@ -36,10 +40,6 @@ public:
     map<string, vector<string>> getCatagories();
 
     string toString();
-protected:
-    void loadConfigFromFile(string configFilepath, bool isDefault);
-    void loadConfig(istream &configStream, bool isDefault);
-    void addDefaultElement(string catagory, string element, string content);
 };
 
 /*
@@ -58,7 +58,7 @@ Loader::Loader(){
  */
 Loader::Loader(string configFilepath){
     catagories = {};
-    loadConfigFromFile(configFilepath, false);
+    loadConfig(configFilepath, false);
     defaultConfig = {};
 }
 
@@ -70,8 +70,8 @@ Loader::Loader(string configFilepath){
  */
 Loader::Loader(string configFilepath, string defaultsFilepath){
     catagories = {};
-    loadConfigFromFile(defaultsFilepath, true);
-    loadConfigFromFile(configFilepath, false);
+    loadConfig(defaultsFilepath, true);
+    loadConfig(configFilepath, false);
 }
 
 /*
@@ -82,7 +82,7 @@ Loader::Loader(string configFilepath, string defaultsFilepath){
  * @param configFilepath The path to file with the config
  * @param isDefault specifies if the config should be loaded as the main or default config
  */
-void Loader::loadConfigFromFile(string configFilepath, bool isDefault){
+void Loader::loadConfig(string configFilepath, bool isDefault){
     ifstream configStream;
 	configStream.open(configFilepath, ios::in);
 
