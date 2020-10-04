@@ -1,3 +1,10 @@
+/* 
+ * File: Loader.h
+ * Author: Drew Smith
+ * Summary: loads a configs in a similar way to .ini
+ * 
+ */
+
 #ifndef LOADER_H
 #define LOADER_H
 
@@ -16,7 +23,8 @@ private:
     map<string, string> defaultConfig;
     map<string, vector<string>> catagories;
 
-    void parseLine();
+    void parseLine(istream &configStream, bool isDefault, string &currentCatagory);
+    void removeDuplicateCatagories();
 public:
     Loader();
     Loader(string configFilepath);
@@ -34,25 +42,46 @@ protected:
     void addDefaultElement(string catagory, string element, string content);
 };
 
-
+/*
+ * Deafult Constuctor
+ */
 Loader::Loader(){
     catagories = {};
     currentConfig = {};
     defaultConfig = {};
 }
 
+/*
+ * Loads a config from a file with no defaults set
+ * 
+ * @param configFilepath The path to file with the config
+ */
 Loader::Loader(string configFilepath){
     catagories = {};
     loadConfigFromFile(configFilepath, false);
     defaultConfig = {};
 }
 
+/* 
+ * Loads a config and a defualt config from files
+ * 
+ * @param configFilepath The path to file with the main config
+ * @param defaultsFilepath The path to file with the default config
+ */
 Loader::Loader(string configFilepath, string defaultsFilepath){
     catagories = {};
     loadConfigFromFile(defaultsFilepath, true);
     loadConfigFromFile(configFilepath, false);
 }
 
+/*
+ * Loads a config from a file
+ * 
+ * @see loadConfig
+ * 
+ * @param configFilepath The path to file with the config
+ * @param isDefault specifies if the config should be loaded as the main or default config
+ */
 void Loader::loadConfigFromFile(string configFilepath, bool isDefault){
     ifstream configStream;
 	configStream.open(configFilepath, std::ios::in);
@@ -67,81 +96,135 @@ void Loader::loadConfigFromFile(string configFilepath, bool isDefault){
     configStream.close();
 }
 
+/*
+ * Loads a config from a stream. Overwrites defaultConfig or currentConfig depending on isDefault
+ * 
+ * @see parseLine
+ * @see removeDuplicateCatagories
+ * 
+ * @param configStream The stream with the config
+ * @param isDefault specifies if the config should be loaded as the main or default config
+ */
 void Loader::loadConfig(istream &configStream, bool isDefault){
     if (isDefault)
         defaultConfig = {};
     else
         currentConfig = {};
 
-	string lineString, currentCatagory = "";
+	string currentCatagory = "";
 
     while (!configStream.eof()){
-        getline(configStream, lineString);
+        parseLine(configStream, isDefault, currentCatagory);
+    }
 
-        if(lineString.length() == 0 || lineString.at(0) == '#'){
-            continue;
+    removeDuplicateCatagories();
+}
+
+
+/* 
+ * Helper method to loadConfig. Gets the next line of configStream and either sets currentCatagory, adds an element (which may add to catagories) or does nothing
+ * 
+ * @see loadConfig
+ * 
+ * @param configStream The stream with the config
+ * @param isDefault Specifies if the config should be loaded as the main or default config
+ * @param currentCatagory the Catagory that the next element would be stored in
+ */
+void Loader::parseLine(istream &configStream, bool isDefault, string& currentCatagory){
+    string lineString;
+    getline(configStream, lineString);
+
+    if(lineString.length() == 0 || lineString.at(0) == '#'){
+        return;
+    }
+    else if(lineString.at(0) == '['){
+        currentCatagory = lineString.substr(1, lineString.find(']') - 1);
+    }
+    else if(currentCatagory != ""){
+        int equalSymbolPos = lineString.find('=');
+        if (equalSymbolPos == -1)
+            return;
+        string currentElement = lineString.substr(0, equalSymbolPos);
+        string currentContent = lineString.substr(equalSymbolPos + 1, lineString.length() - equalSymbolPos - 1);
+        
+        
+        if (isDefault){
+            addDefaultElement(currentCatagory, currentElement, currentContent);
         }
-        else if(lineString.at(0) == '['){
-            currentCatagory = lineString.substr(1, lineString.find(']') - 1);
-        }
-        else if(currentCatagory != ""){
-            int equalSymbolPos = lineString.find('=');
-            if (equalSymbolPos == -1)
-                continue;
-            string currentElement = lineString.substr(0, equalSymbolPos);
-            string currentContent = lineString.substr(equalSymbolPos + 1, lineString.length() - equalSymbolPos - 1);
-            
-            
-            if (isDefault){
-                addDefaultElement(currentCatagory, currentElement, currentContent);
+        else{
+            if(defaultConfig.size() != 0){
+                if(catagories.find(currentCatagory) == catagories.end())
+                    cerr << "Warning: The catagory \"" << currentCatagory << "\" was not in the default config but was used.\n";
+                if(defaultConfig.find(currentCatagory + ":" + currentElement) == defaultConfig.end())
+                    cerr << "Warning: The element \"" << currentElement << "\" in the catagory \"" <<
+                    currentCatagory << "\" was not in the default config but was used.\n";
             }
-            else{
-                if(defaultConfig.size() != 0){
-                    if(catagories.find(currentCatagory) == catagories.end())
-                        cerr << "Warning: The catagory \"" << currentCatagory << "\" was not in the default config but was used.\n";
-                    if(defaultConfig.find(currentCatagory + ":" + currentElement) == defaultConfig.end())
-                        cerr << "Warning: The element \"" << currentElement << "\" in the catagory \"" <<
-                        currentCatagory << "\" was not in the default config but was used.\n";
-                }
 
                 addElement(currentCatagory, lineString.substr(0, equalSymbolPos),
                 lineString.substr(equalSymbolPos + 1, lineString.length() - equalSymbolPos - 1));
             }
 
-            if(catagories.find(currentCatagory) == catagories.end()){
-                catagories.insert({currentCatagory, {currentElement}});
-            }
-            else{
-                catagories.at(currentCatagory).push_back(currentElement);
-            }
+        if(catagories.find(currentCatagory) == catagories.end()){
+            catagories.insert({currentCatagory, {currentElement}});
+        }
+        else{
+            catagories.at(currentCatagory).push_back(currentElement);
         }
     }
+}
 
+/* 
+ * Helper method to loadConfig. Removes duplicate entries in the vectors of catagories
+ * 
+ * @see loadConfig
+ * 
+ */
+void Loader::removeDuplicateCatagories(){
     for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         std::vector<string> elements = {};
         for(int i = 0; i < it->second.size(); i++){
-            for(int j = 0; j < elements.size() + 1; j++){
-                if (j == elements.size()){
-                    elements.push_back(it->second[i]);
-                    break;
-                }
+            int j = 0;
+            while (j < elements.size()){
                 if (it->second[i] == elements[j])
                     break;
+                j++;
             }
+            if (j == elements.size())
+                    elements.push_back(it->second[i]);
         }
         it->second = elements;
     }
 }
 
-
+/*
+ * Adds an element to currentConfig in the form of {catagory + ":" + element, content}
+ * 
+ * @param catagory The catagory the content is added
+ * @param element The element the content is added
+ * @param content the value to be stored in the catagory and element
+ */
 void Loader::addElement(string catagory, string element, string content){
     currentConfig.insert({catagory + ":" + element, content});
 }
 
+/*
+ * Adds an element to defaultConfig in the form of {catagory:element, content}
+ * 
+ * @param catagory The catagory the content is added
+ * @param element The element the content is added
+ * @param content the value to be stored in the catagory and element
+ */
 void Loader::addDefaultElement(string catagory, string element, string content){
     defaultConfig.insert({catagory + ":" + element, content});
 }
 
+/*
+ * Attempts to get the content at {catagory:element}. Will try to retrieve from the main config and then the default config. 
+ * Will attempt to retireve from deafult if content in main config has length 0.
+ * 
+ * @param catagory The catagory that is checked
+ * @param element The element that is checked
+ */
 string Loader::getElement(string catagory, string element){
     if(currentConfig.find(catagory + ":" + element) != currentConfig.end() && currentConfig.at(catagory + ":" + element).length() != 0)
         return currentConfig.at(catagory + ":" + element);
@@ -151,16 +234,16 @@ string Loader::getElement(string catagory, string element){
 }
 
 string Loader::toString(){
-    string result = "";
+    string result = "Current config:\n";
     for (std::map<string,string>::iterator it=currentConfig.begin(); it!=currentConfig.end(); ++it)
         result += it->first + " => " + it->second + '\n';
 
-    result += '\n';
+    result += "\nDefault config:\n";
 
     for (std::map<string,string>::iterator it=defaultConfig.begin(); it!=defaultConfig.end(); ++it)
         result += it->first + " => " + it->second + '\n';
 
-    result += '\n';
+    result += "\nCatagories:\n";
 
     for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         result += it->first + '\n';
