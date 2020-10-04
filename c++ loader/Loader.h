@@ -153,9 +153,13 @@ void Loader::parseLine(istream &configStream, bool isDefault, string& currentCat
         }
         else{
             if(defaultConfig.size() != 0){
-                if(catagories.find(currentCatagory) == catagories.end())
+                int endChar = currentCatagory.length() - 1;
+                while (endChar > 0 && currentCatagory.at(endChar) >= '0' && currentCatagory.at(endChar) <= '9'){
+                    endChar--;
+                }
+                if(catagories.find(currentCatagory.substr(0, endChar + 1)) == catagories.end())
                     cerr << "Warning: The catagory \"" << currentCatagory << "\" was not in the default config but was used.\n";
-                if(defaultConfig.find(currentCatagory + ":" + currentElement) == defaultConfig.end())
+                if(defaultConfig.find(currentCatagory.substr(0, endChar + 1) + ":" + currentElement) == defaultConfig.end())
                     cerr << "Warning: The element \"" << currentElement << "\" in the catagory \"" <<
                     currentCatagory << "\" was not in the default config but was used.\n";
             }
@@ -230,6 +234,14 @@ string Loader::getElement(string catagory, string element){
         return currentConfig.at(catagory + ":" + element);
     else if(defaultConfig.find(catagory + ":" + element) != defaultConfig.end())
         return defaultConfig.at(catagory + ":" + element);
+
+    int endChar = catagory.length() - 1;
+    while (endChar > 0 && catagory.at(endChar) >= '0' && catagory.at(endChar) <= '9'){
+        endChar--;
+    }
+    if(defaultConfig.find(catagory.substr(0, endChar + 1) + ":" + element) != defaultConfig.end())
+        return defaultConfig.at(catagory.substr(0, endChar + 1) + ":" + element);
+    
     return "";
 }
 
@@ -239,18 +251,24 @@ string Loader::toString(){
         result += it->first + " => " + it->second + '\n';
 
     result += "\nDefault config:\n";
-
     for (std::map<string,string>::iterator it=defaultConfig.begin(); it!=defaultConfig.end(); ++it)
         result += it->first + " => " + it->second + '\n';
 
-    result += "\nCatagories:\n";
+    result += "\nEvaluated config:\n";
+    for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
+        for(int i = 0; i < it->second.size(); i++){
+            result += it->first + ":" + it->second[i] + " => " + getElement(it->first, it->second[i]) + '\n';
+        }
+        result += "\n";
+    }
 
+    result += "\nCatagories:\n";
     for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         result += it->first + '\n';
         for(int i = 0; i < it->second.size(); i++){
             result += it->second.at(i) + " ";
         }
-        result += '\n';
+        result += "\n\n";
     }
 
     return result;
