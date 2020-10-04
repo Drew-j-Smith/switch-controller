@@ -10,3 +10,12 @@ obj
 *.exe
 *.out
 .vscode
+
+CMakeFiles
+Debug
+Win32
+*.cmake
+*.sln
+*.vcxproj
+*filters
+CMakeCache.txt
