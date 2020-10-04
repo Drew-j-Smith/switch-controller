@@ -84,7 +84,7 @@ Loader::Loader(string configFilepath, string defaultsFilepath){
  */
 void Loader::loadConfigFromFile(string configFilepath, bool isDefault){
     ifstream configStream;
-	configStream.open(configFilepath, std::ios::in);
+	configStream.open(configFilepath, ios::in);
 
     if (configStream) {
         loadConfig(configStream, isDefault);
@@ -184,8 +184,8 @@ void Loader::parseLine(istream &configStream, bool isDefault, string& currentCat
  * 
  */
 void Loader::removeDuplicateCatagories(){
-    for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
-        std::vector<string> elements = {};
+    for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
+        vector<string> elements = {};
         for(int i = 0; i < it->second.size(); i++){
             int j = 0;
             while (j < elements.size()){
@@ -247,15 +247,15 @@ string Loader::getElement(string catagory, string element){
 
 string Loader::toString(){
     string result = "Current config:\n";
-    for (std::map<string,string>::iterator it=currentConfig.begin(); it!=currentConfig.end(); ++it)
+    for (map<string,string>::iterator it=currentConfig.begin(); it!=currentConfig.end(); ++it)
         result += it->first + " => " + it->second + '\n';
 
     result += "\nDefault config:\n";
-    for (std::map<string,string>::iterator it=defaultConfig.begin(); it!=defaultConfig.end(); ++it)
+    for (map<string,string>::iterator it=defaultConfig.begin(); it!=defaultConfig.end(); ++it)
         result += it->first + " => " + it->second + '\n';
 
     result += "\nEvaluated config:\n";
-    for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
+    for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         for(int i = 0; i < it->second.size(); i++){
             result += it->first + ":" + it->second[i] + " => " + getElement(it->first, it->second[i]) + '\n';
         }
@@ -263,7 +263,7 @@ string Loader::toString(){
     }
 
     result += "\nCatagories:\n";
-    for(std::map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
+    for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         result += it->first + '\n';
         for(int i = 0; i < it->second.size(); i++){
             result += it->second.at(i) + " ";
