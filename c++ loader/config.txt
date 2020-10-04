@@ -43,8 +43,14 @@ window-height=1080
 [pictures]
 picture-folder=pictures/
 picture-recording-filename=picture.png
+
+[picture1]
 picture-filename=test.png
+
+[picture2]
 picture-filename=haanit.png
+
+[picture3]
 picture-filename=haanit mask.png
 
 
@@ -71,12 +77,7 @@ max-x=
 max-y=
 next-macro-success=
 next-macro-fail=
-next-macro-default=switch
-macro1.txt
-macro1.txt
-macro1.txt
-macro2.txt
-end-switch
+next-macro-default={macro1,macro1,macro1,macro2}
 
 [macro2]
 filename=celeste intro.txt
@@ -185,10 +186,7 @@ max-x=
 max-y=
 next-macro-success=
 next-macro-fail=
-next-macro-default=switch
-octopath walk.txt
-octopath restore sp.txt
-end-switch
+next-macro-default={octopath walk.txt,octopath restore sp.txt}
 
 
 [macro7]

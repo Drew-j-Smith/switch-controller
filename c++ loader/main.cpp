@@ -36,28 +36,28 @@ int main(){
     l3.loadConfig(ss, true);
     cout << l3.toString(); */
 
-    Loader l4 = Loader("test2.txt", "test1.txt");
-    cout << "expected 'd' got:" << l4.getElement("1", "1") << endl;
-    cout << "expected 'b' got:" << l4.getElement("1", "2") << endl;
-    cout << "expected 'c' got:" << l4.getElement("1", "3") << endl;
-    cout << "expected ' ' got:" << l4.getElement("2", "1") << endl;
-    cout << "expected 'b' got:" << l4.getElement("2", "2") << endl;
-    cout << "expected 'c' got:" << l4.getElement("2", "3") << endl;
-    cout << "expected 'e' got:" << l4.getElement("2", "4") << endl;
-    cout << "expected 'f' got:" << l4.getElement("2", "5") << endl;
-    cout << "expected 'g' got:" << l4.getElement("2", "6") << endl;
-    cout << "expected 'a' got:" << l4.getElement("3", "1") << endl;
-    cout << "expected 'b' got:" << l4.getElement("3", "2") << endl;
-    cout << "expected 'c' got:" << l4.getElement("3", "3") << endl;
+    // Loader l4 = Loader("test2.txt", "test1.txt");
+    // cout << "expected 'd' got:" << l4.getElement("1", "1") << endl;
+    // cout << "expected 'b' got:" << l4.getElement("1", "2") << endl;
+    // cout << "expected 'c' got:" << l4.getElement("1", "3") << endl;
+    // cout << "expected ' ' got:" << l4.getElement("2", "1") << endl;
+    // cout << "expected 'b' got:" << l4.getElement("2", "2") << endl;
+    // cout << "expected 'c' got:" << l4.getElement("2", "3") << endl;
+    // cout << "expected 'e' got:" << l4.getElement("2", "4") << endl;
+    // cout << "expected 'f' got:" << l4.getElement("2", "5") << endl;
+    // cout << "expected 'g' got:" << l4.getElement("2", "6") << endl;
+    // cout << "expected 'a' got:" << l4.getElement("3", "1") << endl;
+    // cout << "expected 'b' got:" << l4.getElement("3", "2") << endl;
+    // cout << "expected 'c' got:" << l4.getElement("3", "3") << endl;
 
-    cout << l4.toString();
-    
-    // ArduinoLoader l5 = ArduinoLoader();
-    // l5.loadConfigFile("config.txt");
-    // cout << l5.toString();
+    // cout << l4.toString();
 
-    // l5 = ArduinoLoader("config.txt");
-    // cout << l5.toString();
+    ArduinoLoader l5 = ArduinoLoader();
+    l5.loadConfigFile("config.txt");
+    cout << l5.toString();
+
+    //l5 = ArduinoLoader("config.txt");
+    //cout << l5.toString();
 
     return 0;
 }

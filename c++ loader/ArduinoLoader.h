@@ -47,9 +47,31 @@ window-height=1080
 [pictures]
 picture-folder=pictures/
 picture-recording-filename=picture.png
+[picture]
+picture-filename=
 [macros]
 macro-folder=macros/
 macro-recording-filename=macro.txt
+[macro]
+filename=
+button=
+enable-imgProc=0
+template=
+mask=
+match-method=3
+search-min-x=0
+search-min-y=0
+search-max-x=0
+search-max-y=0
+macro-to-import-template-setting=
+match-threshold=.95
+min-x=0
+min-y=0
+max-x=0
+max-y=0
+next-macro-success=
+next-macro-fail=
+next-macro-default=
 )";
 
 class ArduinoLoader : public Loader{
@@ -68,9 +90,9 @@ ArduinoLoader::ArduinoLoader(){
 }
 
 ArduinoLoader::ArduinoLoader(string filepath){
-    loadConfigFile(filepath);
     stringstream ss = stringstream(defaultConfigString);
     loadConfig(ss, true);
+    loadConfigFile(filepath);
 }
 
 void ArduinoLoader::loadConfigFile(string filepath){
