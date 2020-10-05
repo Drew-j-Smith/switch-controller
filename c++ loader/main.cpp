@@ -1,3 +1,5 @@
+#include <SFML/Graphics.hpp>
+
 #include <iostream>
 #include "loader.h"
 #include <sstream>
@@ -58,6 +60,12 @@ int main(){
 
     //l5 = ArduinoLoader("config.txt");
     //cout << l5.toString();
+
+    while (true) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
+            break;
+        }
+    }
 
     return 0;
 }
