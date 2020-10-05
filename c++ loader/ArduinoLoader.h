@@ -184,16 +184,14 @@ void ArduinoLoader::loadPictures(){
 string ArduinoLoader::toString(){
     string result = Loader::toString();
 
-    result += "\nMacros\n";
-
-    for(map<string, vector<array<char, 8>>>::iterator i = macros.begin(); i != macros.end(); i++){
-        result += i->first + " Lines:" + to_string(i->second.size()) + '\n';
+    result.append("\nMacros\n");
+    for(map<string, vector<array<char, 8>>>::iterator it = macros.begin(); it != macros.end(); it++){
+        result.append(it->first + " Lines:" + to_string(it->second.size()) + '\n');
     }
 
-    result += "\nPictures\n";
-
-    for(map<string, cv::Mat>::iterator i = pictures.begin(); i != pictures.end(); i++){
-        result += i->first + " width:" + to_string(i->second.size().width) + " height:" + to_string(i->second.size().height) + '\n';
+    result.append("\nPictures\n");
+    for(map<string, cv::Mat>::iterator it = pictures.begin(); it != pictures.end(); it++){
+        result.append(it->first + " width:" + to_string(it->second.size().width) + " height:" + to_string(it->second.size().height) + '\n');
     }
 
     return result;

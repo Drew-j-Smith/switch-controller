@@ -186,8 +186,8 @@ void Loader::parseLine(istream &configStream, bool isDefault, string& currentCat
 void Loader::removeDuplicateCatagories(){
     for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         vector<string> elements = {};
-        for(int i = 0; i < it->second.size(); i++){
-            int j = 0;
+        for(unsigned int i = 0; i < it->second.size(); i++){
+            unsigned int j = 0;
             while (j < elements.size()){
                 if (it->second[i] == elements[j])
                     break;
@@ -248,27 +248,27 @@ string Loader::getElement(string catagory, string element){
 string Loader::toString(){
     string result = "Current config:\n";
     for (map<string,string>::iterator it=currentConfig.begin(); it!=currentConfig.end(); ++it)
-        result += it->first + " => " + it->second + '\n';
+        result.append(it->first + " => " + it->second + '\n');
 
-    result += "\nDefault config:\n";
+    result.append("\nDefault config:\n");
     for (map<string,string>::iterator it=defaultConfig.begin(); it!=defaultConfig.end(); ++it)
-        result += it->first + " => " + it->second + '\n';
+        result.append(it->first + " => " + it->second + '\n');
 
-    result += "\nEvaluated config:\n";
+    result.append("\nEvaluated config:\n");
     for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
-        for(int i = 0; i < it->second.size(); i++){
-            result += it->first + ":" + it->second[i] + " => " + getElement(it->first, it->second[i]) + '\n';
+        for(unsigned int i = 0; i < it->second.size(); i++){
+            result.append(it->first + ":" + it->second[i] + " => " + getElement(it->first, it->second[i]) + '\n');
         }
-        result += "\n";
+        result.append("\n");
     }
 
-    result += "\nCatagories:\n";
+    result.append("\nCatagories:\n");
     for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
-        result += it->first + '\n';
-        for(int i = 0; i < it->second.size(); i++){
-            result += it->second.at(i) + " ";
+        result.append(it->first + '\n');
+        for(unsigned int i = 0; i < it->second.size(); i++){
+            result.append(it->second.at(i) + " ");
         }
-        result += "\n\n";
+        result.append("\n\n");
     }
 
     return result;
