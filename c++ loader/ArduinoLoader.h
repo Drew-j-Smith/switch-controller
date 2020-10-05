@@ -81,8 +81,8 @@ next-macro-default=
 
 class ArduinoLoader : public Loader{
 private:
-    map<string,vector<array<char, 8>>> macros;
-    map<string,cv::Mat> pictures;
+    map<string, vector<array<char, 8>>> macros;
+    map<string, cv::Mat> pictures;
 
     void loadMacros();
     void loadPictures();
@@ -94,7 +94,8 @@ public:
 
     std::vector<std::array<char, 8>> loadMacro(string filepath);
     cv::Mat loadPicture(string filepath);
-    string getElement(string catagory, string element);
+
+    string toString();
 };
 
 ArduinoLoader::ArduinoLoader(){
@@ -150,20 +151,53 @@ cv::Mat ArduinoLoader::loadPicture(string filepath) {
     if (image.empty()) // Check for invalid input
     {
         std::cerr << "Could not open file " << filepath << "\n";
-        return cv::Mat();
     }
     return image;
 }
 
 void ArduinoLoader::loadMacros(){
-    
+    for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
+        int endChar = it->first.length() - 1;
+        while (endChar > 0 && it->first.at(endChar) >= '0' && it->first.at(endChar) <= '9'){
+            endChar--;
+        }
+        if (it->first.substr(0, endChar + 1) != "macro" || it->first == "macro")
+            continue;
+
+        macros.insert({it->first, loadMacro(getElement("macros", "macro-folder") + getElement(it->first, "filename"))});
+    }
 }
 
 void ArduinoLoader::loadPictures(){
-
+    for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
+        int endChar = it->first.length() - 1;
+        while (endChar > 0 && it->first.at(endChar) >= '0' && it->first.at(endChar) <= '9'){
+            endChar--;
+        }
+        if (it->first.substr(0, endChar + 1) != "picture" || it->first == "picture")
+            continue;
+        
+        pictures.insert({it->first, loadPicture(getElement("pictures", "picture-folder") + getElement(it->first, "picture-filename"))});
+    }
 }
 
+string ArduinoLoader::toString(){
+    string result = Loader::toString();
 
+    result += "\nMacros\n";
+
+    for(map<string, vector<array<char, 8>>>::iterator i = macros.begin(); i != macros.end(); i++){
+        result += i->first + " Lines:" + to_string(i->second.size()) + '\n';
+    }
+
+    result += "\nPictures\n";
+
+    for(map<string, cv::Mat>::iterator i = pictures.begin(); i != pictures.end(); i++){
+        result += i->first + " width:" + to_string(i->second.size().width) + " height:" + to_string(i->second.size().height) + '\n';
+    }
+
+    return result;
+}
 
 
 #endif
