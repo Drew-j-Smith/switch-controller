@@ -18,22 +18,22 @@
 using namespace std;
 
 class Loader{
+private:
+    void parseLine(istream &configStream, bool isDefault, string &currentCatagory);
+    void removeDuplicateCatagories();
 protected:
     map<string, string> currentConfig;
     map<string, string> defaultConfig;
     map<string, vector<string>> catagories;
-
-    void parseLine(istream &configStream, bool isDefault, string &currentCatagory);
-    void removeDuplicateCatagories();
-
-    void loadConfig(string configFilepath, bool isDefault);
-    void loadConfig(istream &configStream, bool isDefault);
-    void addDefaultElement(string catagory, string element, string content);
 public:
     Loader();
     Loader(string configFilepath);
     Loader(string configFilepath, string defaultsFilepath);
 
+    void loadConfig(string configFilepath, bool isDefault);
+    void loadConfig(istream &configStream, bool isDefault);
+
+    void addDefaultElement(string catagory, string element, string content);
     void addElement(string catagory, string element, string content);
     string getElement(string catagory, string element);
 
@@ -246,13 +246,13 @@ string Loader::getElement(string catagory, string element){
 }
 
 string Loader::toString(){
-    string result = "Current config:\n";
-    for (map<string,string>::iterator it=currentConfig.begin(); it!=currentConfig.end(); ++it)
-        result.append(it->first + " => " + it->second + '\n');
+    string result = ""; // = "Current config:\n";
+    // for (map<string,string>::iterator it=currentConfig.begin(); it!=currentConfig.end(); ++it)
+    //     result.append(it->first + " => " + it->second + '\n');
 
-    result.append("\nDefault config:\n");
-    for (map<string,string>::iterator it=defaultConfig.begin(); it!=defaultConfig.end(); ++it)
-        result.append(it->first + " => " + it->second + '\n');
+    // result.append("\nDefault config:\n");
+    // for (map<string,string>::iterator it=defaultConfig.begin(); it!=defaultConfig.end(); ++it)
+    //     result.append(it->first + " => " + it->second + '\n');
 
     result.append("\nEvaluated config:\n");
     for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){

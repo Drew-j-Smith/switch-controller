@@ -79,21 +79,48 @@ next-macro-default=
 )";
 #pragma endregion
 
+struct macro{
+    int button;
+    bool enableImgProc;
+    int templatePic;
+    int maskPic;
+    int matchMethod;
+    int searchMinX;
+    int searchMinY;
+    int searchMaxX;
+    int searchMaxY;
+    int macroTemplate;
+    int matchthreshold;
+    int minX;
+    int minY;
+    int maxX;
+    int maxY;
+
+    vector<int> macroSuccessList;
+    vector<int> macroFailList;
+    vector<int> macroDefault;
+};
+
 class ArduinoLoader : public Loader{
 private:
     map<string, vector<array<char, 8>>> macros;
     map<string, cv::Mat> pictures;
 
-    void loadMacros();
-    void loadPictures();
+    Loader::addDefaultElement;
+    Loader::getElement;
+    Loader::addElement;
+    Loader::getCatagories;
+
+    std::vector<std::array<char, 8>> loadMacro(string filepath);
+    cv::Mat loadPicture(string filepath);
 public:
     ArduinoLoader();
     ArduinoLoader(string filepath);
 
     void loadConfig(string filepath);
 
-    std::vector<std::array<char, 8>> loadMacro(string filepath);
-    cv::Mat loadPicture(string filepath);
+    void reloadMacros();
+    void reloadPictures();
 
     string toString();
 };
@@ -101,6 +128,9 @@ public:
 ArduinoLoader::ArduinoLoader(){
     stringstream ss = stringstream(defaultConfigString);
     Loader::loadConfig(ss, true);
+
+    macros = {};
+    pictures = {};
 }
 
 ArduinoLoader::ArduinoLoader(string filepath){
@@ -112,8 +142,8 @@ ArduinoLoader::ArduinoLoader(string filepath){
 void ArduinoLoader::loadConfig(string filepath){
     Loader::loadConfig(filepath, false);
 
-    loadMacros();
-    loadPictures();
+    reloadMacros();
+    reloadPictures();
 }
 
 
@@ -155,7 +185,7 @@ cv::Mat ArduinoLoader::loadPicture(string filepath) {
     return image;
 }
 
-void ArduinoLoader::loadMacros(){
+void ArduinoLoader::reloadMacros(){
     for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         int endChar = it->first.length() - 1;
         while (endChar > 0 && it->first.at(endChar) >= '0' && it->first.at(endChar) <= '9'){
@@ -168,7 +198,7 @@ void ArduinoLoader::loadMacros(){
     }
 }
 
-void ArduinoLoader::loadPictures(){
+void ArduinoLoader::reloadPictures(){
     for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         int endChar = it->first.length() - 1;
         while (endChar > 0 && it->first.at(endChar) >= '0' && it->first.at(endChar) <= '9'){
