@@ -20,7 +20,7 @@ using namespace std;
 class Loader{
 private:
     void parseLine(istream &configStream, bool isDefault, string &currentCatagory);
-    void removeDuplicateCatagories();
+    void removeDuplicateCatagories(map<string, vector<string>> &catagories);
 protected:
     map<string, string> currentConfig;
     map<string, string> defaultConfig;
@@ -119,7 +119,7 @@ void Loader::loadConfig(istream &configStream, bool isDefault){
         parseLine(configStream, isDefault, currentCatagory);
     }
 
-    removeDuplicateCatagories();
+    removeDuplicateCatagories(catagories);
 }
 
 
@@ -181,7 +181,7 @@ void Loader::parseLine(istream &configStream, bool isDefault, string& currentCat
  * @see loadConfig
  * 
  */
-void Loader::removeDuplicateCatagories(){
+void Loader::removeDuplicateCatagories(map<string, vector<string>> &catagories){
     for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
         vector<string> elements = {};
         for(unsigned int i = 0; i < it->second.size(); i++){
