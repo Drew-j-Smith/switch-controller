@@ -25,6 +25,8 @@ protected:
     map<string, string> currentConfig;
     map<string, string> defaultConfig;
     map<string, vector<string>> catagories;
+
+    string removeTrailingDigit(string str);
 public:
     Loader();
     Loader(string configFilepath);
@@ -153,13 +155,9 @@ void Loader::parseLine(istream &configStream, bool isDefault, string& currentCat
         }
         else{
             if(defaultConfig.size() != 0){
-                int endChar = currentCatagory.length() - 1;
-                while (endChar > 0 && currentCatagory.at(endChar) >= '0' && currentCatagory.at(endChar) <= '9'){
-                    endChar--;
-                }
-                if(catagories.find(currentCatagory.substr(0, endChar + 1)) == catagories.end())
+                if(catagories.find(removeTrailingDigit(currentCatagory)) == catagories.end())
                     cerr << "Warning: The catagory \"" << currentCatagory << "\" was not in the default config but was used.\n";
-                if(defaultConfig.find(currentCatagory.substr(0, endChar + 1) + ":" + currentElement) == defaultConfig.end())
+                if(defaultConfig.find(removeTrailingDigit(currentCatagory) + ":" + currentElement) == defaultConfig.end())
                     cerr << "Warning: The element \"" << currentElement << "\" in the catagory \"" <<
                     currentCatagory << "\" was not in the default config but was used.\n";
             }
@@ -235,12 +233,8 @@ string Loader::getElement(string catagory, string element){
     else if(defaultConfig.find(catagory + ":" + element) != defaultConfig.end())
         return defaultConfig.at(catagory + ":" + element);
 
-    int endChar = catagory.length() - 1;
-    while (endChar > 0 && catagory.at(endChar) >= '0' && catagory.at(endChar) <= '9'){
-        endChar--;
-    }
-    if(defaultConfig.find(catagory.substr(0, endChar + 1) + ":" + element) != defaultConfig.end())
-        return defaultConfig.at(catagory.substr(0, endChar + 1) + ":" + element);
+    if(defaultConfig.find(removeTrailingDigit(catagory) + ":" + element) != defaultConfig.end())
+        return defaultConfig.at(removeTrailingDigit(catagory) + ":" + element);
     
     return "";
 }
@@ -276,6 +270,14 @@ string Loader::toString(){
 
 map<string, vector<string>> Loader::getCatagories(){
     return catagories;
+}
+
+string Loader::removeTrailingDigit(string str){
+    int endChar = str.length() - 1;
+    while (endChar > 0 && str.at(endChar) >= '0' && str.at(endChar) <= '9'){
+        endChar--;
+    }
+    return str.substr(0, endChar + 1);
 }
 
 #endif

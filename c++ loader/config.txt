@@ -62,7 +62,7 @@ macro-recording-filename=macro.txt
 filename=test macro.txt
 button=
 enable-imgProc=0
-template=picture.png
+template=picture1
 mask=
 match-method=3
 search-min-x=
@@ -77,7 +77,7 @@ max-x=
 max-y=
 next-macro-success=
 next-macro-fail=
-next-macro-default={macro1,macro1,macro1,macro2}
+next-macro-default=macro1 macro1 macro1 macro2
 
 [macro2]
 filename=celeste intro.txt
@@ -105,8 +105,8 @@ next-macro-default=
 filename=octopath walk.txt
 button=t
 enable-imgProc=1
-template=haanit.png
-mask=haanit mask.png
+template=picture2
+mask=picture3
 match-method=3
 search-min-x=1550
 search-min-y=30
@@ -186,7 +186,7 @@ max-x=
 max-y=
 next-macro-success=
 next-macro-fail=
-next-macro-default={octopath walk.txt,octopath restore sp.txt}
+next-macro-default=macro3 macro8
 
 
 [macro7]
