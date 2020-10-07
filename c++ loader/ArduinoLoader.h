@@ -4,6 +4,7 @@
 #include "Loader.h"
 #include <string>
 #include <vector>
+#include <map>
 #include <sstream>
 
 #include <opencv2/core.hpp>
