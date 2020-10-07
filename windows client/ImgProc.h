@@ -61,7 +61,7 @@ ImgProc::ImgProc(Loader &l) {
 	critcalVals.resize(loader.getNumMacros());
 	matchPoints.resize(loader.getNumMacros());
 
-	HWND window = FindWindow(NULL, loader.getLocGameWindowName().c_str());
+	HWND window = FindWindowA(NULL, loader.getLocGameWindowName().c_str());
 	hwindowDC = GetDC(window);
 
 }
