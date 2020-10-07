@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
-project(loaderTest)
+project(ArduinoController)
 
 find_package(OpenCV REQUIRED)
 find_package(SFML 2 COMPONENTS graphics REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS})
 
-add_executable(loaderTest main.cpp)
-target_link_libraries(loaderTest ${OpenCV_LIBS} sfml-graphics)
+add_executable(ArduinoController Arduino.cpp SerialPort.cpp)
+target_link_libraries(ArduinoController ${OpenCV_LIBS} sfml-graphics)

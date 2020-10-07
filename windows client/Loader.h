@@ -142,7 +142,7 @@ public:
 
 	sf::Keyboard::Key getKeyCode(int index);
 	std::string getCOM_Port();
-	std::wstring getLocGameWindowName();
+	std::string getLocGameWindowName();
 	int getLocWindowWidth();
 	int getLocWindowHeight();
 
@@ -189,7 +189,7 @@ private:
 
 	sf::Keyboard::Key keyCodes[29];
 	std::string COM_Port;
-	std::wstring locGameWindowName;
+	std::string locGameWindowName;
 	int locWindowWidth;
 	int locWindowHeight;
 
@@ -284,7 +284,7 @@ void Loader::loadConfig(std::string filename) {
 						if (i == 0)
 							COM_Port = substring;
 						else if (i == 1)
-							locGameWindowName = std::wstring(substring.begin(), substring.end());
+							locGameWindowName = substring;
 						else if (i == 2)
 							locWindowWidth = std::stoi(substring);
 						else if (i == 3)
@@ -516,7 +516,7 @@ std::string Loader::getCOM_Port() {
 	return COM_Port;
 }
 
-std::wstring Loader::getLocGameWindowName() {
+std::string Loader::getLocGameWindowName() {
 	return locGameWindowName;
 }
 

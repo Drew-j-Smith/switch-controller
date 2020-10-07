@@ -5,7 +5,7 @@
 * LICENSE: MIT
 */
 
-#include "pch.h"
+// #include "pch.h" // for visual studio
 #include "SerialPort.hpp"
 
 

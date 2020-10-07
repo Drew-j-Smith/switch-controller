@@ -1,4 +1,5 @@
-#include "pch.h"
+// #include "pch.h" // for visual studio
+
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
