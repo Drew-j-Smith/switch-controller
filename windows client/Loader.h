@@ -264,7 +264,7 @@ void Loader::loadConfig(std::string filename) {
 					if (lineString.substr(0, controlKeywords[i].size()).compare(controlKeywords[i]) == 0 && controlKeywords[i].size() > 0) {
 						std::string substring = lineString.substr(controlKeywords[i].size());
 						transform(substring.begin(), substring.end(), substring.begin(), ::tolower);
-						if (substring.length() == 0)
+						if (substring.length() == 0 || substring[0] == 13)
 							keyCodes[i] = static_cast<sf::Keyboard::Key>(-1);
 						else if (substring[0] >= 'a' && substring[0] <= 'z')
 							keyCodes[i] = static_cast<sf::Keyboard::Key>(substring[0] - 'a');
@@ -324,7 +324,7 @@ void Loader::loadConfig(std::string filename) {
 										if (j == 0)
 											loadMacro(macroFolder, substring);
 										else if (j == 1) {
-											if (substring.length() == 0)
+											if (substring.length() == 0 || substring[0] == 13)
 												macroKeyCodes.push_back(static_cast<sf::Keyboard::Key>(-1));
 											else if (substring[0] >= 'a' && substring[0] <= 'z')
 												macroKeyCodes.push_back(static_cast<sf::Keyboard::Key>(substring[0] - 'a'));
@@ -332,7 +332,7 @@ void Loader::loadConfig(std::string filename) {
 												macroKeyCodes.push_back(static_cast<sf::Keyboard::Key>(std::stoi(substring)));
 										}
 										if (j == 2) {
-											if (substring.length() == 0)
+											if (substring.length() == 0 || substring[0] == 13)
 												enableMacroImgProc.push_back(false);
 											else
 												enableMacroImgProc.push_back(std::stoi(substring));
@@ -350,66 +350,66 @@ void Loader::loadConfig(std::string filename) {
 												macroMasks.push_back(getPictureIndex(substring));
 										}
 										if (j == 5) {
-											if (substring.length() == 0)
+											if (substring.length() == 0 || substring[0] == 13)
 												macroMatchMethods.push_back(3);
 											else
 												macroMatchMethods.push_back(std::stoi(substring));
 										}
 										if (j == 6) {
-											if (substring.length() == 0)
+											if (substring.length() == 0 || substring[0] == 13)
 												matchThresholds.push_back(-1);
 											else
 												matchThresholds.push_back(std::stod(substring));
 										}
 										if (j == 7) {
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												minMacroMatchPoints[minMacroMatchPoints.size() - 1].x = std::stoi(substring);
 										}
 										if (j == 8)
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												minMacroMatchPoints[minMacroMatchPoints.size() - 1].y = std::stoi(substring);
 										if (j == 9)
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												maxMacroMatchPoints[maxMacroMatchPoints.size() - 1].x = std::stoi(substring);
 										if (j == 10)
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												maxMacroMatchPoints[maxMacroMatchPoints.size() - 1].y = std::stoi(substring);
 										if (j == 11) {
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												loadNextMacro(nextMacroImgMatch, substring, infile);
 											else
 												loadNextMacro(nextMacroImgMatch, "", infile);
 										}
 										if (j == 12) {
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												loadNextMacro(nextMacroNoImgMatch, substring, infile);
 											else
 												loadNextMacro(nextMacroNoImgMatch, "", infile);
 										}
 										if (j == 13) {
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												loadNextMacro(nextMacroNoImgProc, substring, infile);
 											else
 												loadNextMacro(nextMacroNoImgProc, "", infile);
 										}
 										if (j == 14) {
-											if (substring.length() == 0)
+											if (substring.length() == 0 && substring[0] == 13)
 												sharedMacroTemplates.push_back(-1);
 											else
 												sharedMacroTemplates.push_back(macroIndexMap[substring]);
 										}
 										if (j == 15) {
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												minMacroSearchPoints[minMacroSearchPoints.size() - 1].x = std::stoi(substring);
 										}
 										if (j == 16)
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												minMacroSearchPoints[minMacroSearchPoints.size() - 1].y = std::stoi(substring);
 										if (j == 17)
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												maxMacroSearchPoints[maxMacroSearchPoints.size() - 1].x = std::stoi(substring);
 										if (j == 18)
-											if (substring.length() != 0)
+											if (substring.length() != 0 && substring[0] != 13)
 												maxMacroSearchPoints[maxMacroSearchPoints.size() - 1].y = std::stoi(substring);
 
 									}
