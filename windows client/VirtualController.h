@@ -8,42 +8,21 @@
 #include <vector>
 #include <fstream>
 #include <iomanip>
-// #include "SerialPort.hpp"
 #include <boost/asio.hpp>
 #include "Loader.h"
 #include "ImgProc.h"
 #include <atomic>
+#include <memory>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
 
-const bool verbose = true;
+const bool verbose = false;
 const bool displayNextMacro = true;
 const int minDelayMS = 16;
 const bool enableKeyboardInput = true;
 const int recoverCycles = 5;
-
-template<typename T>
-struct MobileAtomic
-{
-	std::atomic<T> atomic;
-
-	MobileAtomic() : atomic(T()) {}
-
-	explicit MobileAtomic(T const& v) : atomic(v) {}
-	explicit MobileAtomic(std::atomic<T> const& a) : atomic(a.load()) {}
-
-	MobileAtomic(MobileAtomic const&other) : atomic(other.atomic.load()) {}
-
-	MobileAtomic& operator=(MobileAtomic const &other)
-	{
-		atomic.store(other.atomic.load());
-		return *this;
-	}
-};
-typedef MobileAtomic<bool> AtomicBool;
-
 
 
 
@@ -87,7 +66,7 @@ private:
 
 	ImgProc imgProc;
 
-	std::vector<AtomicBool> imgMatch;
+	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
 
 	int desyncCounter;
 
@@ -132,14 +111,23 @@ VirtualController::VirtualController(Loader &l, ImgProc &i){
 	loader = l;
 	imgProc = i;
 
-	boost::asio::io_service io;
-	port = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
-	port->open(loader.getCOM_Port());
-	port->set_option(boost::asio::serial_port_base::baud_rate(9600));
-	port->set_option(boost::asio::serial_port_base::character_size(8));
-	port->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
-	port->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
-	port->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
+	try{
+		boost::asio::io_service io;
+		port = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
+		port->open(loader.getCOM_Port());
+		port->set_option(boost::asio::serial_port_base::baud_rate(9600));
+		port->set_option(boost::asio::serial_port_base::character_size(8));
+		port->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
+		port->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
+		port->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
+	}
+	catch(const std::exception& e){
+		std::cerr << e.what() << '\n';
+		std::cerr << "Fatal error opening serial port" << std::endl;
+		exit(-1);
+	}
+	
+
 	
 	if (verbose)
 		std::cout << "COM port connected" << std::endl;
@@ -153,11 +141,15 @@ VirtualController::VirtualController(Loader &l, ImgProc &i){
 
 	imgMatch.resize(loader.getNumMacros());
 
+	for(int i = 0; i < imgMatch.size(); i++){
+		imgMatch[i] = std::unique_ptr<std::atomic<bool>>(new std::atomic<bool>(false));
+	}
+
 	setNuetral();
 }
 
 void VirtualController::update() {
-	//std::cout << "thread 1:" << imgProc.getImgMatch(2) << '\n';
+	
 	if (verbose)
 		std::cout << "Time since last update: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
 
@@ -336,8 +328,8 @@ void VirtualController::getDatafromMacro() {
 	if (currentMarcoLine == loader.getMacro(currentMacro).size()) {
 		isMacroActive = false;
 		if (loader.getEnableMacroImgProc(currentMacro)) {
-			//std::cout << imgMatch[currentMacro].atomic.load() << '\n';
-			if (imgMatch[currentMacro].atomic.load()) {
+			
+			if (imgMatch[currentMacro]->load()) {
 				if (loader.getNextMacroImgMatch(currentMacro).length() == 0)
 					return;
 				if (displayNextMacro)
@@ -395,7 +387,7 @@ void VirtualController::stopMacros() {
 
 void VirtualController::updateImgMatch(std::vector<bool> newData) {
 	for (int i = 0; i < loader.getNumMacros(); i++) {
-		imgMatch[i].atomic.store(newData[i]);
+		imgMatch[i]->store(newData[i]);
 	}
 }
 
