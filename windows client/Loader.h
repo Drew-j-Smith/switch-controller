@@ -338,13 +338,13 @@ void Loader::loadConfig(std::string filename) {
 												enableMacroImgProc.push_back(std::stoi(substring));
 										}
 										if (j == 3) {
-											if (substring.length() == 0)
+											if (substring.length() == 0 || substring[0] == 13)
 												macroTemplates.push_back(-1);
 											else
 												macroTemplates.push_back(getPictureIndex(substring));
 										}
 										if (j == 4) {
-											if (substring.length() == 0)
+											if (substring.length() == 0 || substring[0] == 13)
 												macroMasks.push_back(-1);
 											else
 												macroMasks.push_back(getPictureIndex(substring));
@@ -393,7 +393,7 @@ void Loader::loadConfig(std::string filename) {
 												loadNextMacro(nextMacroNoImgProc, "", infile);
 										}
 										if (j == 14) {
-											if (substring.length() == 0 && substring[0] == 13)
+											if (substring.length() == 0 || substring[0] == 13)
 												sharedMacroTemplates.push_back(-1);
 											else
 												sharedMacroTemplates.push_back(macroIndexMap[substring]);
