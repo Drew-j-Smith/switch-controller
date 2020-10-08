@@ -8,7 +8,8 @@
 #include <vector>
 #include <fstream>
 #include <iomanip>
-#include "SerialPort.hpp"
+// #include "SerialPort.hpp"
+#include <boost/asio.hpp>
 #include "Loader.h"
 #include "ImgProc.h"
 #include <atomic>
@@ -17,7 +18,7 @@
 #include <opencv2/imgcodecs.hpp>
 
 
-const bool verbose = false;
+const bool verbose = true;
 const bool displayNextMacro = true;
 const int minDelayMS = 16;
 const bool enableKeyboardInput = true;
@@ -69,7 +70,8 @@ private:
 	void getDatafromMacro();
 	void recordMacro();
 
-	SerialPort *arduino;
+	boost::shared_ptr<boost::asio::serial_port> port;
+
 	sf::Clock clockSinceLastUpdate;
 	bool firstCycle = true;
 
@@ -129,10 +131,18 @@ VirtualController::VirtualController(Loader &l, ImgProc &i){
 
 	loader = l;
 	imgProc = i;
-	arduino = new SerialPort(loader.getCOM_Port().c_str());
+
+	boost::asio::io_service io;
+	port = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
+	port->open(loader.getCOM_Port());
+	port->set_option(boost::asio::serial_port_base::baud_rate(9600));
+	port->set_option(boost::asio::serial_port_base::character_size(8));
+	port->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
+	port->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
+	port->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
 	
 	if (verbose)
-		std::cout << "COM port connected: " << arduino->isConnected() << std::endl;
+		std::cout << "COM port connected" << std::endl;
 
 
 	clockSinceLastUpdate = sf::Clock();
@@ -207,46 +217,25 @@ void VirtualController::update() {
 
 	
 
+	boost::asio::write(*port, boost::asio::buffer(data, 8));
 
-	if (arduino->isConnected()) {
- 
-		if (!arduino->writeSerialPort(data, 8))
-			std::cerr << "Data was not written\n";
+	port->read_some(boost::asio::buffer(inputBuffer, 8));
+	
+	
 
-		if (desyncCounter >=  recoverCycles) {
-			std::cerr << "Attempting to compensate\n";
-			desyncCounter = 0;
-			if (arduino->bytesAvailible() > 8)
-				if (!arduino->readSerialPort(inputBuffer, arduino->bytesAvailible() - 8))
-					std::cerr << "Error occured reading data\n";
-			if (!arduino->readSerialPort(inputBuffer, arduino->bytesAvailible()))
-				std::cerr << "Error occured reading data\n";
+	if (verbose) {
+		std::cout << "\n\nbytes sent and recieved\n";
+		for (int i = 0; i < 8; i++) {
+			std::cout << int(data[i]) << " " << int(inputBuffer[i]) << "\n";
 		}
-		else if (!arduino->readSerialPort(inputBuffer, 8) && !firstCycle)
-			std::cerr << "Error occured reading data\n";
-		
-
-		if (arduino->bytesAvailible() != 8 && !firstCycle) {
-			std::cerr << "Warning, desync may have occured, bytes remaining: " << arduino->bytesAvailible() - 8 << "\n";
-			desyncCounter++;
-		}
-		else
-			desyncCounter = 0;
-
-		if (verbose) {
-			std::cout << "Bytes availible: " << arduino->bytesAvailible() << "\n\nbytes sent and recieved\n";
-			for (int i = 0; i < 8; i++) {
-				std::cout << int(data[i]) << " " << int(inputBuffer[i]) << "\n";
-			}
-			std::cout << "\n\n";
-		}
-
-		firstCycle = false;
+		std::cout << "\n\n";
 	}
+
+
 }
 
 bool VirtualController::isConnected() {
-	return arduino->isConnected();
+	return true;
 };
 
 void VirtualController::setNuetral() {

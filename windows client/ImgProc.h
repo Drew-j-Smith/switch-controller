@@ -3,7 +3,9 @@
 
 
 #include "Loader.h"
-#include <Windows.h>
+#ifdef _WIN32
+	#include <Windows.h>
+#endif
 #include <string>
 
 #include <opencv2/core.hpp>
@@ -35,7 +37,10 @@ private:
 
 	Loader loader;
 
-	HDC hwindowDC;
+	#ifdef _WIN32
+		HDC hwindowDC;
+	#endif
+	
 
 	std::vector<bool> imgMatch;
 	cv::Mat scrnsht;
@@ -61,8 +66,10 @@ ImgProc::ImgProc(Loader &l) {
 	critcalVals.resize(loader.getNumMacros());
 	matchPoints.resize(loader.getNumMacros());
 
-	HWND window = FindWindowA(NULL, loader.getLocGameWindowName().c_str());
-	hwindowDC = GetDC(window);
+	#ifdef _WIN32
+		HWND window = FindWindowA(NULL, loader.getLocGameWindowName().c_str());
+		hwindowDC = GetDC(window);
+	#endif
 
 }
 
@@ -192,84 +199,92 @@ std::vector<bool> ImgProc::getImgMatch() {
 
 
 bool ImgProc::screenshot(cv::Mat& m){
-	cv::Mat tempMat;
-	HDC hwindowCompatibleDC = CreateCompatibleDC(hwindowDC);
-	if (!hwindowCompatibleDC)
-	{
-		return false;
-	}
+	
+	#ifdef _WIN32
+		cv::Mat tempMat;
+		HDC hwindowCompatibleDC = CreateCompatibleDC(hwindowDC);
+		if (!hwindowCompatibleDC)
+		{
+			return false;
+		}
 
-	if (!SetStretchBltMode(hwindowCompatibleDC, COLORONCOLOR))
-	{
-		DeleteDC(hwindowCompatibleDC);
-		return false;
-	}
+		if (!SetStretchBltMode(hwindowCompatibleDC, COLORONCOLOR))
+		{
+			DeleteDC(hwindowCompatibleDC);
+			return false;
+		}
 
-	HBITMAP hbwindow = CreateCompatibleBitmap(hwindowDC, loader.getLocWindowWidth(), loader.getLocWindowHeight());
-	if (!hbwindow)
-	{
-		DeleteDC(hwindowCompatibleDC);
-		return false;
-	}
+		HBITMAP hbwindow = CreateCompatibleBitmap(hwindowDC, loader.getLocWindowWidth(), loader.getLocWindowHeight());
+		if (!hbwindow)
+		{
+			DeleteDC(hwindowCompatibleDC);
+			return false;
+		}
 
-	BITMAPINFOHEADER bi;
-	bi.biSize = sizeof(BITMAPINFOHEADER);
-	bi.biWidth = loader.getLocWindowWidth();
-	bi.biHeight = -loader.getLocWindowHeight();
-	bi.biPlanes = 1;
-	bi.biBitCount = 32;
-	bi.biCompression = BI_RGB;
-	bi.biSizeImage = 0;
-	bi.biXPelsPerMeter = 0;
-	bi.biYPelsPerMeter = 0;
-	bi.biClrUsed = 0;
-	bi.biClrImportant = 0;
+		BITMAPINFOHEADER bi;
+		bi.biSize = sizeof(BITMAPINFOHEADER);
+		bi.biWidth = loader.getLocWindowWidth();
+		bi.biHeight = -loader.getLocWindowHeight();
+		bi.biPlanes = 1;
+		bi.biBitCount = 32;
+		bi.biCompression = BI_RGB;
+		bi.biSizeImage = 0;
+		bi.biXPelsPerMeter = 0;
+		bi.biYPelsPerMeter = 0;
+		bi.biClrUsed = 0;
+		bi.biClrImportant = 0;
 
-	if (!SelectObject(hwindowCompatibleDC, hbwindow))
-	{
+		if (!SelectObject(hwindowCompatibleDC, hbwindow))
+		{
+			DeleteObject(hbwindow);
+			DeleteDC(hwindowCompatibleDC);
+			return false;
+		}
+
+		if (!StretchBlt(
+			hwindowCompatibleDC,
+			0, 0,
+			loader.getLocWindowWidth(), loader.getLocWindowHeight(),
+			hwindowDC,
+			0, 0,
+			loader.getLocWindowWidth(), loader.getLocWindowHeight(),
+			SRCCOPY))
+		{
+			DeleteObject(hbwindow);
+			DeleteDC(hwindowCompatibleDC);
+			return false;
+		}
+
+		tempMat.create(loader.getLocWindowHeight(), loader.getLocWindowWidth(), CV_8UC4);
+
+		if (!GetDIBits(
+			hwindowDC,
+			hbwindow,
+			0,
+			loader.getLocWindowHeight(),
+			tempMat.data,
+			(BITMAPINFO *)&bi,
+			DIB_RGB_COLORS))
+		{
+			tempMat.release();
+			DeleteObject(hbwindow);
+			DeleteDC(hwindowCompatibleDC);
+			return false;
+		}
+
 		DeleteObject(hbwindow);
 		DeleteDC(hwindowCompatibleDC);
+
+		const bool success = tempMat.cols > 0 && tempMat.rows > 0;
+
+		cv::cvtColor(tempMat, m, cv::COLOR_BGRA2BGR);
+		return success;
+		
+	#else
+		m = cv::Mat();
 		return false;
-	}
+	#endif
 
-	if (!StretchBlt(
-		hwindowCompatibleDC,
-		0, 0,
-		loader.getLocWindowWidth(), loader.getLocWindowHeight(),
-		hwindowDC,
-		0, 0,
-		loader.getLocWindowWidth(), loader.getLocWindowHeight(),
-		SRCCOPY))
-	{
-		DeleteObject(hbwindow);
-		DeleteDC(hwindowCompatibleDC);
-		return false;
-	}
-
-	tempMat.create(loader.getLocWindowHeight(), loader.getLocWindowWidth(), CV_8UC4);
-
-	if (!GetDIBits(
-		hwindowDC,
-		hbwindow,
-		0,
-		loader.getLocWindowHeight(),
-		tempMat.data,
-		(BITMAPINFO *)&bi,
-		DIB_RGB_COLORS))
-	{
-		tempMat.release();
-		DeleteObject(hbwindow);
-		DeleteDC(hwindowCompatibleDC);
-		return false;
-	}
-
-	DeleteObject(hbwindow);
-	DeleteDC(hwindowCompatibleDC);
-
-	const bool success = tempMat.cols > 0 && tempMat.rows > 0;
-
-	cv::cvtColor(tempMat, m, cv::COLOR_BGRA2BGR);
-	return success;
 }
 
 

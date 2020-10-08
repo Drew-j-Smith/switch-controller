@@ -34,7 +34,8 @@ desktop-screenshot=r
 
 
 [general]
-com-port=\\.\COM3
+com-port=COM3
+#com-port=/dev/ttyS3
 window-name=Game Capture HD
 window-width=1920
 window-height=1080
