@@ -32,7 +32,6 @@ public:
 	VirtualController();
 	VirtualController(Loader &l, ImgProc &i);
 	
-	bool isConnected();
 	void update();
 	void setNuetral();
 
@@ -52,7 +51,6 @@ private:
 	boost::shared_ptr<boost::asio::serial_port> port;
 
 	sf::Clock clockSinceLastUpdate;
-	bool firstCycle = true;
 
 	Loader loader;
 
@@ -67,8 +65,6 @@ private:
 	ImgProc imgProc;
 
 	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
-
-	int desyncCounter;
 
 	char data[8];
 	char inputBuffer[8];
@@ -130,14 +126,13 @@ VirtualController::VirtualController(Loader &l, ImgProc &i){
 
 	
 	if (verbose)
-		std::cout << "COM port connected" << std::endl;
+		std::cout << "Serial port connected" << std::endl;
 
 
 	clockSinceLastUpdate = sf::Clock();
 
 	isMacroActive = false;
 	isMacroRecordingActive = false;
-	desyncCounter = 0;
 
 	imgMatch.resize(loader.getNumMacros());
 
@@ -225,10 +220,6 @@ void VirtualController::update() {
 
 
 }
-
-bool VirtualController::isConnected() {
-	return true;
-};
 
 void VirtualController::setNuetral() {
 	data[0] = 85;
