@@ -15,4 +15,4 @@ include_directories(${SFML_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(ArduinoController Arduino.cpp)
-target_link_libraries(ArduinoController ${OpenCV_LIBS} ${Boost_LIBRARIES} sfml-graphics)
+target_link_libraries(ArduinoController ${OpenCV_LIBS} ${SFML_LIBRARIES} ${Boost_LIBRARIES})
