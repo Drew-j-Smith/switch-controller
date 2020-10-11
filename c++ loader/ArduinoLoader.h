@@ -1,7 +1,6 @@
 #ifndef ARDUINO_LOADER_H
 #define ARDUINO_LOADER_H
 
-#include "Loader.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -10,75 +9,16 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 using namespace std;
 
-#pragma region
-const string defaultConfigString = R"(
-[controls]
-y=
-b=k
-a=j
-x=i
-l=
-r=o
-xl=l
-xr=
-select=
-start=e
-l-click=
-r-click=
-home=60
-capture=
-left-stick-x+=d
-left-stick-x-=a
-left-stick-y+=w
-left-stick-y-=s
-right-stick-x+=
-right-stick-x-=
-right-stick-y+=
-right-stick-y-=
-dpad-up=
-dpad-right=
-dpad-down=
-dpad-left=
-start-macro-recording=y
-stop-macro-recording=u
-desktop-screenshot=r
-[general]
-com-port=\\.\COM3
-window-name=Game Capture HD
-window-width=1920
-window-height=1080
-[pictures]
-picture-folder=pictures/
-picture-recording-filename=picture.png
-[picture]
-picture-filename=
-[macros]
-macro-folder=macros/
-macro-recording-filename=macro.txt
-[macro]
-filename=
-button=-1
-enable-imgProc=0
-template=
-mask=
-match-method=3
-search-min-x=0
-search-min-y=0
-search-max-x=0
-search-max-y=0
-macro-to-import-template-setting=
-match-threshold=.95
-min-x=0
-min-y=0
-max-x=0
-max-y=0
-next-macro-success=
-next-macro-fail=
-next-macro-default=
-)";
-#pragma endregion
+//cmake -DCMAKE_TOOLCHAIN_FILE=C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake .
+//todo button to start/stop recording
+//todo save as current date
+//todo add file errors
+
 
 struct macro{
     string name;
@@ -105,17 +45,13 @@ struct macro{
     vector<int> macroDefaultList;
 };
 
-class ArduinoLoader : public Loader{
+class ArduinoLoader{
 private:
-    //map<string, vector<array<char, 8>>> macros;
-    //map<string, cv::Mat> pictures;
 
     vector<cv::Mat> pictures;
     vector<macro> macros;
 
-    Loader::addDefaultElement;
-    Loader::addElement;
-    Loader::getCatagories;
+    boost::property_tree::ptree config;
 
 
     void reloadPictures(vector<cv::Mat> &pictures, map<string, int> &pictureIndicices);
@@ -132,24 +68,19 @@ public:
 
     void reloadPicturesAndMacros();
 
-    string getElement(string catagories, string element);
-
     string toString();
 };
 
 ArduinoLoader::ArduinoLoader(){
-    stringstream ss = stringstream(defaultConfigString);
-    Loader::loadConfig(ss, true);
+    config = boost::property_tree::ptree();
 }
 
 ArduinoLoader::ArduinoLoader(string filepath){
-    stringstream ss = stringstream(defaultConfigString);
-    Loader::loadConfig(ss, true);
-    loadConfig(filepath);
+    boost::property_tree::read_json(filepath, config);
 }
 
 void ArduinoLoader::loadConfig(string filepath){
-    Loader::loadConfig(filepath, false);
+    boost::property_tree::read_json(filepath, config);
 
     reloadPicturesAndMacros();
 }
@@ -197,57 +128,57 @@ void ArduinoLoader::reloadMacros(vector<macro> &macros, map<string, int> &macroI
     macros = {};//todo set size beforehand
     macroIndicices = {};
 
-    for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
-        if (removeTrailingDigit(it->first) != "macro" || it->first == "macro")
-            continue;
-        cout << it->first << endl;
+    boost::property_tree::ptree macroPtree = config.find("macros")->second;
 
+    for(boost::property_tree::ptree::iterator it = macroPtree.begin(); it != macroPtree.end(); it++){
+        macroIndicices.insert({it->first, macros.size()});
         macro currentMacro;
         currentMacro.name = it->first;
-        string button = Loader::getElement(it->first, "button");
-        if(button.at(0) >= 'a' && button.at(0) <= 'z'){
-            currentMacro.button = button.at(0) - 'a';
-        }
-        else if(button.at(0) >= 'A' && button.at(0) <= 'Z'){
-            currentMacro.button = button.at(0) - 'A';
-        }
-        else{
-            currentMacro.button = stoi(button);
-        }
-        currentMacro.enableImgProc = stoi(Loader::getElement(it->first, "enable-imgProc"));
-        
-        string templatePic = Loader::getElement(it->first, "template");
-        if(pictureIndicices.find(templatePic) != pictureIndicices.end())
-            currentMacro.templatePic = pictureIndicices.at(templatePic);
-        else
-            currentMacro.templatePic = -1;
-
-        string maskPic = Loader::getElement(it->first, "mask");
-        if(pictureIndicices.find(maskPic) != pictureIndicices.end())
-            currentMacro.maskPic = pictureIndicices.at(maskPic);
-        else
-            currentMacro.maskPic = -1;
-
-        currentMacro.matchMethod = stoi(Loader::getElement(it->first, "match-method"));
-        currentMacro.searchMinX = stoi(Loader::getElement(it->first, "search-min-x"));
-        currentMacro.searchMinY = stoi(Loader::getElement(it->first, "search-min-y"));
-        currentMacro.searchMaxX = stoi(Loader::getElement(it->first, "search-max-x"));
-        currentMacro.searchMaxY = stoi(Loader::getElement(it->first, "search-max-y"));
-        currentMacro.matchThreshold = stof(Loader::getElement(it->first, "match-threshold"));
-        currentMacro.minX = stoi(Loader::getElement(it->first, "min-x"));
-        currentMacro.minY = stoi(Loader::getElement(it->first, "min-y"));
-        currentMacro.maxX = stoi(Loader::getElement(it->first, "max-x"));
-        currentMacro.maxY = stoi(Loader::getElement(it->first, "max-y"));
-
-        currentMacro.data = loadMacro(getElement("macros", "macro-folder") + Loader::getElement(it->first, "filename"));
-
         macros.push_back(currentMacro);
-
-        macroIndicices.insert({it->first, macros.size() - 1});
     }
 
-    for(unsigned int i = 0; i < macros.size(); i++){
-        string macroTemplate = Loader::getElement(macros[i].name, "macro-to-import-template-setting");
+    for(int i = 0; i < macros.size(); i++){
+        boost::property_tree::ptree currentMacro = macroPtree.find(macros[i].name)->second;
+
+        macros[i].enableImgProc = currentMacro.get("enable image match", false);
+        macros[i].matchMethod = currentMacro.get("shared settings.match method", 3);
+        macros[i].searchMinX = currentMacro.get("search min x", 0);
+        macros[i].searchMinY = currentMacro.get("search min y", 0);
+        macros[i].searchMaxX = currentMacro.get("search max x", config.get("general.window width", 0));
+        macros[i].searchMaxY = currentMacro.get("search max y", config.get("general.window height", 0));
+        macros[i].matchThreshold = currentMacro.get("shared settings.match threshold", 0);
+        macros[i].minX = currentMacro.get("shared settings.min x", 0);
+        macros[i].minY = currentMacro.get("shared settings.min y", 0);
+        macros[i].maxX = currentMacro.get("shared settings.max x", config.get("general.window width", 0));
+        macros[i].maxY = currentMacro.get("shared settings.max y", config.get("general.window height", 0));
+
+        macros[i].data = loadMacro(config.get("general.macro folder", "") + currentMacro.get("filename", ""));
+
+        string button = currentMacro.get("button", "-1");
+        if(button.at(0) >= 'a' && button.at(0) <= 'z'){
+            macros[i].button = button.at(0) - 'a';
+        }
+        else if(button.at(0) >= 'A' && button.at(0) <= 'Z'){
+            macros[i].button = button.at(0) - 'A';
+        }
+        else{
+            macros[i].button = stoi(button);
+        }
+
+        string templatePic = currentMacro.get("shared settings.template picture", "");
+        if(pictureIndicices.find(templatePic) != pictureIndicices.end())
+            macros[i].templatePic = pictureIndicices.at(templatePic);
+        else
+            macros[i].templatePic = -1;
+        
+        string maskPic = currentMacro.get("shared settings.mask picture", "");
+        if(pictureIndicices.find(maskPic) != pictureIndicices.end())
+            macros[i].maskPic = pictureIndicices.at(maskPic);
+        else
+            macros[i].maskPic = -1;
+
+
+        string macroTemplate = currentMacro.get("share settings from macro", "");
         if(macroIndicices.find(macroTemplate) != macroIndicices.end()){
             macros[i].macroTemplate = macroIndicices.at(macroTemplate);
         }
@@ -255,44 +186,38 @@ void ArduinoLoader::reloadMacros(vector<macro> &macros, map<string, int> &macroI
             macros[i].macroTemplate = -1;
         }
 
-        string macroStr;
 
-        macros[i].macroSuccessList = {};
-        stringstream macroSuccessStream = stringstream(Loader::getElement(macros[i].name, "next-macro-success"));
-        while(!macroSuccessStream.eof()){
-            macroSuccessStream >> macroStr;
-            if(macroIndicices.find(macroStr) != macroIndicices.end())
-                macros[i].macroSuccessList.push_back(macroIndicices.at(macroStr));
+        boost::property_tree::ptree nextMacroList = currentMacro.find("next macro success")->second;
+        for(boost::property_tree::ptree::iterator it = nextMacroList.begin(); it != nextMacroList.end(); it++){
+            if(macroIndicices.find(it->first) != macroIndicices.end())
+                macros[i].macroSuccessList.push_back(macroIndicices.at(it->first));
         }
 
-        macros[i].macroFailList = {};
-        stringstream macroFailStream = stringstream(Loader::getElement(macros[i].name, "next-macro-fail"));
-        while(!macroFailStream.eof()){
-            macroFailStream >> macroStr;
-            if(macroIndicices.find(macroStr) != macroIndicices.end())
-                macros[i].macroFailList.push_back(macroIndicices.at(macroStr));
+        nextMacroList = currentMacro.find("next macro fail")->second;
+        for(boost::property_tree::ptree::iterator it = nextMacroList.begin(); it != nextMacroList.end(); it++){
+            if(macroIndicices.find(it->first) != macroIndicices.end())
+                macros[i].macroFailList.push_back(macroIndicices.at(it->first));
         }
 
-        macros[i].macroDefaultList = {};
-        stringstream macroDefaultStream = stringstream(Loader::getElement(macros[i].name, "next-macro-default"));
-        while(!macroDefaultStream.eof()){
-            macroDefaultStream >> macroStr;
-            if(macroIndicices.find(macroStr) != macroIndicices.end())
-                macros[i].macroDefaultList.push_back(macroIndicices.at(macroStr));
+        nextMacroList = currentMacro.find("next macro default")->second;
+        for(boost::property_tree::ptree::iterator it = nextMacroList.begin(); it != nextMacroList.end(); it++){
+            if(macroIndicices.find(it->first) != macroIndicices.end())
+                macros[i].macroDefaultList.push_back(macroIndicices.at(it->first));
         }
+        
     }
+
 }
 
 void ArduinoLoader::reloadPictures(vector<cv::Mat> &pictures, map<string, int> &pictureIndicices){
     pictures = {};
     pictureIndicices = {};
 
-    for(map<string, vector<string>>::iterator it = catagories.begin(); it != catagories.end(); ++it){
-        if (removeTrailingDigit(it->first) != "picture" || it->first == "picture")
-            continue;
-        
-        pictures.push_back(loadPicture(Loader::getElement("pictures", "picture-folder") + Loader::getElement(it->first, "picture-filename")));
-        pictureIndicices.insert({it->first, pictures.size() - 1});
+    boost::property_tree::ptree picturePtree = config.find("pictures")->second;
+
+    for(boost::property_tree::ptree::iterator it = picturePtree.begin(); it != picturePtree.end(); it++){
+        pictureIndicices.insert({it->first, macros.size()});
+        pictures.push_back(loadPicture(config.get("general.picture folder","") + it->second.get("picture filename", "")));
     }
 }
 
@@ -304,7 +229,12 @@ void ArduinoLoader::reloadPicturesAndMacros(){
 }
 
 string ArduinoLoader::toString(){
-    string result = Loader::toString();
+    string result;
+    stringstream outstream = stringstream("");
+
+    boost::property_tree::json_parser::write_json(outstream, config);
+
+    result += outstream.str();
 
     result.append("\nMacros\n");
     for(unsigned int i = 0; i < macros.size(); i++){
@@ -335,13 +265,5 @@ string ArduinoLoader::toString(){
 
     return result;
 }
-
-string ArduinoLoader::getElement(string catagory, string element){
-    if(removeTrailingDigit(catagory) == "macro" || removeTrailingDigit(catagory) == "picture")
-        return "";
-    else
-        return Loader::getElement(catagory, element);
-}
-
 
 #endif

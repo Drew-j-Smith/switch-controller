@@ -1,8 +1,6 @@
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
-#include "loader.h"
-#include <sstream>
 #include "ArduinoLoader.h"
 
 using namespace std;
@@ -55,7 +53,7 @@ int main(){
     // cout << l4.toString();
 
     ArduinoLoader l5 = ArduinoLoader();
-    l5.loadConfig("config.txt");
+    l5.loadConfig("config.json");
     cout << l5.toString();
 
     //l5 = ArduinoLoader("config.txt");
