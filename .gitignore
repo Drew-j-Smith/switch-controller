@@ -10,6 +10,7 @@ obj
 *.exe
 *.out
 .vscode
+*.bat
 
 CMakeFiles
 Debug
