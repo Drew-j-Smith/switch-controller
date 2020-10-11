@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-struct macro{
+struct Macro{
     std::string name;
     int button;
     bool enableImgProc;
@@ -29,7 +29,7 @@ struct macro{
     std::vector<int> macroDefaultList;
 };
 
-struct switchButtons{
+struct SwitchButtons{
     int y;
     int b;
     int a;
@@ -52,10 +52,10 @@ struct switchButtons{
     int rightStickXminus;
     int rightStickYplus;
     int rightStickYminus;
-    int dPadUp;
-    int dPadRight;
-    int dPadDown;
-    int dPadLeft;
+    int dpadUp;
+    int dpadRight;
+    int dpadDown;
+    int dpadLeft;
     int recordMacro;
     int screenshot;
 };

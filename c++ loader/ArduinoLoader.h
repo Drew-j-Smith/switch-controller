@@ -17,18 +17,21 @@
 using namespace std;
 
 //todo save as current date
-//todo add file errors
+//todo fix indicies of macro
 
 class ArduinoLoader{
 private:
     vector<cv::Mat> pictures;
-    vector<macro> macros;
+    vector<Macro> macros;
+    SwitchButtons switchButtons;
     boost::property_tree::ptree config;
 
     void reloadPictures(vector<cv::Mat> &pictures, map<string, int> &pictureIndicices);
-    void reloadMacros(vector<macro> &macros, map<string, int> &macroIndicices, map<string, int> pictureIndicices);
+    void reloadMacros(vector<Macro> &macros, map<string, int> &macroIndicices, map<string, int> pictureIndicices);
+    SwitchButtons getSwitchButtons();
     std::vector<std::array<char, 8>> loadMacro(string filename);
     cv::Mat loadPicture(string filename);
+    int getButton(string button);
 public:
     ArduinoLoader();
     ArduinoLoader(string filename);
@@ -53,6 +56,7 @@ void ArduinoLoader::loadConfig(string filename){
     map<string, int> macroIndicices;
     reloadPictures(pictures, pictureIndicices);
     reloadMacros(macros, macroIndicices, pictureIndicices);
+    switchButtons = getSwitchButtons();
 }
 
 
@@ -94,7 +98,7 @@ cv::Mat ArduinoLoader::loadPicture(string filename) {
     return image;
 }
 
-void ArduinoLoader::reloadMacros(vector<macro> &macros, map<string, int> &macroIndicices, map<string, int> pictureIndicices){
+void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroIndicices, map<string, int> pictureIndicices){
     macros = {};
     macroIndicices = {};
 
@@ -102,7 +106,7 @@ void ArduinoLoader::reloadMacros(vector<macro> &macros, map<string, int> &macroI
 
     for(boost::property_tree::ptree::iterator it = macroPtree.begin(); it != macroPtree.end(); it++){
         macroIndicices.insert({it->first, macros.size()});
-        macro currentMacro;
+        Macro currentMacro;
         currentMacro.name = it->first;
         macros.push_back(currentMacro);
     }
@@ -110,17 +114,17 @@ void ArduinoLoader::reloadMacros(vector<macro> &macros, map<string, int> &macroI
     for(unsigned int i = 0; i < macros.size(); i++){
         boost::property_tree::ptree currentMacro = macroPtree.find(macros[i].name)->second;
 
-        macros[i].enableImgProc = currentMacro.get("enable image match", false);
-        macros[i].matchMethod = currentMacro.get("shared settings.match method", 3);
-        macros[i].searchMinX = currentMacro.get("search min x", 0);
-        macros[i].searchMinY = currentMacro.get("search min y", 0);
-        macros[i].searchMaxX = currentMacro.get("search max x", config.get("general.window width", 0));
-        macros[i].searchMaxY = currentMacro.get("search max y", config.get("general.window height", 0));
+        macros[i].enableImgProc  = currentMacro.get("enable image match", false);
+        macros[i].matchMethod    = currentMacro.get("shared settings.match method", 3);
+        macros[i].searchMinX     = currentMacro.get("search min x", 0);
+        macros[i].searchMinY     = currentMacro.get("search min y", 0);
+        macros[i].searchMaxX     = currentMacro.get("search max x", config.get("general.window width", 0));
+        macros[i].searchMaxY     = currentMacro.get("search max y", config.get("general.window height", 0));
         macros[i].matchThreshold = currentMacro.get("shared settings.match threshold", 0.0);
-        macros[i].minX = currentMacro.get("shared settings.min x", 0);
-        macros[i].minY = currentMacro.get("shared settings.min y", 0);
-        macros[i].maxX = currentMacro.get("shared settings.max x", config.get("general.window width", 0));
-        macros[i].maxY = currentMacro.get("shared settings.max y", config.get("general.window height", 0));
+        macros[i].minX           = currentMacro.get("shared settings.min x", 0);
+        macros[i].minY           = currentMacro.get("shared settings.min y", 0);
+        macros[i].maxX           = currentMacro.get("shared settings.max x", config.get("general.window width", 0));
+        macros[i].maxY           = currentMacro.get("shared settings.max y", config.get("general.window height", 0));
 
         macros[i].data = loadMacro(config.get("general.macro folder", "") + currentMacro.get("filename", ""));
 
@@ -140,8 +144,6 @@ void ArduinoLoader::reloadMacros(vector<macro> &macros, map<string, int> &macroI
                 std::cerr << "Error loading key for " << macros[i].name << std::endl;
                 macros[i].button = -1;
             }
-            
-            
         }
 
         string templatePic = currentMacro.get("shared settings.template picture", "");
@@ -213,6 +215,61 @@ void ArduinoLoader::reloadPictures(vector<cv::Mat> &pictures, map<string, int> &
     }
 }
 
+SwitchButtons ArduinoLoader::getSwitchButtons(){
+    SwitchButtons switchButtons;
+    switchButtons.y                = getButton("y");
+    switchButtons.b                = getButton("b");
+    switchButtons.a                = getButton("a");
+    switchButtons.x                = getButton("x");
+    switchButtons.l                = getButton("l");
+    switchButtons.r                = getButton("r");
+    switchButtons.xl               = getButton("xl");
+    switchButtons.xr               = getButton("xr");
+    switchButtons.select           = getButton("select");
+    switchButtons.start            = getButton("start");
+    switchButtons.lClick           = getButton("l click");
+    switchButtons.rRlick           = getButton("r click");
+    switchButtons.home             = getButton("home");
+    switchButtons.capture          = getButton("capture");
+    switchButtons.leftStickXplus   = getButton("left stick x+");
+    switchButtons.leftStickXminus  = getButton("left stick x-");
+    switchButtons.leftStickYplus   = getButton("left stick y+");
+    switchButtons.leftStickYminus  = getButton("left stick y-");
+    switchButtons.rightStickXplus  = getButton("right stick x+");
+    switchButtons.rightStickXminus = getButton("right stick x-");
+    switchButtons.rightStickYplus  = getButton("right stick y+");
+    switchButtons.rightStickYminus = getButton("right stick y-");
+    switchButtons.dpadUp           = getButton("dpad up");
+    switchButtons.dpadRight        = getButton("dpad right");
+    switchButtons.dpadDown         = getButton("dpad down");
+    switchButtons.dpadLeft         = getButton("dpad left");
+    switchButtons.recordMacro      = getButton("record macro");
+    switchButtons.screenshot       = getButton("screenshot");
+    return switchButtons;
+}
+
+int ArduinoLoader::getButton(string button){
+    string buttonCode = config.get("controls." + button, "-1");
+    if(buttonCode.at(0) >= 'a' && buttonCode.at(0) <= 'z'){
+        return buttonCode.at(0) - 'a';
+    }
+    else if(buttonCode.at(0) >= 'A' && buttonCode.at(0) <= 'Z'){
+        return buttonCode.at(0) - 'A';
+    }
+    else{
+        try{
+            return stoi(buttonCode);
+        }
+        catch(const std::exception& e){
+            std::cerr << e.what() << '\n';
+            std::cerr << "Error loading key for " << button << std::endl;
+            return -1;
+        }
+        
+        
+    }
+}
+
 string ArduinoLoader::toString(){
     string result;
     stringstream outstream = stringstream("");
@@ -224,28 +281,60 @@ string ArduinoLoader::toString(){
     result.append("\nMacros\n");
     for(unsigned int i = 0; i < macros.size(); i++){
         result.append(macros[i].name);
-        result.append("\nmacro length: " + to_string(macros[i].data.size()));
-        result.append("\nbutton: " + to_string(macros[i].button));
-        result.append("\nenableImgProc: " + to_string(macros[i].enableImgProc));
-        result.append("\ntemplatePic: " + to_string(macros[i].templatePic));
-        result.append("\nmaskPic: " + to_string(macros[i].maskPic));
-        result.append("\nmatchMethod: " + to_string(macros[i].matchMethod));
-        result.append("\nsearchMinX: " + to_string(macros[i].searchMinX));
-        result.append("\nsearchMinY: " + to_string(macros[i].searchMinY));
-        result.append("\nsearchMaxX: " + to_string(macros[i].searchMaxX));
-        result.append("\nsearchMaxY: " + to_string(macros[i].searchMaxY));
-        result.append("\nmacroTemplate: " + to_string(macros[i].macroTemplate));
+        result.append("\nmacro length:   " + to_string(macros[i].data.size()));
+        result.append("\nbutton:         " + to_string(macros[i].button));
+        result.append("\nenableImgProc:  " + to_string(macros[i].enableImgProc));
+        result.append("\ntemplatePic:    " + to_string(macros[i].templatePic));
+        result.append("\nmaskPic:        " + to_string(macros[i].maskPic));
+        result.append("\nmatchMethod:    " + to_string(macros[i].matchMethod));
+        result.append("\nsearchMinX:     " + to_string(macros[i].searchMinX));
+        result.append("\nsearchMinY:     " + to_string(macros[i].searchMinY));
+        result.append("\nsearchMaxX:     " + to_string(macros[i].searchMaxX));
+        result.append("\nsearchMaxY:     " + to_string(macros[i].searchMaxY));
+        result.append("\nmacroTemplate:  " + to_string(macros[i].macroTemplate));
         result.append("\nmatchThreshold: " + to_string(macros[i].matchThreshold));
-        result.append("\nminX: " + to_string(macros[i].minX));
-        result.append("\nminY: " + to_string(macros[i].minY));
-        result.append("\nmaxX: " + to_string(macros[i].maxX));
-        result.append("\nmaxY: " + to_string(macros[i].maxY));
+        result.append("\nminX:           " + to_string(macros[i].minX));
+        result.append("\nminY:           " + to_string(macros[i].minY));
+        result.append("\nmaxX:           " + to_string(macros[i].maxX));
+        result.append("\nmaxY:           " + to_string(macros[i].maxY));
         result.append("\n");
     }
 
+    result.append("\nControls");
+    result.append("\ny:                " + to_string(switchButtons.y));
+    result.append("\nb:                " + to_string(switchButtons.b));
+    result.append("\na:                " + to_string(switchButtons.a));
+    result.append("\nx:                " + to_string(switchButtons.x));
+    result.append("\nl:                " + to_string(switchButtons.l));
+    result.append("\nr:                " + to_string(switchButtons.r));
+    result.append("\nxl:               " + to_string(switchButtons.xl));
+    result.append("\nxr:               " + to_string(switchButtons.xr));
+    result.append("\nselect:           " + to_string(switchButtons.select));
+    result.append("\nstart:            " + to_string(switchButtons.start));
+    result.append("\nlClick:           " + to_string(switchButtons.lClick));
+    result.append("\nrRlick:           " + to_string(switchButtons.rRlick));
+    result.append("\nhome:             " + to_string(switchButtons.home));
+    result.append("\ncapture:          " + to_string(switchButtons.capture));
+    result.append("\nleftStickXplus:   " + to_string(switchButtons.leftStickXplus));
+    result.append("\nleftStickXminus:  " + to_string(switchButtons.leftStickXminus));
+    result.append("\nleftStickYplus:   " + to_string(switchButtons.leftStickYplus));
+    result.append("\nleftStickYminus:  " + to_string(switchButtons.leftStickYminus));
+    result.append("\nrightStickXplus:  " + to_string(switchButtons.rightStickXplus));
+    result.append("\nrightStickXminus: " + to_string(switchButtons.rightStickXminus));
+    result.append("\nrightStickYplus:  " + to_string(switchButtons.rightStickYplus));
+    result.append("\nrightStickYminus: " + to_string(switchButtons.rightStickYminus));
+    result.append("\ndpadUp:           " + to_string(switchButtons.dpadUp));
+    result.append("\ndpadRight:        " + to_string(switchButtons.dpadRight));
+    result.append("\ndpadDown:         " + to_string(switchButtons.dpadDown));
+    result.append("\ndpadLeft:         " + to_string(switchButtons.dpadLeft));
+    result.append("\nrecordMacro:      " + to_string(switchButtons.recordMacro));
+    result.append("\nscreenshot:       " + to_string(switchButtons.screenshot));
+    result.append("\n");
+
+
     result.append("\nPictures\n");
     for(unsigned int i = 0; i < pictures.size(); i++){
-        result.append(to_string(i) + " width:" + to_string(pictures[i].size().width) + " height:" + to_string(pictures[i].size().height) + '\n');
+        result.append("index:" + to_string(i) + " width:" + to_string(pictures[i].size().width) + " height:" + to_string(pictures[i].size().height) + '\n');
     }
 
     return result;
