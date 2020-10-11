@@ -6,9 +6,7 @@
         "window width":1920,
         "window height":1080,
         "macro folder":"macros/",
-        "macro recording filename":"macro.txt",
-        "picture folder":"pictures/",
-        "picture recording filename":"picture.png"
+        "picture folder":"pictures/"
     },
     "controls":
     {
@@ -28,7 +26,7 @@
     },
     "pictures":
     {
-        "pciture1":
+        "picture1":
         {
             "picture filename":"haanit.png"
         }
@@ -38,12 +36,12 @@
         "macro1":
         {
             "filename":"test macro.txt",
-            "button":-1,
-            "enable image match":false,
-            "search min x":0,
-            "search min y":0,
-            "search max x":0,
-            "search max y":0,
+            "button":15,
+            "enable image match":true,
+            "search min x":1,
+            "search min y":2,
+            "search max x":3,
+            "search max y":4,
             "next macro success":
             ["macro1", "macro2", "macro3"],
             "next macro fail":
@@ -53,14 +51,14 @@
             "share settings from macro":"",
             "shared settings":
             {
-                "template image":"",
-                "mask image":"",
-                "match method":3,
-                "match-threshold":0.95,
-                "min x":0,
-                "min y":0,
-                "max-x":0,
-                "max-y":0
+                "template image":"picture1",
+                "mask image":"picture1",
+                "match method":4,
+                "match threshold":0.95,
+                "min x":5,
+                "min y":6,
+                "max x":7,
+                "max y":8
             }
         }
     }
