@@ -16,13 +16,12 @@
         "xl":"l",
         "start":"e",
         "home":60,
-        "left stick x+":"d",
-        "left stick x-":"a",
-        "left stick y+":"w",
-        "left stick y-":"s",
-        "start macro recording":"y",
-        "stop macro recording":"u",
-        "desktop screenshot":"r"
+        "leftStickXplus":"d",
+        "leftStickXminus":"a",
+        "leftStickYplus":"w",
+        "leftStickYminus":"s",
+        "recordMacro":"y",
+        "screenshot":"r"
     },
     "pictures":
     {

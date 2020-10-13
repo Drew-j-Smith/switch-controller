@@ -38,6 +38,12 @@ public:
 
     void loadConfig(string filename);
 
+    vector<cv::Mat> getPictures();
+    vector<Macro> getMacros();
+    SwitchButtons getSwitchButtons();
+    string getOption(string option);
+
+
     string toString();
 };
 
@@ -59,6 +65,7 @@ void ArduinoLoader::loadConfig(string filename){
     switchButtons = getSwitchButtons();
 }
 
+#pragma region privateMethods
 
 std::vector<std::array<char, 8>> ArduinoLoader::loadMacro(string filename){
     ifstream infile;
@@ -146,13 +153,13 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
             }
         }
 
-        string templatePic = currentMacro.get("shared settings.template picture", "");
+        string templatePic = currentMacro.get("shared settings.template image", "");
         if(pictureIndicices.find(templatePic) != pictureIndicices.end())
             macros[i].templatePic = pictureIndicices.at(templatePic);
         else
             macros[i].templatePic = -1;
         
-        string maskPic = currentMacro.get("shared settings.mask picture", "");
+        string maskPic = currentMacro.get("shared settings.mask image", "");
         if(pictureIndicices.find(maskPic) != pictureIndicices.end())
             macros[i].maskPic = pictureIndicices.at(maskPic);
         else
@@ -227,23 +234,23 @@ SwitchButtons ArduinoLoader::getSwitchButtons(){
     switchButtons.xr               = getButton("xr");
     switchButtons.select           = getButton("select");
     switchButtons.start            = getButton("start");
-    switchButtons.lClick           = getButton("l click");
-    switchButtons.rRlick           = getButton("r click");
+    switchButtons.lClick           = getButton("lClick");
+    switchButtons.rRlick           = getButton("rRlick");
     switchButtons.home             = getButton("home");
     switchButtons.capture          = getButton("capture");
-    switchButtons.leftStickXplus   = getButton("left stick x+");
-    switchButtons.leftStickXminus  = getButton("left stick x-");
-    switchButtons.leftStickYplus   = getButton("left stick y+");
-    switchButtons.leftStickYminus  = getButton("left stick y-");
-    switchButtons.rightStickXplus  = getButton("right stick x+");
-    switchButtons.rightStickXminus = getButton("right stick x-");
-    switchButtons.rightStickYplus  = getButton("right stick y+");
-    switchButtons.rightStickYminus = getButton("right stick y-");
-    switchButtons.dpadUp           = getButton("dpad up");
-    switchButtons.dpadRight        = getButton("dpad right");
-    switchButtons.dpadDown         = getButton("dpad down");
-    switchButtons.dpadLeft         = getButton("dpad left");
-    switchButtons.recordMacro      = getButton("record macro");
+    switchButtons.leftStickXplus   = getButton("leftStickXplus");
+    switchButtons.leftStickXminus  = getButton("leftStickXminus");
+    switchButtons.leftStickYplus   = getButton("leftStickYplus");
+    switchButtons.leftStickYminus  = getButton("leftStickYminus");
+    switchButtons.rightStickXplus  = getButton("rightStickXplus");
+    switchButtons.rightStickXminus = getButton("rightStickXminus");
+    switchButtons.rightStickYplus  = getButton("rightStickYplus");
+    switchButtons.rightStickYminus = getButton("rightStickYminus");
+    switchButtons.dpadUp           = getButton("dpadUp");
+    switchButtons.dpadRight        = getButton("dpadRight");
+    switchButtons.dpadDown         = getButton("dpadDown");
+    switchButtons.dpadLeft         = getButton("dpadLeft");
+    switchButtons.recordMacro      = getButton("recordMacro");
     switchButtons.screenshot       = getButton("screenshot");
     return switchButtons;
 }
@@ -269,6 +276,8 @@ int ArduinoLoader::getButton(string button){
         
     }
 }
+
+#pragma endregion privateMethods
 
 string ArduinoLoader::toString(){
     string result;
@@ -338,6 +347,22 @@ string ArduinoLoader::toString(){
     }
 
     return result;
+}
+
+vector<cv::Mat> ArduinoLoader::getPictures(){
+    return pictures;
+}
+
+vector<Macro> ArduinoLoader::getMacros(){
+    return macros;
+}
+
+SwitchButtons ArduinoLoader::getSwitchButtons(){
+    return switchButtons;
+}
+
+string ArduinoLoader::getOption(string option){
+    return config.get("general." + option, "");
 }
 
 #endif
