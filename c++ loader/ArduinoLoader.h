@@ -28,7 +28,7 @@ private:
 
     void reloadPictures(vector<cv::Mat> &pictures, map<string, int> &pictureIndicices);
     void reloadMacros(vector<Macro> &macros, map<string, int> &macroIndicices, map<string, int> pictureIndicices);
-    SwitchButtons getSwitchButtons();
+    SwitchButtons reloadSwitchButtons();
     std::vector<std::array<char, 8>> loadMacro(string filename);
     cv::Mat loadPicture(string filename);
     int getButton(string button);
@@ -62,7 +62,7 @@ void ArduinoLoader::loadConfig(string filename){
     map<string, int> macroIndicices;
     reloadPictures(pictures, pictureIndicices);
     reloadMacros(macros, macroIndicices, pictureIndicices);
-    switchButtons = getSwitchButtons();
+    switchButtons = reloadSwitchButtons();
 }
 
 #pragma region privateMethods
@@ -222,7 +222,7 @@ void ArduinoLoader::reloadPictures(vector<cv::Mat> &pictures, map<string, int> &
     }
 }
 
-SwitchButtons ArduinoLoader::getSwitchButtons(){
+SwitchButtons ArduinoLoader::reloadSwitchButtons(){
     SwitchButtons switchButtons;
     switchButtons.y                = getButton("y");
     switchButtons.b                = getButton("b");
