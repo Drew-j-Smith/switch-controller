@@ -2,25 +2,26 @@
 #define IMGPROC_H
 
 
-#include "Loader.h"
+#include "ArduinoStructs.h"
 #ifdef _WIN32
 	#include <Windows.h>
 #endif
 #include <string>
+#include <vector>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/imgproc.hpp"
 
-
+using namespace std;
 
 const bool displayImg = false;
 
 class ImgProc {
 public:
 	ImgProc();
-	ImgProc(Loader &l);
+	ImgProc(vector<cv::Mat> pictures, vector<Macro> macros, string windowName, int windowWidth, int windowHeight);
 
 	void saveImg(cv::Mat& m, std::string filename);
 	void showImg(cv::Mat& m, std::string windowName);
@@ -33,13 +34,18 @@ public:
 	
 	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, cv::Mat mask = cv::Mat());
 private:
-	bool isMatch(double value, double threshold, int match_method, cv::Point matchPoint, cv::Point minPoint, cv::Point maxPoint);
+	bool isMatch(double value, double threshold, int match_method, cv::Point matchPoint, int minX, int minY, int maxX, int maxY);
 
-	Loader loader;
 
 	#ifdef _WIN32
 		HDC hwindowDC;
 	#endif
+	
+
+	vector<cv::Mat> pictures;
+	vector<Macro> macros;
+	int windowWidth;
+	int windowHeight;
 	
 
 	std::vector<bool> imgMatch;
@@ -56,18 +62,25 @@ private:
 
 
 ImgProc::ImgProc(){
-	loader = Loader();
+	this->pictures = {};
+	this->macros = {};
+	this->windowWidth = 0;
+	this->windowHeight = 0;
 }
 
-ImgProc::ImgProc(Loader &l) {
-	loader = l;
+ImgProc::ImgProc(vector<cv::Mat> pictures, vector<Macro> macros, string windowName, int windowWidth, int windowHeight) {
 
-	imgMatch.resize(loader.getNumMacros());
-	critcalVals.resize(loader.getNumMacros());
-	matchPoints.resize(loader.getNumMacros());
+	this->pictures = pictures;
+	this->macros = macros;
+	this->windowWidth = windowWidth;
+	this->windowHeight = windowHeight;
+
+	imgMatch.resize(macros.size());
+	critcalVals.resize(macros.size());
+	matchPoints.resize(macros.size());
 
 	#ifdef _WIN32
-		HWND window = FindWindowA(NULL, loader.getLocGameWindowName().c_str());
+		HWND window = FindWindowA(NULL, windowName.c_str());
 		hwindowDC = GetDC(window);
 	#endif
 
@@ -76,51 +89,67 @@ ImgProc::ImgProc(Loader &l) {
 
 bool ImgProc::update() {
 	screenshot(scrnsht);
-	//showImg(scrnsht, "0");
+	showImg(scrnsht, "0");
 
 	bool update = false;
-	for (int i = 0; i < loader.getNumMacros(); i++) {
+	for (int i = 0; i < macros.size(); i++) {
 		
-		if (!loader.getEnableMacroImgProc(i) || loader.getSharedMacroTemplates(i) != -1) {
+		if (!macros[i].enableImgProc || macros[i].macroTemplate != -1) {
 			continue;
 		}
 		else {
 			update = true;
-			cv::Rect rectCrop = cv::Rect(loader.getMinMacroSearchPoints(i).x,
-				loader.getMinMacroSearchPoints(i).y,
-				loader.getMaxMacroSearchPoints(i).x - loader.getMinMacroSearchPoints(i).x,
-				loader.getMaxMacroSearchPoints(i).y - loader.getMinMacroSearchPoints(i).y);
+			cv::Rect rectCrop = cv::Rect(macros[i].searchMinX,
+				macros[i].searchMinY,
+				macros[i].searchMaxX - macros[i].searchMinX,
+				macros[i].searchMaxY - macros[i].searchMinY);
 			cv::Mat submat = cv::Mat(scrnsht, rectCrop);
 
-			templ = loader.getPicture(loader.getMacroTemplates(i));
-			if (loader.getMacroMasks(i) == -1) {
-				matchTemplate(submat, templ, rslt, loader.getMacroMatchMethods(i), critcalVals[i], matchPoints[i]);
+			templ = pictures[macros[i].templatePic];
+			if (macros[i].maskPic == -1) {
+				try{
+					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i]);
+				}
+				catch(const std::exception& e){
+					std::cerr << e.what() << '\n';
+					std::cerr << "Error with image match" << '\n';
+					exit(-1);
+				}
 			}
 			else {
-				mask = loader.getPicture(loader.getMacroMasks(i));
-				matchTemplate(submat, templ, rslt, loader.getMacroMatchMethods(i), critcalVals[i], matchPoints[i], mask);
+				mask = pictures[macros[i].maskPic];
+				try{
+					cout << submat.size << endl;
+					cout << templ.size << endl;
+					cout << mask.size << endl;
+					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], mask);
+				}
+				catch(const std::exception& e){
+					std::cerr << e.what() << '\n';
+					std::cerr << "Error with image match" << '\n';
+					exit(-1);
+				}
 			}
-			matchPoints[i].x += loader.getMinMacroSearchPoints(i).x;
-			matchPoints[i].y += loader.getMinMacroSearchPoints(i).y;
+			matchPoints[i].x += macros[i].searchMinX; //adjusting the match point so the coordinates match with the screenshot
+			matchPoints[i].y += macros[i].searchMinY;
 		}
 	}
 	if (!update)
 		return false;
-
-	for (int i = 0; i < loader.getNumMacros(); i++) {
-		if (!loader.getEnableMacroImgProc(i)) {
+	for (int i = 0; i < macros.size(); i++) {
+		if (!macros[i].enableImgProc) {
 			imgMatch[i] = false;
 			continue;
 		}
-		else if (loader.getSharedMacroTemplates(i) != -1) {
-			imgMatch[i] = isMatch(critcalVals[loader.getSharedMacroTemplates(i)], loader.getMatchThresholds(i),
-				loader.getMacroMatchMethods(loader.getSharedMacroTemplates(i)), matchPoints[loader.getSharedMacroTemplates(i)], 
-				loader.getMinMacroMatchPoints(i), loader.getMaxMacroMatchPoints(i));
+		else if (macros[i].macroTemplate != -1) {
+			imgMatch[i] = isMatch(critcalVals[macros[i].macroTemplate], macros[i].matchThreshold,
+				macros[macros[i].macroTemplate].matchMethod, matchPoints[macros[i].macroTemplate], 
+				macros[i].searchMinX, macros[i].searchMinY, macros[i].searchMaxX, macros[i].searchMaxY);
 		}
 		else {
-			imgMatch[i] = isMatch(critcalVals[i], loader.getMatchThresholds(i),
-				loader.getMacroMatchMethods(i), matchPoints[i],
-				loader.getMinMacroMatchPoints(i), loader.getMaxMacroMatchPoints(i));
+			imgMatch[i] = isMatch(critcalVals[i], macros[i].matchThreshold,
+				macros[i].matchMethod, matchPoints[i],
+				macros[i].searchMinX, macros[i].searchMinY, macros[i].searchMaxX, macros[i].searchMaxY);
 			//std::cout << critcalVals[i] << '\n';
 		}
 	}
@@ -164,20 +193,20 @@ void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int m
 }
 
 
-bool ImgProc::isMatch(double value, double threshold, int match_method, cv::Point matchPoint, cv::Point minPoint, cv::Point maxPoint) {
+bool ImgProc::isMatch(double value, double threshold, int match_method, cv::Point matchPoint, int minX, int minY, int maxX, int maxY) {
 	if (match_method == cv::TM_SQDIFF || match_method == cv::TM_SQDIFF_NORMED) {
 		return value < threshold && 
-			matchPoint.x >= minPoint.x && 
-			matchPoint.y >= minPoint.y && 
-			matchPoint.x <= maxPoint.x && 
-			matchPoint.y <= maxPoint.y;
+			matchPoint.x >= minX && 
+			matchPoint.y >= minY && 
+			matchPoint.x <= maxX && 
+			matchPoint.y <= maxY;
 	}
 	else {
 		return threshold < value &&
-		matchPoint.x >= minPoint.x &&
-		matchPoint.y >= minPoint.y &&
-		matchPoint.x <= maxPoint.x &&
-		matchPoint.y <= maxPoint.y;
+		matchPoint.x >= minX &&
+		matchPoint.y >= minY &&
+		matchPoint.x <= maxX &&
+		matchPoint.y <= maxY;
 	}
 }
 
@@ -214,7 +243,7 @@ bool ImgProc::screenshot(cv::Mat& m){
 			return false;
 		}
 
-		HBITMAP hbwindow = CreateCompatibleBitmap(hwindowDC, loader.getLocWindowWidth(), loader.getLocWindowHeight());
+		HBITMAP hbwindow = CreateCompatibleBitmap(hwindowDC, windowWidth, windowHeight);
 		if (!hbwindow)
 		{
 			DeleteDC(hwindowCompatibleDC);
@@ -223,8 +252,8 @@ bool ImgProc::screenshot(cv::Mat& m){
 
 		BITMAPINFOHEADER bi;
 		bi.biSize = sizeof(BITMAPINFOHEADER);
-		bi.biWidth = loader.getLocWindowWidth();
-		bi.biHeight = -loader.getLocWindowHeight();
+		bi.biWidth = windowWidth;
+		bi.biHeight = -windowHeight;
 		bi.biPlanes = 1;
 		bi.biBitCount = 32;
 		bi.biCompression = BI_RGB;
@@ -244,10 +273,10 @@ bool ImgProc::screenshot(cv::Mat& m){
 		if (!StretchBlt(
 			hwindowCompatibleDC,
 			0, 0,
-			loader.getLocWindowWidth(), loader.getLocWindowHeight(),
+			windowWidth, windowHeight,
 			hwindowDC,
 			0, 0,
-			loader.getLocWindowWidth(), loader.getLocWindowHeight(),
+			windowWidth, windowHeight,
 			SRCCOPY))
 		{
 			DeleteObject(hbwindow);
@@ -255,13 +284,13 @@ bool ImgProc::screenshot(cv::Mat& m){
 			return false;
 		}
 
-		tempMat.create(loader.getLocWindowHeight(), loader.getLocWindowWidth(), CV_8UC4);
+		tempMat.create(windowHeight, windowWidth, CV_8UC4);
 
 		if (!GetDIBits(
 			hwindowDC,
 			hbwindow,
 			0,
-			loader.getLocWindowHeight(),
+			windowHeight,
 			tempMat.data,
 			(BITMAPINFO *)&bi,
 			DIB_RGB_COLORS))

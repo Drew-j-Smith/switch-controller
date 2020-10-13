@@ -5,10 +5,9 @@
 #include <iostream>
 #include <thread>
 #include "VirtualController.h"
-#include "Loader.h"
 #include "ImgProc.h"
+#include "ArduinoLoader.h"
 
-Loader l;
 ImgProc i;
 VirtualController v;
 
@@ -20,9 +19,9 @@ void updateThread() {
 
 int main()
 {
-	l = Loader("config.txt");
-	i = ImgProc(l);
-	v = VirtualController(l, i);
+	ArduinoLoader l("config.json");
+	i = ImgProc(l.getPictures(), l.getMacros(), l.getOption("window name"), stoi(l.getOption("window width")), stoi(l.getOption("window height")));
+	v = VirtualController(l.getPictures(), l.getMacros(), l.getSwitchButtons(), l.getOption("serial port"));
 
 	std::thread th1(updateThread);
 
@@ -33,8 +32,6 @@ int main()
 			v.stopMacros();
 			std::cout << "Stopping macros\n";
 		}
-			
-
 		v.update();
 	}
 }

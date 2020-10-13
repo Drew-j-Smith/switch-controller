@@ -17,7 +17,7 @@
 using namespace std;
 
 //todo save as current date
-//todo fix indicies of macro
+//add back screenshot
 
 class ArduinoLoader{
 private:

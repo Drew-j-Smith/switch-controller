@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iomanip>
 #include <boost/asio.hpp>
-#include "Loader.h"
+#include "ArduinoStructs.h"
 #include "ImgProc.h"
 #include <atomic>
 #include <memory>
@@ -17,12 +17,13 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+using namespace std;
+
 
 const bool verbose = false;
 const bool displayNextMacro = true;
 const int minDelayMS = 16;
 const bool enableKeyboardInput = true;
-const int recoverCycles = 5;
 
 
 
@@ -30,7 +31,7 @@ class VirtualController
 {
 public:
 	VirtualController();
-	VirtualController(Loader &l, ImgProc &i);
+	VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort);
 	
 	void update();
 	void setNuetral();
@@ -52,7 +53,9 @@ private:
 
 	sf::Clock clockSinceLastUpdate;
 
-	Loader loader;
+	vector<cv::Mat> pictures;
+	vector<Macro> macros;
+	SwitchButtons switchButtons;
 
 	//std::vector<std::array<char, 8>> currentMacro;
 	int currentMacro;
@@ -102,20 +105,18 @@ VirtualController::VirtualController() {
 
 }
 
-VirtualController::VirtualController(Loader &l, ImgProc &i){
+VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort){
 
-	loader = l;
-	imgProc = i;
+	this->pictures = pictures;
+	this->macros = macros;
+	this->switchButtons = switchButtons;
+
 
 	try{
 		boost::asio::io_service io;
 		port = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
-		port->open(loader.getCOM_Port());
+		port->open(serialPort);
 		port->set_option(boost::asio::serial_port_base::baud_rate(9600));
-		port->set_option(boost::asio::serial_port_base::character_size(8));
-		port->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
-		port->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
-		port->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << '\n';
@@ -134,7 +135,7 @@ VirtualController::VirtualController(Loader &l, ImgProc &i){
 	isMacroActive = false;
 	isMacroRecordingActive = false;
 
-	imgMatch.resize(loader.getNumMacros());
+	imgMatch.resize(macros.size());
 
 	for(int i = 0; i < imgMatch.size(); i++){
 		imgMatch[i] = std::unique_ptr<std::atomic<bool>>(new std::atomic<bool>(false));
@@ -159,29 +160,29 @@ void VirtualController::update() {
 	clockSinceLastUpdate.restart();
 
 	if (!isMacroActive && !isMacroRecordingActive) {
-		if (sf::Keyboard::isKeyPressed(loader.getKeyCode(26))) {
-			outfile.open(loader.getMacroFolder() + loader.getMacroRecordingFilename(), std::ios::out);
+		if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro)) {
+			outfile.open(/*todo loader.getMacroFolder() +  loader.getMacroRecordingFilename()*/"temp", std::ios::out);
 			isMacroRecordingActive = true;
 		}
 		else {
-			for (int i = 0; i < loader.getNumMacros(); i++) {
-				if (sf::Keyboard::isKeyPressed(loader.getMacroKeyCode(i))) {
+			for (int i = 0; i < macros.size(); i++) {
+				if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)macros[i].button)) {
 					activateMacro(i);
 				}
 			}
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(27))) {
+	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro)) {
 		outfile.close();
 		isMacroRecordingActive = false;
 	}
 
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(28))) {
-		cv::Mat img;
-		imgProc.screenshot(img);
-		imgProc.saveImg(img, loader.getPictureFolder() + loader.getPictureRecordingFilename());
-	}
+	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(28))) { todo
+	// 	cv::Mat img;
+	// 	imgProc.screenshot(img);
+	// 	imgProc.saveImg(img, loader.getPictureFolder() + loader.getPictureRecordingFilename());
+	// }
 
 
 	if (isMacroActive && !isMacroRecordingActive) {
@@ -243,104 +244,108 @@ void VirtualController::setData(char data, int byte) {
 void VirtualController::getDataFromKeyboard() {
 	data[0] = 85;
 
-	//buttons
 	data[1] = 0;
-	for (int i = 0; i < 7; i++) {
-		if (sf::Keyboard::isKeyPressed(loader.getKeyCode(i))) {
-			data[1] |= (1 << i);
-		}
-	}
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(7))) {
-		data[1] -= 128;
-	}
-
 	data[2] = 0;
-	for (int i = 0; i < 6; i++) {
-		if (sf::Keyboard::isKeyPressed(loader.getKeyCode(8 + i))) {
-			data[2] |= (1 << i);
-		}
-	}
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.y      ))data[1] |= (1 << 0);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.b      ))data[1] |= (1 << 1);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.a      ))data[1] |= (1 << 2);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.x      ))data[1] |= (1 << 3);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.l      ))data[1] |= (1 << 4);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.r      ))data[1] |= (1 << 5);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xl     ))data[1] |= (1 << 6);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xr     ))data[2] -= 128;
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.select ))data[2] |= (1 << 0);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.start  ))data[2] |= (1 << 1);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.lClick ))data[2] |= (1 << 2);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rRlick ))data[2] |= (1 << 3);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.home   ))data[2] |= (1 << 4);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.capture))data[2] |= (1 << 5);
 
 	//control sticks
-	for (int i = 0; i < 4; i++) {
-		data[3 + i] = sf::Keyboard::isKeyPressed(loader.getKeyCode(14 + 2 * i)) * 127
-			+ sf::Keyboard::isKeyPressed(loader.getKeyCode(15 + 2 * i)) * 128 + 128;
-	}
+	data[3] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickXplus  ) * 127 + 
+			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickXminus ) * 128 + 128;
+	data[4] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickYminus ) * 127 + 
+	          sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickYplus  ) * 128 + 128;
+	data[5] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickXplus ) * 127 + 
+			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickXminus) * 128 + 128;
+	data[6] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickYminus) * 127 + 
+			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickYplus ) * 128 + 128;
 
-	//dpad
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22)) &&
-		sf::Keyboard::isKeyPressed(loader.getKeyCode(24)) ||
-		sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
-		sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
-		data[7] = 8;
-		return;
-	}
+	data[7] = 8;
+	//dpad todo fix
+	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22)) &&
+	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(24)) ||
+	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
+	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
+	// 	data[7] = 8;
+	// 	return;
+	// }
 
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22)) &&
-		sf::Keyboard::isKeyPressed(loader.getKeyCode(23))) {
-		data[7] = 1;
-	}
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
-		sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
-		data[7] = 3;
-	}
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
-		sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
-		data[7] = 5;
-	}
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(24)) &&
-		sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
-		data[7] = 7;
-	}
+	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22)) &&
+	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(23))) {
+	// 	data[7] = 1;
+	// }
+	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
+	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
+	// 	data[7] = 3;
+	// }
+	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
+	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
+	// 	data[7] = 5;
+	// }
+	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(24)) &&
+	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
+	// 	data[7] = 7;
+	// }
 
-	if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22))) {
-		data[7] = 0;
-	}
-	else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23))) {
-		data[7] = 2;
-	}
-	else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
-		data[7] = 4;
-	}
-	else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
-		data[7] = 6;
-	}
-	else {
-		data[7] = 8;
-	}
+	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22))) {
+	// 	data[7] = 0;
+	// }
+	// else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23))) {
+	// 	data[7] = 2;
+	// }
+	// else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
+	// 	data[7] = 4;
+	// }
+	// else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
+	// 	data[7] = 6;
+	// }
+	// else {
+	// 	data[7] = 8;
+	// }
 
 
 };
 
 void VirtualController::getDatafromMacro() {
-	memcpy(data, loader.getMacro(currentMacro)[currentMarcoLine].data(), sizeof(char) * 8);
+	memcpy(data, &macros[currentMacro].data[currentMarcoLine], sizeof(char) * 8);
 	data[0] = 85;
 	currentMarcoLine++;
-	if (currentMarcoLine == loader.getMacro(currentMacro).size()) {
+	if (currentMarcoLine == macros[currentMacro].data.size()) {
 		isMacroActive = false;
-		if (loader.getEnableMacroImgProc(currentMacro)) {
+		if (macros[currentMacro].enableImgProc) {
 			
 			if (imgMatch[currentMacro]->load()) {
-				if (loader.getNextMacroImgMatch(currentMacro).length() == 0)
+				if (macros[currentMacro].macroSuccessList.size() == 0)
 					return;
 				if (displayNextMacro)
-					std::cout << "Activating macro: " << loader.getNextMacroImgMatch(currentMacro) << "\n";
-				activateMacro(loader.getMacroIndex(loader.advanceNextMacroImgMatch(currentMacro)));
+					std::cout << "Activating macro: " << macros[macros[currentMacro].macroSuccessList[0]].name << "\n";
+				// activateMacro(loader.getMacroIndex(loader.advanceNextMacroImgMatch(currentMacro))); todo
 			}
 			else {
-				if (loader.getNextMacroNoImgMatch(currentMacro).length() == 0)
+				if (macros[currentMacro].macroFailList.size() == 0)
 					return;
 				if (displayNextMacro)
-					std::cout << "Activating macro: " << loader.getNextMacroNoImgMatch(currentMacro) << "\n";
-				activateMacro(loader.getMacroIndex(loader.advanceNextMacroNoImgMatch(currentMacro)));
+					std::cout << "Activating macro: " << macros[macros[currentMacro].macroFailList[0]].name << "\n";
+				// activateMacro(loader.getMacroIndex(loader.advanceNextMacroNoImgMatch(currentMacro))); todo
 			}
 		}
 		else {
-			if (loader.getNextMacroNoImgProc(currentMacro).length() == 0)
+			if (macros[currentMacro].macroDefaultList.size() == 0)
 				return;
 			if (displayNextMacro)
-				std::cout << "Activating macro: " << loader.getNextMacroNoImgProc(currentMacro) << "\n";
-			activateMacro(loader.getMacroIndex(loader.advanceNextMacroNoImgProc(currentMacro)));
+				std::cout << "Activating macro: " << macros[macros[currentMacro].macroDefaultList[0]].name << "\n";
+			// activateMacro(loader.getMacroIndex(loader.advanceNextMacroNoImgProc(currentMacro))); todo
 		}
 	}
 }
@@ -363,7 +368,7 @@ void VirtualController::recordMacro() {
 
 
 int VirtualController::activateMacro(int index) {
-	if (index < 0 || index >= loader.getNumMacros() || isMacroActive || isMacroRecordingActive)
+	if (index < 0 || index >= macros.size() || isMacroActive || isMacroRecordingActive)
 		return 0;
 	isMacroActive = true;
 	currentMacro = index;
@@ -377,7 +382,7 @@ void VirtualController::stopMacros() {
 
 
 void VirtualController::updateImgMatch(std::vector<bool> newData) {
-	for (int i = 0; i < loader.getNumMacros(); i++) {
+	for (int i = 0; i < macros.size(); i++) {
 		imgMatch[i]->store(newData[i]);
 	}
 }
