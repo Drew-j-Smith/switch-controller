@@ -25,9 +25,13 @@
     },
     "pictures":
     {
-        "picture1":
+        "haanit":
         {
             "picture filename":"haanit.png"
+        },
+        "haanit mask":
+        {
+            "picture filename":"haanit mask.png"
         }
     },
     "macros":
@@ -35,12 +39,13 @@
         "macro1":
         {
             "filename":"test macro.txt",
-            "button":15,
-            "enable image match":true,
-            "search min x":1,
-            "search min y":2,
-            "search max x":3,
-            "search max y":4,
+            "button":-1,
+            "enable image match":false,
+            "match threshold":0.97,
+            "min x":0,
+            "min y":0,
+            "max x":0,
+            "max y":0,
             "next macro success":
             ["macro1", "macro2", "macro3"],
             "next macro fail":
@@ -50,15 +55,87 @@
             "share settings from macro":"",
             "shared settings":
             {
-                "template image":"picture1",
-                "mask image":"picture1",
-                "match method":4,
-                "match threshold":0.95,
-                "min x":5,
-                "min y":6,
-                "max x":7,
-                "max y":8
+                "template image":"haanit",
+                "mask image":"haanit",
+                "match method":3,
+                "search min x":0,
+                "search min y":0,
+                "search max x":0,
+                "search max y":0
             }
+        },
+        "octopath walk":
+        {
+            "filename":"octopath walk.txt",
+            "button":"t",
+            "enable image match":true,
+            "match threshold":0.97,
+            "next macro success":
+            ["octopath test haanit first"],
+            "next macro fail":
+            ["octopath walk"],
+            "shared settings":
+            {
+                "template image":"haanit",
+                "mask image":"haanit mask",
+                "match method":3,
+                "search min x":1550,
+                "search min y":30,
+                "search max x":1750,
+                "search max y":70
+            }
+        },
+        "octopath attack":
+        {
+            "filename":"octopath attack.txt",
+            "enable image match":true,
+            "match threshold":0.97,
+            "next macro success":
+            ["octopath flee"],
+            "next macro fail":
+            ["octopath win"],
+            "share settings from macro":"octopath walk"
+        },
+        "octopath defend":
+        {
+            "filename":"octopath defend.txt",
+            "enable image match":true,
+            "match threshold":0.97,
+            "next macro success":
+            ["octopath test haanit first"],
+            "next macro fail":
+            ["octopath win"],
+            "share settings from macro":"octopath walk"
+        },
+        "octopath win":
+        {
+            "filename":"octopath win.txt",
+            "next macro default":
+            ["octopath walk", "octopath restore sp"]
+        },
+        "octopath test haanit first":
+        {
+            "filename":"octopath test haanit first.txt",
+            "enable image match":true,
+            "match threshold":0.97,
+            "max x":1600,
+            "next macro success":
+            ["octopath attack"],
+            "next macro fail":
+            ["octopath defend"],
+            "share settings from macro":"octopath walk"
+        },
+        "octopath restore sp":
+        {
+            "filename":"octopath restore sp.txt",
+            "next macro default":
+            ["octopath walk"]
+        },
+        "octopath flee":
+        {
+            "filename":"octopath flee.txt",
+            "next macro default":
+            ["octopath win"]
         }
     }
 }

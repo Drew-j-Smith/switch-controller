@@ -49,6 +49,8 @@ private:
 	void getDatafromMacro();
 	void recordMacro();
 
+	int cycleMacros(vector<int>& macroList);
+
 	boost::shared_ptr<boost::asio::serial_port> port;
 
 	sf::Clock clockSinceLastUpdate;
@@ -330,14 +332,14 @@ void VirtualController::getDatafromMacro() {
 					return;
 				if (displayNextMacro)
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroSuccessList[0]].name << "\n";
-				// activateMacro(loader.getMacroIndex(loader.advanceNextMacroImgMatch(currentMacro))); todo
+				activateMacro(cycleMacros(macros[currentMacro].macroSuccessList));
 			}
 			else {
 				if (macros[currentMacro].macroFailList.size() == 0)
 					return;
 				if (displayNextMacro)
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroFailList[0]].name << "\n";
-				// activateMacro(loader.getMacroIndex(loader.advanceNextMacroNoImgMatch(currentMacro))); todo
+				activateMacro(cycleMacros(macros[currentMacro].macroFailList));
 			}
 		}
 		else {
@@ -345,7 +347,7 @@ void VirtualController::getDatafromMacro() {
 				return;
 			if (displayNextMacro)
 				std::cout << "Activating macro: " << macros[macros[currentMacro].macroDefaultList[0]].name << "\n";
-			// activateMacro(loader.getMacroIndex(loader.advanceNextMacroNoImgProc(currentMacro))); todo
+			activateMacro(cycleMacros(macros[currentMacro].macroDefaultList));
 		}
 	}
 }
@@ -391,5 +393,13 @@ bool VirtualController::isMcrActv() {
 	return isMacroActive;
 }
 
+int VirtualController::cycleMacros(vector<int>& macroList){
+	int temp = macroList[0];
+	for (int i = 0; i < macroList.size() - 1; i++) {
+		macroList[i] = macroList[i + 1];
+	}
+	macroList[macroList.size() - 1] = temp;
+	return temp;
+}
 
 #endif

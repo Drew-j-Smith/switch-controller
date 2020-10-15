@@ -89,7 +89,7 @@ ImgProc::ImgProc(vector<cv::Mat> pictures, vector<Macro> macros, string windowNa
 
 bool ImgProc::update() {
 	screenshot(scrnsht);
-	showImg(scrnsht, "0");
+	// showImg(scrnsht, "0");
 
 	bool update = false;
 	for (int i = 0; i < macros.size(); i++) {
@@ -119,9 +119,6 @@ bool ImgProc::update() {
 			else {
 				mask = pictures[macros[i].maskPic];
 				try{
-					cout << submat.size << endl;
-					cout << templ.size << endl;
-					cout << mask.size << endl;
 					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], mask);
 				}
 				catch(const std::exception& e){
@@ -144,13 +141,13 @@ bool ImgProc::update() {
 		else if (macros[i].macroTemplate != -1) {
 			imgMatch[i] = isMatch(critcalVals[macros[i].macroTemplate], macros[i].matchThreshold,
 				macros[macros[i].macroTemplate].matchMethod, matchPoints[macros[i].macroTemplate], 
-				macros[i].searchMinX, macros[i].searchMinY, macros[i].searchMaxX, macros[i].searchMaxY);
+				macros[i].minX, macros[i].minY, macros[i].maxX, macros[i].maxY);
 		}
 		else {
 			imgMatch[i] = isMatch(critcalVals[i], macros[i].matchThreshold,
 				macros[i].matchMethod, matchPoints[i],
-				macros[i].searchMinX, macros[i].searchMinY, macros[i].searchMaxX, macros[i].searchMaxY);
-			//std::cout << critcalVals[i] << '\n';
+				macros[i].minX, macros[i].minY, macros[i].maxX, macros[i].maxY);
+			// std::cout << critcalVals[i] << '\n';
 		}
 	}
 

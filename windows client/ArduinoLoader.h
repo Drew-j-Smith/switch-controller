@@ -123,15 +123,15 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
 
         macros[i].enableImgProc  = currentMacro.get("enable image match", false);
         macros[i].matchMethod    = currentMacro.get("shared settings.match method", 3);
-        macros[i].searchMinX     = currentMacro.get("search min x", 0);
-        macros[i].searchMinY     = currentMacro.get("search min y", 0);
-        macros[i].searchMaxX     = currentMacro.get("search max x", config.get("general.window width", 0));
-        macros[i].searchMaxY     = currentMacro.get("search max y", config.get("general.window height", 0));
-        macros[i].matchThreshold = currentMacro.get("shared settings.match threshold", 0.0);
-        macros[i].minX           = currentMacro.get("shared settings.min x", 0);
-        macros[i].minY           = currentMacro.get("shared settings.min y", 0);
-        macros[i].maxX           = currentMacro.get("shared settings.max x", config.get("general.window width", 0));
-        macros[i].maxY           = currentMacro.get("shared settings.max y", config.get("general.window height", 0));
+        macros[i].searchMinX     = currentMacro.get("shared settings.search min x", 0);
+        macros[i].searchMinY     = currentMacro.get("shared settings.search min y", 0);
+        macros[i].searchMaxX     = currentMacro.get("shared settings.search max x", config.get("general.window width", 0));
+        macros[i].searchMaxY     = currentMacro.get("shared settings.search max y", config.get("general.window height", 0));
+        macros[i].matchThreshold = currentMacro.get("match threshold", 0.0);
+        macros[i].minX           = currentMacro.get("min x", 0);
+        macros[i].minY           = currentMacro.get("min y", 0);
+        macros[i].maxX           = currentMacro.get("max x", config.get("general.window width", 0));
+        macros[i].maxY           = currentMacro.get("max y", config.get("general.window height", 0));
 
         macros[i].data = loadMacro(config.get("general.macro folder", "") + currentMacro.get("filename", ""));
 
@@ -180,8 +180,8 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
         if(currentMacro.find("next macro success") != currentMacro.not_found()){
             nextMacroList = currentMacro.find("next macro success")->second;
             for(boost::property_tree::ptree::iterator it = nextMacroList.begin(); it != nextMacroList.end(); it++){
-                if(macroIndicices.find(it->first) != macroIndicices.end()){
-                    macros[i].macroSuccessList.push_back(macroIndicices.at(it->first));
+                if(macroIndicices.find(it->second.get("","")) != macroIndicices.end()){
+                    macros[i].macroSuccessList.push_back(macroIndicices.at(it->second.get("","")));
                 }
             }
         }
@@ -190,8 +190,8 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
         if(currentMacro.find("next macro fail") != currentMacro.not_found()){
             nextMacroList = currentMacro.find("next macro fail")->second;
             for(boost::property_tree::ptree::iterator it = nextMacroList.begin(); it != nextMacroList.end(); it++){
-                if(macroIndicices.find(it->first) != macroIndicices.end()){
-                    macros[i].macroFailList.push_back(macroIndicices.at(it->first));
+                if(macroIndicices.find(it->second.get("","")) != macroIndicices.end()){
+                    macros[i].macroFailList.push_back(macroIndicices.at(it->second.get("","")));
                 }
             }
         }
@@ -200,8 +200,8 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
         if(currentMacro.find("next macro default") != currentMacro.not_found()){
             nextMacroList = currentMacro.find("next macro default")->second;
             for(boost::property_tree::ptree::iterator it = nextMacroList.begin(); it != nextMacroList.end(); it++){
-                if(macroIndicices.find(it->first) != macroIndicices.end()){
-                    macros[i].macroDefaultList.push_back(macroIndicices.at(it->first));
+                if(macroIndicices.find(it->second.get("","")) != macroIndicices.end()){
+                    macros[i].macroDefaultList.push_back(macroIndicices.at(it->second.get("","")));
                 }
             }
         }
@@ -217,7 +217,7 @@ void ArduinoLoader::reloadPictures(vector<cv::Mat> &pictures, map<string, int> &
     boost::property_tree::ptree picturePtree = config.find("pictures")->second;
 
     for(boost::property_tree::ptree::iterator it = picturePtree.begin(); it != picturePtree.end(); it++){
-        pictureIndicices.insert({it->first, macros.size()});
+        pictureIndicices.insert({it->first, pictures.size()});
         pictures.push_back(loadPicture(config.get("general.picture folder","") + it->second.get("picture filename", "")));
     }
 }
@@ -289,7 +289,7 @@ string ArduinoLoader::toString(){
 
     result.append("\nMacros\n");
     for(unsigned int i = 0; i < macros.size(); i++){
-        result.append(macros[i].name);
+        result.append("\n" + macros[i].name);
         result.append("\nmacro length:   " + to_string(macros[i].data.size()));
         result.append("\nbutton:         " + to_string(macros[i].button));
         result.append("\nenableImgProc:  " + to_string(macros[i].enableImgProc));
