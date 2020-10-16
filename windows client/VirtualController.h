@@ -27,104 +27,84 @@
 using namespace std;
 
 
-const bool verbose = false;
-const bool displayNextMacro = true;
-const int minDelayMS = 16;
-const bool enableKeyboardInput = true;
-
+const bool VERBOSE_OUTPUT = true;
+const bool OUTPUT_MACRO_ACTIVATION = true;
+const int MIN_DELAY_MS = 16;
+const bool ENABLE_KAYBOARD_INPUT = true;
 
 
 class VirtualController
 {
 public:
-	VirtualController();
 	VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort, string macroFolder);
 	
 	void update();
-	void setNuetral();
-
-	char* getData();
-	void setData(char data, int byte);
 
 	int activateMacro(unsigned int index);
 	void stopMacros();
 	bool isMacroActive();
 
+	void getDataFromKeyboard(char* data);
+	void setNuetral(char* data);
+
 	void updateImgMatch(std::vector<bool> newData);
 private:
-	void getDataFromKeyboard(char* data);
 	void getDatafromMacro(char* data);
-	void recordMacro();
+	void recordMacro(char* data);
 
 	int cycleMacros(vector<int>& macroList);
 
 	std::shared_ptr<boost::asio::serial_port> port;
 
-	sf::Clock clockSinceLastUpdate;
-
 	vector<cv::Mat> pictures;
 	vector<Macro> macros;
 	SwitchButtons switchButtons;
+
+	char data[8];
+
+	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
+
+	sf::Clock clockSinceLastUpdate;
 
 	string macroFolder;
 
 	int currentMacro;
 	int currentMarcoLine;
 	bool macrosActive;
-
 	bool isMacroRecordingActive;
 	std::ofstream outfile;
 
-	thread thread1;
-	thread thread2;
+	thread readThread;
+	thread writeThread;
 
 	static void write(std::shared_ptr<boost::asio::serial_port> port, char* data){
-		char* datacpy[8];
+		char datacpy[8];
 		memcpy(datacpy, data, 8 * sizeof(char));
 		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
+
+		if (VERBOSE_OUTPUT) {
+			std::cout << "bytes sent\n";
+			for (int i = 0; i < 8; i++) {
+				std::cout << setw(5) << int(datacpy[i]);
+			}
+			std::cout << "\n";
+		}
 	}
 
-	static void read(std::shared_ptr<boost::asio::serial_port> port, char* data){
-		boost::asio::read(*port, boost::asio::buffer(data, 8));
+	static void read(std::shared_ptr<boost::asio::serial_port> port){
+		char recievedData[8];
+		boost::asio::read(*port, boost::asio::buffer(recievedData, 8));
+
+		if (VERBOSE_OUTPUT) {
+			std::cout << "bytes recieved\n";
+			for (int i = 0; i < 8; i++) {
+				std::cout << setw(5) << int(recievedData[i]);
+			}
+			std::cout << "\n";
+		}
 	}
-
-	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
-
-	char data[8];
-	char inputBuffer[8];
-	// byte 0 is a check byte set to 85
-
-	// byte 1 bit 1: y
-	// byte 1 bit 2: b
-	// byte 1 bit 3: a
-	// byte 1 bit 4: x
-	// byte 1 bit 5: l
-	// byte 1 bit 6: r
-	// byte 1 bit 7: xl
-	// byte 1 bit 8: xr
-
-	// byte 2 bit 1: select
-	// byte 2 bit 2: start
-	// byte 2 bit 3: l click
-	// byte 2 bit 4: r click
-	// byte 2 bit 5: home
-	// byte 2 bit 6: capture
-
-	// byte 3 is left stick x
-	// byte 4 is left stick y
-	// byte 5 is right stick x
-	// byte 6 is right stick y
-
-	// byte 7 is HAT(d-pad)
-	// 0 to 8 
-	// up = 0 
-	// counts clockwise 
-	// 8 is nuetral
 };
 
-VirtualController::VirtualController() {
-
-}
 
 VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort, string macroFolder){
 
@@ -147,7 +127,7 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 	
 
 	
-	if (verbose)
+	if (VERBOSE_OUTPUT)
 		std::cout << "Serial port connected" << std::endl;
 
 
@@ -161,21 +141,19 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 	for(unsigned int i = 0; i < imgMatch.size(); i++){
 		imgMatch[i] = std::unique_ptr<std::atomic<bool>>(new std::atomic<bool>(false));
 	}
-
-	setNuetral();
 }
 
 void VirtualController::update() {
 	
-	if (verbose)
+	if (VERBOSE_OUTPUT)
 		std::cout << "Time since last update: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
 
-	if (clockSinceLastUpdate.getElapsedTime().asMilliseconds() > minDelayMS)
-		std::cerr << "Warning, running behind " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() - minDelayMS << "ms\n";
+	if (clockSinceLastUpdate.getElapsedTime().asMilliseconds() > MIN_DELAY_MS)
+		std::cerr << "Warning, running behind " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() - MIN_DELAY_MS << "ms\n";
 
-	while (clockSinceLastUpdate.getElapsedTime().asMilliseconds() < minDelayMS);
+	while (clockSinceLastUpdate.getElapsedTime().asMilliseconds() < MIN_DELAY_MS);
 
-	if (verbose)
+	if (VERBOSE_OUTPUT)
 		std::cout << "Time waited: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
 
 	clockSinceLastUpdate.restart();
@@ -207,51 +185,38 @@ void VirtualController::update() {
 
 	if (macrosActive && !isMacroRecordingActive) {
 		getDatafromMacro(data);
-		if (verbose)
+		if (VERBOSE_OUTPUT)
 			std::cout << "Playing macro\n";
 	}
-	else if (enableKeyboardInput) {
+	else if (ENABLE_KAYBOARD_INPUT) {
 		getDataFromKeyboard(data);
-		if (verbose)
+		if (VERBOSE_OUTPUT)
 			std::cout << "Taking keyboard input\n";
 	}
 	else{
-		setNuetral();
+		setNuetral(data);
 	}
 
 	if (isMacroRecordingActive) {
-		recordMacro();
-		if (verbose)
+		recordMacro(data);
+		if (VERBOSE_OUTPUT)
 			std::cout << "Recording\n";
 	}
-	
 
-	if(thread1.joinable())
-		thread1.join();
+	if(readThread.joinable())
+		readThread.join();
 
-	if(thread2.joinable())
-		thread2.join();
+	if(writeThread.joinable())
+		writeThread.join();
 
-	thread1 = thread(VirtualController::read, port, inputBuffer);
+	readThread = thread(VirtualController::read, port);
 
-	thread2 = thread(VirtualController::write, port, data);
-
-
-	
-	
-
-	if (verbose) {
-		std::cout << "\n\nbytes sent and recieved\n";
-		for (int i = 0; i < 8; i++) {
-			std::cout << int(data[i]) << " " << int(inputBuffer[i]) << "\n";
-		}
-		std::cout << "\n\n";
-	}
+	writeThread = thread(VirtualController::write, port, data);
 
 
 }
 
-void VirtualController::setNuetral() {
+void VirtualController::setNuetral(char* data) {
 	data[0] = 85;
 	data[1] = -128;
 	data[2] = -128;
@@ -260,14 +225,6 @@ void VirtualController::setNuetral() {
 	data[5] = 0;
 	data[6] = 0;
 	data[7] = 8;
-};
-
-char* VirtualController::getData() {
-	return data;
-}
-
-void VirtualController::setData(char data, int byte) {
-	this->data[byte] = data;
 }
 
 void VirtualController::getDataFromKeyboard(char* data) {
@@ -335,14 +292,14 @@ void VirtualController::getDatafromMacro(char* data) {
 			if (imgMatch[currentMacro]->load()) {
 				if (macros[currentMacro].macroSuccessList.size() == 0)
 					return;
-				if (displayNextMacro)
+				if (OUTPUT_MACRO_ACTIVATION)
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroSuccessList[0]].name << "\n";
 				activateMacro(cycleMacros(macros[currentMacro].macroSuccessList));
 			}
 			else {
 				if (macros[currentMacro].macroFailList.size() == 0)
 					return;
-				if (displayNextMacro)
+				if (OUTPUT_MACRO_ACTIVATION)
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroFailList[0]].name << "\n";
 				activateMacro(cycleMacros(macros[currentMacro].macroFailList));
 			}
@@ -350,14 +307,14 @@ void VirtualController::getDatafromMacro(char* data) {
 		else {
 			if (macros[currentMacro].macroDefaultList.size() == 0)
 				return;
-			if (displayNextMacro)
+			if (OUTPUT_MACRO_ACTIVATION)
 				std::cout << "Activating macro: " << macros[macros[currentMacro].macroDefaultList[0]].name << "\n";
 			activateMacro(cycleMacros(macros[currentMacro].macroDefaultList));
 		}
 	}
 }
 
-void VirtualController::recordMacro() {
+void VirtualController::recordMacro(char* data) {
 	if (outfile)
 	{
 		for (int i = 0; i < 8; i++) {

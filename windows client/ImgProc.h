@@ -16,7 +16,7 @@
 
 using namespace std;
 
-const bool displayImg = false;
+const bool DISPLAY_IMAGE = false;
 
 class ImgProc {
 public:
@@ -181,7 +181,7 @@ void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int m
 		matchPoint = maxLoc;
 		criticalVal = maxVal;
 	}
-	if (displayImg) {
+	if (DISPLAY_IMAGE) {
 		rectangle(img_display, matchPoint, cv::Point(matchPoint.x + templ.cols, matchPoint.y + templ.rows), cv::Scalar::all(0), 2, 8, 0);
 		rectangle(result, matchPoint, cv::Point(matchPoint.x + templ.cols, matchPoint.y + templ.rows), cv::Scalar::all(0), 2, 8, 0);
 		showImg(img_display, "1");
