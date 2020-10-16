@@ -92,7 +92,7 @@ bool ImgProc::update() {
 	// showImg(scrnsht, "0");
 
 	bool update = false;
-	for (int i = 0; i < macros.size(); i++) {
+	for (unsigned int i = 0; i < macros.size(); i++) {
 		
 		if (!macros[i].enableImgProc || macros[i].macroTemplate != -1) {
 			continue;
@@ -133,7 +133,7 @@ bool ImgProc::update() {
 	}
 	if (!update)
 		return false;
-	for (int i = 0; i < macros.size(); i++) {
+	for (unsigned int i = 0; i < macros.size(); i++) {
 		if (!macros[i].enableImgProc) {
 			imgMatch[i] = false;
 			continue;

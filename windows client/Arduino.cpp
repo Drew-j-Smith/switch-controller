@@ -8,22 +8,19 @@
 #include "ImgProc.h"
 #include "ArduinoLoader.h"
 
-ImgProc i;
-VirtualController v;
 
-void updateThread() {
-	while (i.update()) {
-		v.updateImgMatch(i.getImgMatch());
+void updateThread(VirtualController* v, ImgProc* i) {
+	while (i->update()) {
+		v->updateImgMatch(i->getImgMatch());
 	};
 }
 
-int main()
-{
+int main(){
 	ArduinoLoader l("config.json");
-	i = ImgProc(l.getPictures(), l.getMacros(), l.getOption("window name"), stoi(l.getOption("window width")), stoi(l.getOption("window height")));
-	v = VirtualController(l.getPictures(), l.getMacros(), l.getSwitchButtons(), l.getOption("serial port"));
+	ImgProc i(l.getPictures(), l.getMacros(), l.getOption("window name"), stoi(l.getOption("window width")), stoi(l.getOption("window height")));
+	VirtualController v(l.getPictures(), l.getMacros(), l.getSwitchButtons(), l.getOption("serial port"), l.getOption("macro folder"));
 
-	std::thread th1(updateThread);
+	std::thread th1(updateThread, &v, &i);
 
 	std::cout << "Ready\n";
 

@@ -3,19 +3,24 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <boost/asio.hpp>
+
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+
+#include "ArduinoStructs.h"
+#include "ImgProc.h"
+
 #include <string>
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <iomanip>
-#include <boost/asio.hpp>
-#include "ArduinoStructs.h"
-#include "ImgProc.h"
 #include <atomic>
 #include <memory>
+#include <chrono>
+#include <ctime>
 
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
 
 using namespace std;
 
@@ -31,7 +36,7 @@ class VirtualController
 {
 public:
 	VirtualController();
-	VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort);
+	VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort, string macroFolder);
 	
 	void update();
 	void setNuetral();
@@ -39,14 +44,14 @@ public:
 	char* getData();
 	void setData(char data, int byte);
 
-	int activateMacro(int index);
+	int activateMacro(unsigned int index);
 	void stopMacros();
 	bool isMcrActv();
 
 	void updateImgMatch(std::vector<bool> newData);
 private:
-	void getDataFromKeyboard();
-	void getDatafromMacro();
+	void getDataFromKeyboard(char* data);
+	void getDatafromMacro(char* data);
 	void recordMacro();
 
 	int cycleMacros(vector<int>& macroList);
@@ -58,6 +63,8 @@ private:
 	vector<cv::Mat> pictures;
 	vector<Macro> macros;
 	SwitchButtons switchButtons;
+
+	string macroFolder;
 
 	//std::vector<std::array<char, 8>> currentMacro;
 	int currentMacro;
@@ -107,12 +114,12 @@ VirtualController::VirtualController() {
 
 }
 
-VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort){
+VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort, string macroFolder){
 
 	this->pictures = pictures;
 	this->macros = macros;
 	this->switchButtons = switchButtons;
-
+	this->macroFolder = macroFolder;
 
 	try{
 		boost::asio::io_service io;
@@ -139,7 +146,7 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 
 	imgMatch.resize(macros.size());
 
-	for(int i = 0; i < imgMatch.size(); i++){
+	for(unsigned int i = 0; i < imgMatch.size(); i++){
 		imgMatch[i] = std::unique_ptr<std::atomic<bool>>(new std::atomic<bool>(false));
 	}
 
@@ -167,7 +174,7 @@ void VirtualController::update() {
 			isMacroRecordingActive = true;
 		}
 		else {
-			for (int i = 0; i < macros.size(); i++) {
+			for (unsigned int i = 0; i < macros.size(); i++) {
 				if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)macros[i].button)) {
 					activateMacro(i);
 				}
@@ -188,12 +195,12 @@ void VirtualController::update() {
 
 
 	if (isMacroActive && !isMacroRecordingActive) {
-		getDatafromMacro();
+		getDatafromMacro(data);
 		if (verbose)
 			std::cout << "Playing macro\n";
 	}
 	else if (enableKeyboardInput) {
-		getDataFromKeyboard();
+		getDataFromKeyboard(data);
 		if (verbose)
 			std::cout << "Taking keyboard input\n";
 	}
@@ -243,7 +250,7 @@ void VirtualController::setData(char data, int byte) {
 	this->data[byte] = data;
 }
 
-void VirtualController::getDataFromKeyboard() {
+void VirtualController::getDataFromKeyboard(char* data) {
 	data[0] = 85;
 
 	data[1] = 0;
@@ -319,7 +326,7 @@ void VirtualController::getDataFromKeyboard() {
 
 };
 
-void VirtualController::getDatafromMacro() {
+void VirtualController::getDatafromMacro(char* data) {
 	memcpy(data, &macros[currentMacro].data[currentMarcoLine], sizeof(char) * 8);
 	data[0] = 85;
 	currentMarcoLine++;
@@ -369,7 +376,7 @@ void VirtualController::recordMacro() {
 };
 
 
-int VirtualController::activateMacro(int index) {
+int VirtualController::activateMacro(unsigned int index) {
 	if (index < 0 || index >= macros.size() || isMacroActive || isMacroRecordingActive)
 		return 0;
 	isMacroActive = true;
@@ -384,7 +391,7 @@ void VirtualController::stopMacros() {
 
 
 void VirtualController::updateImgMatch(std::vector<bool> newData) {
-	for (int i = 0; i < macros.size(); i++) {
+	for (unsigned int i = 0; i < macros.size(); i++) {
 		imgMatch[i]->store(newData[i]);
 	}
 }
@@ -395,7 +402,7 @@ bool VirtualController::isMcrActv() {
 
 int VirtualController::cycleMacros(vector<int>& macroList){
 	int temp = macroList[0];
-	for (int i = 0; i < macroList.size() - 1; i++) {
+	for (unsigned int i = 0; i < macroList.size() - 1; i++) {
 		macroList[i] = macroList[i + 1];
 	}
 	macroList[macroList.size() - 1] = temp;

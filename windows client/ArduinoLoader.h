@@ -16,9 +16,6 @@
 
 using namespace std;
 
-//todo save as current date
-//add back screenshot
-
 class ArduinoLoader{
 private:
     vector<cv::Mat> pictures;
