@@ -10,7 +10,7 @@ This is repo to help compile and run code for a switch controller emulator with 
 (only the folder with the title LUFA is required to be in the project)
 
 ### Compiling and Flashing in Windows 10
-[Compiler](https://infernoembedded.com/products/avr-tools/release)
+Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10). Seriously, it will save you time.
 
 [DFU mode](https://www.arduino.cc/en/Hacking/DFUProgramming8U2)
 
@@ -26,5 +26,5 @@ The drivers for dfu mode can be found in the flip program folder under \Atmel\Fl
 
 [SFML](https://www.sfml-dev.org/)
 
-[SerialPort](https://github.com/manashmandal/SerialPort) (with a few tweeks)
+[Boost](https://www.boost.org/)
 
