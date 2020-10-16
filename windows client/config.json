@@ -21,7 +21,11 @@
         "leftStickYplus":"w",
         "leftStickYminus":"s",
         "recordMacro":"y",
-        "screenshot":"r"
+        "screenshot":"r",
+        "dpadUp":"g",
+        "dpadRight":"n",
+        "dpadDown":"b",
+        "dpadLeft":"v"
     },
     "pictures":
     {

@@ -281,48 +281,26 @@ void VirtualController::getDataFromKeyboard(char* data) {
 			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickYplus ) * 128 + 128;
 
 	data[7] = 8;
-	//dpad todo fix
-	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22)) &&
-	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(24)) ||
-	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
-	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
-	// 	data[7] = 8;
-	// 	return;
-	// }
-
-	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22)) &&
-	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(23))) {
-	// 	data[7] = 1;
-	// }
-	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
-	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
-	// 	data[7] = 3;
-	// }
-	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23)) &&
-	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
-	// 	data[7] = 5;
-	// }
-	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(24)) &&
-	// 	sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
-	// 	data[7] = 7;
-	// }
-
-	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(22))) {
-	// 	data[7] = 0;
-	// }
-	// else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(23))) {
-	// 	data[7] = 2;
-	// }
-	// else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(24))) {
-	// 	data[7] = 4;
-	// }
-	// else if (sf::Keyboard::isKeyPressed(loader.getKeyCode(25))) {
-	// 	data[7] = 6;
-	// }
-	// else {
-	// 	data[7] = 8;
-	// }
-
+	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadUp) && 
+		!sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadDown)){
+		data[7] = 0; //up
+	}
+	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadDown) &&
+		!sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadUp)){
+		data[7] = 4; //down
+	}
+	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadRight) &&
+		!sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadLeft)){
+		if(data[7] == 0) data[7] = 1; //up right
+		if(data[7] == 8) data[7] = 2; //right
+		if(data[7] == 4) data[7] = 3; //down right
+	}
+	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadLeft) &&
+		!sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadRight)){
+		if(data[7] == 4) data[7] = 5; //down left
+		if(data[7] == 8) data[7] = 6; //left
+		if(data[7] == 0) data[7] = 7; //up left
+	}
 
 };
 
