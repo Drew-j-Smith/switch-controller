@@ -25,7 +25,7 @@ int main(){
 	std::cout << "Ready\n";
 
 	while (true) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && v.isMcrActv()){
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && v.isMacroActive()){
 			v.stopMacros();
 			std::cout << "Stopping macros\n";
 		}

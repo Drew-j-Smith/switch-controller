@@ -21,6 +21,8 @@
 #include <chrono>
 #include <ctime>
 
+#include <thread>
+
 
 using namespace std;
 
@@ -46,7 +48,7 @@ public:
 
 	int activateMacro(unsigned int index);
 	void stopMacros();
-	bool isMcrActv();
+	bool isMacroActive();
 
 	void updateImgMatch(std::vector<bool> newData);
 private:
@@ -56,7 +58,7 @@ private:
 
 	int cycleMacros(vector<int>& macroList);
 
-	boost::shared_ptr<boost::asio::serial_port> port;
+	std::shared_ptr<boost::asio::serial_port> port;
 
 	sf::Clock clockSinceLastUpdate;
 
@@ -66,15 +68,25 @@ private:
 
 	string macroFolder;
 
-	//std::vector<std::array<char, 8>> currentMacro;
 	int currentMacro;
 	int currentMarcoLine;
-	bool isMacroActive;
+	bool macrosActive;
 
 	bool isMacroRecordingActive;
 	std::ofstream outfile;
 
-	ImgProc imgProc;
+	thread thread1;
+	thread thread2;
+
+	static void write(std::shared_ptr<boost::asio::serial_port> port, char* data){
+		char* datacpy[8];
+		memcpy(datacpy, data, 8 * sizeof(char));
+		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
+	}
+
+	static void read(std::shared_ptr<boost::asio::serial_port> port, char* data){
+		boost::asio::read(*port, boost::asio::buffer(data, 8));
+	}
 
 	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
 
@@ -123,7 +135,7 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 
 	try{
 		boost::asio::io_service io;
-		port = boost::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
+		port = std::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
 		port->open(serialPort);
 		port->set_option(boost::asio::serial_port_base::baud_rate(9600));
 	}
@@ -141,7 +153,7 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 
 	clockSinceLastUpdate = sf::Clock();
 
-	isMacroActive = false;
+	macrosActive = false;
 	isMacroRecordingActive = false;
 
 	imgMatch.resize(macros.size());
@@ -159,7 +171,7 @@ void VirtualController::update() {
 		std::cout << "Time since last update: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
 
 	if (clockSinceLastUpdate.getElapsedTime().asMilliseconds() > minDelayMS)
-		std::cerr << "Warning, runnning behind " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() - minDelayMS << "ms\n";
+		std::cerr << "Warning, running behind " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() - minDelayMS << "ms\n";
 
 	while (clockSinceLastUpdate.getElapsedTime().asMilliseconds() < minDelayMS);
 
@@ -168,7 +180,7 @@ void VirtualController::update() {
 
 	clockSinceLastUpdate.restart();
 
-	if (!isMacroActive && !isMacroRecordingActive) {
+	if (!macrosActive && !isMacroRecordingActive) {
 		if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro)) {
 			outfile.open(/*todo loader.getMacroFolder() +  loader.getMacroRecordingFilename()*/"temp", std::ios::out);
 			isMacroRecordingActive = true;
@@ -193,8 +205,7 @@ void VirtualController::update() {
 	// 	imgProc.saveImg(img, loader.getPictureFolder() + loader.getPictureRecordingFilename());
 	// }
 
-
-	if (isMacroActive && !isMacroRecordingActive) {
+	if (macrosActive && !isMacroRecordingActive) {
 		getDatafromMacro(data);
 		if (verbose)
 			std::cout << "Playing macro\n";
@@ -204,6 +215,9 @@ void VirtualController::update() {
 		if (verbose)
 			std::cout << "Taking keyboard input\n";
 	}
+	else{
+		setNuetral();
+	}
 
 	if (isMacroRecordingActive) {
 		recordMacro();
@@ -212,11 +226,17 @@ void VirtualController::update() {
 	}
 	
 
-	
+	if(thread1.joinable())
+		thread1.join();
 
-	boost::asio::write(*port, boost::asio::buffer(data, 8));
+	if(thread2.joinable())
+		thread2.join();
 
-	port->read_some(boost::asio::buffer(inputBuffer, 8));
+	thread1 = thread(VirtualController::read, port, inputBuffer);
+
+	thread2 = thread(VirtualController::write, port, data);
+
+
 	
 	
 
@@ -309,7 +329,7 @@ void VirtualController::getDatafromMacro(char* data) {
 	data[0] = 85;
 	currentMarcoLine++;
 	if (currentMarcoLine == macros[currentMacro].data.size()) {
-		isMacroActive = false;
+		macrosActive = false;
 		if (macros[currentMacro].enableImgProc) {
 			
 			if (imgMatch[currentMacro]->load()) {
@@ -355,16 +375,16 @@ void VirtualController::recordMacro() {
 
 
 int VirtualController::activateMacro(unsigned int index) {
-	if (index < 0 || index >= macros.size() || isMacroActive || isMacroRecordingActive)
+	if (index < 0 || index >= macros.size() || macrosActive || isMacroRecordingActive)
 		return 0;
-	isMacroActive = true;
+	macrosActive = true;
 	currentMacro = index;
 	currentMarcoLine = 0;
 	return 1;
 }
 
 void VirtualController::stopMacros() {
-	isMacroActive = false;
+	macrosActive = false;
 }
 
 
@@ -374,8 +394,8 @@ void VirtualController::updateImgMatch(std::vector<bool> newData) {
 	}
 }
 
-bool VirtualController::isMcrActv() {
-	return isMacroActive;
+bool VirtualController::isMacroActive() {
+	return macrosActive;
 }
 
 int VirtualController::cycleMacros(vector<int>& macroList){
