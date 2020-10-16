@@ -36,34 +36,6 @@
     },
     "macros":
     {
-        "macro1":
-        {
-            "filename":"test macro.txt",
-            "button":-1,
-            "enable image match":false,
-            "match threshold":0.97,
-            "min x":0,
-            "min y":0,
-            "max x":0,
-            "max y":0,
-            "next macro success":
-            ["macro1", "macro2", "macro3"],
-            "next macro fail":
-            ["macro1", "macro2", "macro3"],
-            "next macro default":
-            ["macro1", "macro2", "macro3"],
-            "share settings from macro":"",
-            "shared settings":
-            {
-                "template image":"haanit",
-                "mask image":"haanit",
-                "match method":3,
-                "search min x":0,
-                "search min y":0,
-                "search max x":0,
-                "search max y":0
-            }
-        },
         "octopath walk":
         {
             "filename":"octopath walk.txt",
