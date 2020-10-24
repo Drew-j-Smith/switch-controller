@@ -12,12 +12,12 @@
 
 int main(int argc, char **argv){
 
-	string config = "config.json";
+	std::string config = "config.json";
 
 	for(int i = 1; i < argc; i++){
 		if(strcmp(argv[i], "-c") == 0 && argc > i){
-			config = string(argv[++i]);
-			cout << "Using config \"" << config << "\"\n";
+			config = std::string(argv[++i]);
+			std::cout << "Using config \"" << config << "\"\n";
 		}
 		else if(strcmp(argv[i], "-v") == 0){
 			VERBOSE_OUTPUT = true;
@@ -39,6 +39,8 @@ int main(int argc, char **argv){
 			std::cout << "    set to verbose.                 \n";
 			std::cout << "                                    \n";
 			std::cout << "-x                                  \n";
+			std::cout << "    set to display screen capture.  \n";
+			std::cout << "-m                                  \n";
 			std::cout << "    set to display image match.     \n";
 			return 0;
 		}

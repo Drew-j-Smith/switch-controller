@@ -8,8 +8,9 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
+#include <opencv2/core.hpp>
+
 #include "ArduinoStructs.h"
-#include "ImgProc.h"
 
 #include <string>
 #include <iostream>
@@ -20,11 +21,7 @@
 #include <memory>
 #include <chrono>
 #include <ctime>
-
 #include <thread>
-
-
-using namespace std;
 
 
 bool VERBOSE_OUTPUT = false;
@@ -36,7 +33,7 @@ const bool ENABLE_KAYBOARD_INPUT = true;
 class VirtualController
 {
 public:
-	VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort, string macroFolder);
+	VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, SwitchButtons switchButtons, std::string serialPort, std::string macroFolder);
 	
 	void update();
 
@@ -52,12 +49,12 @@ private:
 	void getDatafromMacro(char* data);
 	void recordMacro(char* data);
 
-	int cycleMacros(vector<int>& macroList);
+	int cycleMacros(std::vector<int>& macroList);
 
 	std::shared_ptr<boost::asio::serial_port> port;
 
-	vector<cv::Mat> pictures;
-	vector<Macro> macros;
+	std::vector<cv::Mat> pictures;
+	std::vector<Macro> macros;
 	SwitchButtons switchButtons;
 
 	char data[8];
@@ -66,7 +63,7 @@ private:
 
 	std::chrono::steady_clock::time_point timeSinceUpdate;
 
-	string macroFolder;
+	std::string macroFolder;
 
 	int currentMacro;
 	int currentMarcoLine;
@@ -74,12 +71,12 @@ private:
 	bool isMacroRecordingActive;
 	std::ofstream outfile;
 
-	thread readThread;
-	thread writeThread;
+	std::thread readThread;
+	std::thread writeThread;
 };
 
 
-VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> macros, SwitchButtons switchButtons, string serialPort, string macroFolder){
+VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, SwitchButtons switchButtons, std::string serialPort, std::string macroFolder){
 
 	this->pictures = pictures;
 	this->macros = macros;
@@ -184,20 +181,20 @@ void VirtualController::update() {
 	if(writeThread.joinable())
 		writeThread.join();
 
-	readThread = thread([&](){
+	readThread = std::thread([&](){
 		char recievedData[8];
 		boost::asio::read(*port, boost::asio::buffer(recievedData, 8));
 
 		if (VERBOSE_OUTPUT) {
 			std::cout << "bytes recieved\n";
 			for (int i = 0; i < 8; i++) {
-				std::cout << setw(5) << int(recievedData[i]);
+				std::cout << std::setw(5) << int(recievedData[i]);
 			}
 			std::cout << "\n";
 		}
 	});
 
-	writeThread = thread([&](){
+	writeThread = std::thread([&](){
 		char datacpy[8];
 		memcpy(datacpy, data, 8 * sizeof(char));
 		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
@@ -205,7 +202,7 @@ void VirtualController::update() {
 		if (VERBOSE_OUTPUT) {
 			std::cout << "bytes sent\n";
 			for (int i = 0; i < 8; i++) {
-				std::cout << setw(5) << int(datacpy[i]);
+				std::cout << std::setw(5) << int(datacpy[i]);
 			}
 			std::cout << "\n";
 		}
@@ -353,7 +350,7 @@ bool VirtualController::isMacroActive() {
 	return macrosActive;
 }
 
-int VirtualController::cycleMacros(vector<int>& macroList){
+int VirtualController::cycleMacros(std::vector<int>& macroList){
 	int temp = macroList[0];
 	for (unsigned int i = 0; i < macroList.size() - 1; i++) {
 		macroList[i] = macroList[i + 1];

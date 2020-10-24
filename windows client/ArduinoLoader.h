@@ -14,49 +14,48 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-using namespace std;
 
 class ArduinoLoader{
 private:
-    vector<cv::Mat> pictures;
-    vector<Macro> macros;
+    std::vector<cv::Mat> pictures;
+    std::vector<Macro> macros;
     SwitchButtons switchButtons;
     boost::property_tree::ptree config;
 
-    void reloadPictures(vector<cv::Mat> &pictures, map<string, int> &pictureIndicices);
-    void reloadMacros(vector<Macro> &macros, map<string, int> &macroIndicices, map<string, int> pictureIndicices);
+    void reloadPictures(std::vector<cv::Mat> &pictures, std::map<std::string, int> &pictureIndicices);
+    void reloadMacros(std::vector<Macro> &macros, std::map<std::string, int> &macroIndicices, std::map<std::string, int> pictureIndicices);
     SwitchButtons reloadSwitchButtons();
-    std::vector<std::array<char, 8>> loadMacro(string filename);
-    cv::Mat loadPicture(string filename);
-    int getButton(string button);
+    std::vector<std::array<char, 8>> loadMacro(std::string filename);
+    cv::Mat loadPicture(std::string filename);
+    int getButton(std::string button);
 public:
     ArduinoLoader();
-    ArduinoLoader(string filename);
+    ArduinoLoader(std::string filename);
 
-    void loadConfig(string filename);
+    void loadConfig(std::string filename);
 
-    vector<cv::Mat> getPictures();
-    vector<Macro> getMacros();
+    std::vector<cv::Mat> getPictures();
+    std::vector<Macro> getMacros();
     SwitchButtons getSwitchButtons();
-    string getOption(string option);
+    std::string getOption(std::string option);
 
 
-    string toString();
+    std::string toString();
 };
 
 ArduinoLoader::ArduinoLoader(){
     config = boost::property_tree::ptree();
 }
 
-ArduinoLoader::ArduinoLoader(string filename){
+ArduinoLoader::ArduinoLoader(std::string filename){
     loadConfig(filename);
 }
 
-void ArduinoLoader::loadConfig(string filename){
+void ArduinoLoader::loadConfig(std::string filename){
     boost::property_tree::read_json(filename, config);
 
-    map<string, int> pictureIndicices;
-    map<string, int> macroIndicices;
+    std::map<std::string, int> pictureIndicices;
+    std::map<std::string, int> macroIndicices;
     reloadPictures(pictures, pictureIndicices);
     reloadMacros(macros, macroIndicices, pictureIndicices);
     switchButtons = reloadSwitchButtons();
@@ -64,13 +63,13 @@ void ArduinoLoader::loadConfig(string filename){
 
 #pragma region privateMethods
 
-std::vector<std::array<char, 8>> ArduinoLoader::loadMacro(string filename){
-    ifstream infile;
-    string stringLine;
+std::vector<std::array<char, 8>> ArduinoLoader::loadMacro(std::string filename){
+    std::ifstream infile;
+    std::string stringLine;
     std::array<char, 8> inputArray;
     std::vector<std::array<char, 8>> macro = {};
 
-    infile.open(filename, ios::in);
+    infile.open(filename, std::ios::in);
 
     if (infile) {
         while (!infile.eof()) {
@@ -92,7 +91,7 @@ std::vector<std::array<char, 8>> ArduinoLoader::loadMacro(string filename){
     return macro;
 }
 
-cv::Mat ArduinoLoader::loadPicture(string filename) {
+cv::Mat ArduinoLoader::loadPicture(std::string filename) {
     cv::Mat image;
     image = cv::imread(filename, cv::IMREAD_COLOR); // Read the file
     if (image.empty()) // Check for invalid input
@@ -102,7 +101,7 @@ cv::Mat ArduinoLoader::loadPicture(string filename) {
     return image;
 }
 
-void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroIndicices, map<string, int> pictureIndicices){
+void ArduinoLoader::reloadMacros(std::vector<Macro> &macros, std::map<std::string, int> &macroIndicices, std::map<std::string, int> pictureIndicices){
     macros = {};
     macroIndicices = {};
 
@@ -132,7 +131,7 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
 
         macros[i].data = loadMacro(config.get("general.macro folder", "") + currentMacro.get("filename", ""));
 
-        string button = currentMacro.get("button", "-1");
+        std::string button = currentMacro.get("button", "-1");
         if(button.at(0) >= 'a' && button.at(0) <= 'z'){
             macros[i].button = button.at(0) - 'a';
         }
@@ -150,20 +149,20 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
             }
         }
 
-        string templatePic = currentMacro.get("shared settings.template image", "");
+        std::string templatePic = currentMacro.get("shared settings.template image", "");
         if(pictureIndicices.find(templatePic) != pictureIndicices.end())
             macros[i].templatePic = pictureIndicices.at(templatePic);
         else
             macros[i].templatePic = -1;
         
-        string maskPic = currentMacro.get("shared settings.mask image", "");
+        std::string maskPic = currentMacro.get("shared settings.mask image", "");
         if(pictureIndicices.find(maskPic) != pictureIndicices.end())
             macros[i].maskPic = pictureIndicices.at(maskPic);
         else
             macros[i].maskPic = -1;
 
 
-        string macroTemplate = currentMacro.get("share settings from macro", "");
+        std::string macroTemplate = currentMacro.get("share settings from macro", "");
         if(macroIndicices.find(macroTemplate) != macroIndicices.end()){
             macros[i].macroTemplate = macroIndicices.at(macroTemplate);
         }
@@ -207,7 +206,7 @@ void ArduinoLoader::reloadMacros(vector<Macro> &macros, map<string, int> &macroI
 
 }
 
-void ArduinoLoader::reloadPictures(vector<cv::Mat> &pictures, map<string, int> &pictureIndicices){
+void ArduinoLoader::reloadPictures(std::vector<cv::Mat> &pictures, std::map<std::string, int> &pictureIndicices){
     pictures = {};
     pictureIndicices = {};
 
@@ -252,8 +251,8 @@ SwitchButtons ArduinoLoader::reloadSwitchButtons(){
     return switchButtons;
 }
 
-int ArduinoLoader::getButton(string button){
-    string buttonCode = config.get("controls." + button, "-1");
+int ArduinoLoader::getButton(std::string button){
+    std::string buttonCode = config.get("controls." + button, "-1");
     if(buttonCode.at(0) >= 'a' && buttonCode.at(0) <= 'z'){
         return buttonCode.at(0) - 'a';
     }
@@ -276,9 +275,9 @@ int ArduinoLoader::getButton(string button){
 
 #pragma endregion privateMethods
 
-string ArduinoLoader::toString(){
-    string result;
-    stringstream outstream = stringstream("");
+std::string ArduinoLoader::toString(){
+    std::string result;
+    std::stringstream outstream = std::stringstream("");
 
     boost::property_tree::json_parser::write_json(outstream, config);
 
@@ -287,70 +286,70 @@ string ArduinoLoader::toString(){
     result.append("\nMacros\n");
     for(unsigned int i = 0; i < macros.size(); i++){
         result.append("\n" + macros[i].name);
-        result.append("\nmacro length:   " + to_string(macros[i].data.size()));
-        result.append("\nbutton:         " + to_string(macros[i].button));
-        result.append("\nenableImgProc:  " + to_string(macros[i].enableImgProc));
-        result.append("\ntemplatePic:    " + to_string(macros[i].templatePic));
-        result.append("\nmaskPic:        " + to_string(macros[i].maskPic));
-        result.append("\nmatchMethod:    " + to_string(macros[i].matchMethod));
-        result.append("\nsearchMinX:     " + to_string(macros[i].searchMinX));
-        result.append("\nsearchMinY:     " + to_string(macros[i].searchMinY));
-        result.append("\nsearchMaxX:     " + to_string(macros[i].searchMaxX));
-        result.append("\nsearchMaxY:     " + to_string(macros[i].searchMaxY));
-        result.append("\nmacroTemplate:  " + to_string(macros[i].macroTemplate));
-        result.append("\nmatchThreshold: " + to_string(macros[i].matchThreshold));
-        result.append("\nminX:           " + to_string(macros[i].minX));
-        result.append("\nminY:           " + to_string(macros[i].minY));
-        result.append("\nmaxX:           " + to_string(macros[i].maxX));
-        result.append("\nmaxY:           " + to_string(macros[i].maxY));
+        result.append("\nmacro length:   " + std::to_string(macros[i].data.size()));
+        result.append("\nbutton:         " + std::to_string(macros[i].button));
+        result.append("\nenableImgProc:  " + std::to_string(macros[i].enableImgProc));
+        result.append("\ntemplatePic:    " + std::to_string(macros[i].templatePic));
+        result.append("\nmaskPic:        " + std::to_string(macros[i].maskPic));
+        result.append("\nmatchMethod:    " + std::to_string(macros[i].matchMethod));
+        result.append("\nsearchMinX:     " + std::to_string(macros[i].searchMinX));
+        result.append("\nsearchMinY:     " + std::to_string(macros[i].searchMinY));
+        result.append("\nsearchMaxX:     " + std::to_string(macros[i].searchMaxX));
+        result.append("\nsearchMaxY:     " + std::to_string(macros[i].searchMaxY));
+        result.append("\nmacroTemplate:  " + std::to_string(macros[i].macroTemplate));
+        result.append("\nmatchThreshold: " + std::to_string(macros[i].matchThreshold));
+        result.append("\nminX:           " + std::to_string(macros[i].minX));
+        result.append("\nminY:           " + std::to_string(macros[i].minY));
+        result.append("\nmaxX:           " + std::to_string(macros[i].maxX));
+        result.append("\nmaxY:           " + std::to_string(macros[i].maxY));
         result.append("\n");
     }
 
     result.append("\nControls");
-    result.append("\ny:                " + to_string(switchButtons.y));
-    result.append("\nb:                " + to_string(switchButtons.b));
-    result.append("\na:                " + to_string(switchButtons.a));
-    result.append("\nx:                " + to_string(switchButtons.x));
-    result.append("\nl:                " + to_string(switchButtons.l));
-    result.append("\nr:                " + to_string(switchButtons.r));
-    result.append("\nxl:               " + to_string(switchButtons.xl));
-    result.append("\nxr:               " + to_string(switchButtons.xr));
-    result.append("\nselect:           " + to_string(switchButtons.select));
-    result.append("\nstart:            " + to_string(switchButtons.start));
-    result.append("\nlClick:           " + to_string(switchButtons.lClick));
-    result.append("\nrRlick:           " + to_string(switchButtons.rRlick));
-    result.append("\nhome:             " + to_string(switchButtons.home));
-    result.append("\ncapture:          " + to_string(switchButtons.capture));
-    result.append("\nleftStickXplus:   " + to_string(switchButtons.leftStickXplus));
-    result.append("\nleftStickXminus:  " + to_string(switchButtons.leftStickXminus));
-    result.append("\nleftStickYplus:   " + to_string(switchButtons.leftStickYplus));
-    result.append("\nleftStickYminus:  " + to_string(switchButtons.leftStickYminus));
-    result.append("\nrightStickXplus:  " + to_string(switchButtons.rightStickXplus));
-    result.append("\nrightStickXminus: " + to_string(switchButtons.rightStickXminus));
-    result.append("\nrightStickYplus:  " + to_string(switchButtons.rightStickYplus));
-    result.append("\nrightStickYminus: " + to_string(switchButtons.rightStickYminus));
-    result.append("\ndpadUp:           " + to_string(switchButtons.dpadUp));
-    result.append("\ndpadRight:        " + to_string(switchButtons.dpadRight));
-    result.append("\ndpadDown:         " + to_string(switchButtons.dpadDown));
-    result.append("\ndpadLeft:         " + to_string(switchButtons.dpadLeft));
-    result.append("\nrecordMacro:      " + to_string(switchButtons.recordMacro));
-    result.append("\nscreenshot:       " + to_string(switchButtons.screenshot));
+    result.append("\ny:                " + std::to_string(switchButtons.y));
+    result.append("\nb:                " + std::to_string(switchButtons.b));
+    result.append("\na:                " + std::to_string(switchButtons.a));
+    result.append("\nx:                " + std::to_string(switchButtons.x));
+    result.append("\nl:                " + std::to_string(switchButtons.l));
+    result.append("\nr:                " + std::to_string(switchButtons.r));
+    result.append("\nxl:               " + std::to_string(switchButtons.xl));
+    result.append("\nxr:               " + std::to_string(switchButtons.xr));
+    result.append("\nselect:           " + std::to_string(switchButtons.select));
+    result.append("\nstart:            " + std::to_string(switchButtons.start));
+    result.append("\nlClick:           " + std::to_string(switchButtons.lClick));
+    result.append("\nrRlick:           " + std::to_string(switchButtons.rRlick));
+    result.append("\nhome:             " + std::to_string(switchButtons.home));
+    result.append("\ncapture:          " + std::to_string(switchButtons.capture));
+    result.append("\nleftStickXplus:   " + std::to_string(switchButtons.leftStickXplus));
+    result.append("\nleftStickXminus:  " + std::to_string(switchButtons.leftStickXminus));
+    result.append("\nleftStickYplus:   " + std::to_string(switchButtons.leftStickYplus));
+    result.append("\nleftStickYminus:  " + std::to_string(switchButtons.leftStickYminus));
+    result.append("\nrightStickXplus:  " + std::to_string(switchButtons.rightStickXplus));
+    result.append("\nrightStickXminus: " + std::to_string(switchButtons.rightStickXminus));
+    result.append("\nrightStickYplus:  " + std::to_string(switchButtons.rightStickYplus));
+    result.append("\nrightStickYminus: " + std::to_string(switchButtons.rightStickYminus));
+    result.append("\ndpadUp:           " + std::to_string(switchButtons.dpadUp));
+    result.append("\ndpadRight:        " + std::to_string(switchButtons.dpadRight));
+    result.append("\ndpadDown:         " + std::to_string(switchButtons.dpadDown));
+    result.append("\ndpadLeft:         " + std::to_string(switchButtons.dpadLeft));
+    result.append("\nrecordMacro:      " + std::to_string(switchButtons.recordMacro));
+    result.append("\nscreenshot:       " + std::to_string(switchButtons.screenshot));
     result.append("\n");
 
 
     result.append("\nPictures\n");
     for(unsigned int i = 0; i < pictures.size(); i++){
-        result.append("index:" + to_string(i) + " width:" + to_string(pictures[i].size().width) + " height:" + to_string(pictures[i].size().height) + '\n');
+        result.append("index:" + std::to_string(i) + " width:" + std::to_string(pictures[i].size().width) + " height:" + std::to_string(pictures[i].size().height) + '\n');
     }
 
     return result;
 }
 
-vector<cv::Mat> ArduinoLoader::getPictures(){
+std::vector<cv::Mat> ArduinoLoader::getPictures(){
     return pictures;
 }
 
-vector<Macro> ArduinoLoader::getMacros(){
+std::vector<Macro> ArduinoLoader::getMacros(){
     return macros;
 }
 
@@ -358,7 +357,7 @@ SwitchButtons ArduinoLoader::getSwitchButtons(){
     return switchButtons;
 }
 
-string ArduinoLoader::getOption(string option){
+std::string ArduinoLoader::getOption(std::string option){
     return config.get("general." + option, "");
 }
 

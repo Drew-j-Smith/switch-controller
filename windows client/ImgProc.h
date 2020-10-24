@@ -14,15 +14,13 @@
 #include <opencv2/highgui.hpp>
 #include "opencv2/imgproc.hpp"
 
-using namespace std;
-
 bool DISPLAY_SCREEN_CAP = false;
 bool DISPLAY_IMAGE_MATCH = false;
 
 class ImgProc {
 public:
 	ImgProc();
-	ImgProc(vector<cv::Mat> pictures, vector<Macro> macros, string windowName, int windowWidth, int windowHeight);
+	ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, int windowWidth, int windowHeight);
 
 	void saveImg(cv::Mat& m, std::string filename);
 	void showImg(cv::Mat& m, std::string windowName);
@@ -33,7 +31,7 @@ public:
 	std::vector<bool> getImgMatch();
 
 	
-	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, string windowName = "", cv::Mat mask = cv::Mat());
+	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, std::string windowName = "", cv::Mat mask = cv::Mat());
 private:
 	bool isMatch(double value, double threshold, int match_method, cv::Point matchPoint, int minX, int minY, int maxX, int maxY);
 
@@ -43,8 +41,8 @@ private:
 	#endif
 	
 
-	vector<cv::Mat> pictures;
-	vector<Macro> macros;
+	std::vector<cv::Mat> pictures;
+	std::vector<Macro> macros;
 	int windowWidth;
 	int windowHeight;
 	
@@ -69,7 +67,7 @@ ImgProc::ImgProc(){
 	this->windowHeight = 0;
 }
 
-ImgProc::ImgProc(vector<cv::Mat> pictures, vector<Macro> macros, string windowName, int windowWidth, int windowHeight) {
+ImgProc::ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, int windowWidth, int windowHeight) {
 
 	this->pictures = pictures;
 	this->macros = macros;
@@ -110,7 +108,7 @@ bool ImgProc::update() {
 			templ = pictures[macros[i].templatePic];
 			if (macros[i].maskPic == -1) {
 				try{
-					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], "picture" + to_string(i));
+					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], "picture" + std::to_string(i));
 				}
 				catch(const std::exception& e){
 					std::cerr << e.what() << '\n';
@@ -121,7 +119,7 @@ bool ImgProc::update() {
 			else {
 				mask = pictures[macros[i].maskPic];
 				try{
-					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], "picture" + to_string(i), mask);
+					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], "picture" + std::to_string(i), mask);
 				}
 				catch(const std::exception& e){
 					std::cerr << e.what() << '\n';
@@ -159,7 +157,7 @@ bool ImgProc::update() {
 
 
 
-void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, string windowName, cv::Mat mask) {
+void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, std::string windowName, cv::Mat mask) {
 	cv::Mat img_display;
 	img.copyTo(img_display);
 	int result_cols = img.cols - templ.cols + 1;
