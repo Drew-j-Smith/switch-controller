@@ -3,10 +3,10 @@
 
 #include <SFML/Graphics.hpp>
 
-#include <boost/asio.hpp>
-
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/serial_port.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
 
 #include "ArduinoStructs.h"
 #include "ImgProc.h"
@@ -76,33 +76,6 @@ private:
 
 	thread readThread;
 	thread writeThread;
-
-	static void write(std::shared_ptr<boost::asio::serial_port> port, char* data){
-		char datacpy[8];
-		memcpy(datacpy, data, 8 * sizeof(char));
-		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
-
-		if (VERBOSE_OUTPUT) {
-			std::cout << "bytes sent\n";
-			for (int i = 0; i < 8; i++) {
-				std::cout << setw(5) << int(datacpy[i]);
-			}
-			std::cout << "\n";
-		}
-	}
-
-	static void read(std::shared_ptr<boost::asio::serial_port> port){
-		char recievedData[8];
-		boost::asio::read(*port, boost::asio::buffer(recievedData, 8));
-
-		if (VERBOSE_OUTPUT) {
-			std::cout << "bytes recieved\n";
-			for (int i = 0; i < 8; i++) {
-				std::cout << setw(5) << int(recievedData[i]);
-			}
-			std::cout << "\n";
-		}
-	}
 };
 
 
@@ -146,7 +119,7 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 void VirtualController::update() {
 	
 	if (VERBOSE_OUTPUT)
-		std::cout << "Time since last update: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
+		std::cout << "\nTime since last update: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
 
 	if (clockSinceLastUpdate.getElapsedTime().asMilliseconds() > MIN_DELAY_MS)
 		std::cerr << "Warning, running behind " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() - MIN_DELAY_MS << "ms\n";
@@ -209,9 +182,32 @@ void VirtualController::update() {
 	if(writeThread.joinable())
 		writeThread.join();
 
-	readThread = thread(VirtualController::read, port);
+	readThread = thread([&](){
+		char recievedData[8];
+		boost::asio::read(*port, boost::asio::buffer(recievedData, 8));
 
-	writeThread = thread(VirtualController::write, port, data);
+		if (VERBOSE_OUTPUT) {
+			std::cout << "bytes recieved\n";
+			for (int i = 0; i < 8; i++) {
+				std::cout << setw(5) << int(recievedData[i]);
+			}
+			std::cout << "\n";
+		}
+	});
+
+	writeThread = thread([&](){
+		char datacpy[8];
+		memcpy(datacpy, data, 8 * sizeof(char));
+		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
+
+		if (VERBOSE_OUTPUT) {
+			std::cout << "bytes sent\n";
+			for (int i = 0; i < 8; i++) {
+				std::cout << setw(5) << int(datacpy[i]);
+			}
+			std::cout << "\n";
+		}
+	});
 
 
 }
