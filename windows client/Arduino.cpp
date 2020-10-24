@@ -9,18 +9,16 @@
 #include "ArduinoLoader.h"
 
 
-void updateThread(VirtualController* v, ImgProc* i) {
-	while (i->update()) {
-		v->updateImgMatch(i->getImgMatch());
-	};
-}
-
 int main(){
 	ArduinoLoader l("config.json");
 	ImgProc i(l.getPictures(), l.getMacros(), l.getOption("window name"), stoi(l.getOption("window width")), stoi(l.getOption("window height")));
 	VirtualController v(l.getPictures(), l.getMacros(), l.getSwitchButtons(), l.getOption("serial port"), l.getOption("macro folder"));
 
-	std::thread th1(updateThread, &v, &i);
+	std::thread th1([&](){
+		while (i.update()) {
+			v.updateImgMatch(i.getImgMatch());
+		};
+	});
 
 	std::cout << "Ready\n";
 
