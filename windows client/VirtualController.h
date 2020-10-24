@@ -64,7 +64,7 @@ private:
 
 	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
 
-	sf::Clock clockSinceLastUpdate;
+	std::chrono::steady_clock::time_point timeSinceUpdate;
 
 	string macroFolder;
 
@@ -104,7 +104,7 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 		std::cout << "Serial port connected" << std::endl;
 
 
-	clockSinceLastUpdate = sf::Clock();
+	timeSinceUpdate = std::chrono::steady_clock::now();
 
 	macrosActive = false;
 	isMacroRecordingActive = false;
@@ -117,19 +117,21 @@ VirtualController::VirtualController(vector<cv::Mat> pictures, vector<Macro> mac
 }
 
 void VirtualController::update() {
-	
-	if (VERBOSE_OUTPUT)
-		std::cout << "\nTime since last update: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
-
-	if (clockSinceLastUpdate.getElapsedTime().asMilliseconds() > MIN_DELAY_MS)
-		std::cerr << "Warning, running behind " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() - MIN_DELAY_MS << "ms\n";
-
-	while (clockSinceLastUpdate.getElapsedTime().asMilliseconds() < MIN_DELAY_MS);
+	auto now = std::chrono::steady_clock::now();
 
 	if (VERBOSE_OUTPUT)
-		std::cout << "Time waited: " << clockSinceLastUpdate.getElapsedTime().asMilliseconds() << "ms\n";
+		std::cout << "\nTime since last update: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() << "ms\n";
 
-	clockSinceLastUpdate.restart();
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() > MIN_DELAY_MS)
+		std::cerr << "Warning, running behind " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() - MIN_DELAY_MS << "ms\n";
+
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() < MIN_DELAY_MS)
+		now = std::chrono::steady_clock::now();;
+
+	if (VERBOSE_OUTPUT)
+		std::cout << "Time waited: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() << "ms\n";
+
+	timeSinceUpdate = std::chrono::steady_clock::now();
 
 	if (!macrosActive && !isMacroRecordingActive) {
 		if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro)) {
