@@ -16,7 +16,8 @@
 
 using namespace std;
 
-const bool DISPLAY_IMAGE = false;
+bool DISPLAY_SCREEN_CAP = false;
+bool DISPLAY_IMAGE_MATCH = false;
 
 class ImgProc {
 public:
@@ -32,7 +33,7 @@ public:
 	std::vector<bool> getImgMatch();
 
 	
-	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, cv::Mat mask = cv::Mat());
+	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, string windowName = "", cv::Mat mask = cv::Mat());
 private:
 	bool isMatch(double value, double threshold, int match_method, cv::Point matchPoint, int minX, int minY, int maxX, int maxY);
 
@@ -89,7 +90,8 @@ ImgProc::ImgProc(vector<cv::Mat> pictures, vector<Macro> macros, string windowNa
 
 bool ImgProc::update() {
 	screenshot(scrnsht);
-	// showImg(scrnsht, "0");
+	if(DISPLAY_SCREEN_CAP)
+		showImg(scrnsht, "screenshot");
 
 	bool update = false;
 	for (unsigned int i = 0; i < macros.size(); i++) {
@@ -108,7 +110,7 @@ bool ImgProc::update() {
 			templ = pictures[macros[i].templatePic];
 			if (macros[i].maskPic == -1) {
 				try{
-					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i]);
+					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], "picture" + to_string(i));
 				}
 				catch(const std::exception& e){
 					std::cerr << e.what() << '\n';
@@ -119,7 +121,7 @@ bool ImgProc::update() {
 			else {
 				mask = pictures[macros[i].maskPic];
 				try{
-					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], mask);
+					matchTemplate(submat, templ, rslt, macros[i].matchMethod, critcalVals[i], matchPoints[i], "picture" + to_string(i), mask);
 				}
 				catch(const std::exception& e){
 					std::cerr << e.what() << '\n';
@@ -157,7 +159,7 @@ bool ImgProc::update() {
 
 
 
-void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, cv::Mat mask) {
+void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, string windowName, cv::Mat mask) {
 	cv::Mat img_display;
 	img.copyTo(img_display);
 	int result_cols = img.cols - templ.cols + 1;
@@ -181,11 +183,11 @@ void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int m
 		matchPoint = maxLoc;
 		criticalVal = maxVal;
 	}
-	if (DISPLAY_IMAGE) {
+	if (DISPLAY_IMAGE_MATCH) {
 		rectangle(img_display, matchPoint, cv::Point(matchPoint.x + templ.cols, matchPoint.y + templ.rows), cv::Scalar::all(0), 2, 8, 0);
 		rectangle(result, matchPoint, cv::Point(matchPoint.x + templ.cols, matchPoint.y + templ.rows), cv::Scalar::all(0), 2, 8, 0);
-		showImg(img_display, "1");
-		showImg(result, "2");
+		showImg(img_display, windowName + "-1");
+		showImg(result, windowName + "-2");
 	}
 }
 

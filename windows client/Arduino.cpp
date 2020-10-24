@@ -16,8 +16,31 @@ int main(int argc, char **argv){
 
 	for(int i = 1; i < argc; i++){
 		if(strcmp(argv[i], "-c") == 0 && argc > i){
-			config = string(argv[i + 1]);
+			config = string(argv[++i]);
 			cout << "Using config \"" << config << "\"\n";
+		}
+		else if(strcmp(argv[i], "-v") == 0){
+			VERBOSE_OUTPUT = true;
+		}
+		else if(strcmp(argv[i], "-x") == 0){
+			DISPLAY_SCREEN_CAP = true;
+		}
+		else if(strcmp(argv[i], "-m") == 0){
+			DISPLAY_IMAGE_MATCH = true;
+		}
+		else{
+			std::cout << "Drew Smith's Arduino Controller     \n";
+			std::cout << "usage: [-c <path>] [-v] [-x] [-h]   \n";
+			std::cout << "                                    \n";
+			std::cout << "-c                                  \n";
+			std::cout << "    specify config location.        \n";
+			std::cout << "                                    \n";
+			std::cout << "-v                                  \n";
+			std::cout << "    set to verbose.                 \n";
+			std::cout << "                                    \n";
+			std::cout << "-x                                  \n";
+			std::cout << "    set to display image match.     \n";
+			return 0;
 		}
 	}
 

@@ -27,7 +27,7 @@
 using namespace std;
 
 
-const bool VERBOSE_OUTPUT = false;
+bool VERBOSE_OUTPUT = false;
 const bool OUTPUT_MACRO_ACTIVATION = true;
 const int MIN_DELAY_MS = 16;
 const bool ENABLE_KAYBOARD_INPUT = true;
