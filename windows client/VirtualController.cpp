@@ -206,10 +206,10 @@ void VirtualController::getDataFromKeyboard(char* data) {
 };
 
 void VirtualController::getDatafromMacro(char* data) {
-	memcpy(data, &macros[currentMacro].data[currentMarcoLine], sizeof(char) * 8);
+	memcpy(data, &macros[currentMacro].data[currentMarcoLine * 8], sizeof(char) * 8);
 	data[0] = 85;
 	currentMarcoLine++;
-	if (currentMarcoLine == macros[currentMacro].data.size()) {
+	if (currentMarcoLine == macros[currentMacro].macroLength / 8) {
 		macrosActive = false;
 		if (macros[currentMacro].enableImgProc) {
 			

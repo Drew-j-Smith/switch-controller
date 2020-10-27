@@ -21,32 +21,42 @@ void ArduinoLoader::loadConfig(std::string filename){
 
 #pragma region privateMethods
 
-std::vector<std::array<char, 8>> ArduinoLoader::loadMacro(std::string filename){
+void ArduinoLoader::loadMacro(std::string filename, std::shared_ptr<char[]> & data, int & length){
     std::ifstream infile;
     std::string stringLine;
-    std::array<char, 8> inputArray;
-    std::vector<std::array<char, 8>> macro = {};
+    char inputArray[8];
+    char buffer[10000];
+    int bufferPos = 0;
 
     infile.open(filename, std::ios::in);
 
     if (infile) {
-        while (!infile.eof()) {
+        while (!infile.eof() && bufferPos * 8 < 10000) {
             getline(infile, stringLine);
             if (stringLine.length() != 24)
                 continue;
             for (int i = 0; i < 8; i++) {
                 inputArray[i] = std::stoi(stringLine.substr(i * 3, 3)) - 128;
             }
-            macro.push_back(inputArray);
+            memcpy(buffer + bufferPos * 8, inputArray, 8);
+            bufferPos++;
         }
+
+        if(bufferPos * 8 > 10000){
+            std::cerr << "ERROR: Buffer was overrun.\n";
+        }
+
+        data = std::shared_ptr<char[]>(new char[bufferPos * 8]);
+        memcpy(data.get(), buffer, bufferPos * 8);
+        length = bufferPos * 8;
     }
     else
     {
         std::cerr << "Could not open file " + filename << "\n";
+        length = 0;
     }
     infile.close();
 
-    return macro;
 }
 
 cv::Mat ArduinoLoader::loadPicture(std::string filename) {
@@ -87,7 +97,7 @@ void ArduinoLoader::reloadMacros(std::vector<Macro> &macros, std::map<std::strin
         macros[i].maxX           = currentMacro.get("max x", config.get("general.window width", 0));
         macros[i].maxY           = currentMacro.get("max y", config.get("general.window height", 0));
 
-        macros[i].data = loadMacro(config.get("general.macro folder", "") + currentMacro.get("filename", ""));
+        loadMacro(config.get("general.macro folder", "") + currentMacro.get("filename", ""), macros[i].data, macros[i].macroLength);
 
         std::string button = currentMacro.get("button", "-1");
         if(button.at(0) >= 'a' && button.at(0) <= 'z'){
@@ -244,7 +254,7 @@ std::string ArduinoLoader::toString(){
     result.append("\nMacros\n");
     for(unsigned int i = 0; i < macros.size(); i++){
         result.append("\n" + macros[i].name);
-        result.append("\nmacro length:   " + std::to_string(macros[i].data.size()));
+        result.append("\nmacro length:   " + std::to_string(macros[i].macroLength));
         result.append("\nbutton:         " + std::to_string(macros[i].button));
         result.append("\nenableImgProc:  " + std::to_string(macros[i].enableImgProc));
         result.append("\ntemplatePic:    " + std::to_string(macros[i].templatePic));

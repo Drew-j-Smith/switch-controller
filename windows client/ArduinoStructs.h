@@ -20,7 +20,8 @@ struct Macro{
     int maxX;
     int maxY;
 
-    std::vector<std::array<char, 8>> data;
+    std::shared_ptr<char[]> data;
+    int macroLength;
 
     std::vector<int> macroSuccessList;
     std::vector<int> macroFailList;

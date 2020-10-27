@@ -20,7 +20,7 @@ private:
     void reloadPictures(std::vector<cv::Mat> &pictures, std::map<std::string, int> &pictureIndicices);
     void reloadMacros(std::vector<Macro> &macros, std::map<std::string, int> &macroIndicices, std::map<std::string, int> pictureIndicices);
     SwitchButtons reloadSwitchButtons();
-    std::vector<std::array<char, 8>> loadMacro(std::string filename);
+    void loadMacro(std::string filename, std::shared_ptr<char[]> & data, int & length);
     cv::Mat loadPicture(std::string filename);
     int getButton(std::string button);
 public:
