@@ -25,13 +25,14 @@ void ArduinoLoader::loadMacro(std::string filename, std::shared_ptr<char[]> & da
     std::ifstream infile;
     std::string stringLine;
     char inputArray[8];
-    char buffer[10000];
+    const int BUFFER_SIZE = 1000000;
+    char buffer[BUFFER_SIZE];
     int bufferPos = 0;
 
     infile.open(filename, std::ios::in);
 
     if (infile) {
-        while (!infile.eof() && bufferPos * 8 < 10000) {
+        while (!infile.eof() && bufferPos * 8 < BUFFER_SIZE) {
             getline(infile, stringLine);
             if (stringLine.length() != 24)
                 continue;
@@ -42,7 +43,7 @@ void ArduinoLoader::loadMacro(std::string filename, std::shared_ptr<char[]> & da
             bufferPos++;
         }
 
-        if(bufferPos * 8 > 10000){
+        if(bufferPos * 8 > BUFFER_SIZE){
             std::cerr << "ERROR: Buffer was overrun.\n";
         }
 
