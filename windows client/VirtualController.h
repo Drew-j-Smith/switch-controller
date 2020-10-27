@@ -57,7 +57,7 @@ private:
 	std::vector<Macro> macros;
 	SwitchButtons switchButtons;
 
-	char data[8];
+	std::array<char, 8> data;
 
 	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
 
@@ -156,21 +156,21 @@ void VirtualController::update() {
 	// }
 
 	if (macrosActive && !isMacroRecordingActive) {
-		getDatafromMacro(data);
+		getDatafromMacro(data.data());
 		if (VERBOSE_OUTPUT)
 			std::cout << "Playing macro\n";
 	}
 	else if (ENABLE_KAYBOARD_INPUT) {
-		getDataFromKeyboard(data);
+		getDataFromKeyboard(data.data());
 		if (VERBOSE_OUTPUT)
 			std::cout << "Taking keyboard input\n";
 	}
 	else{
-		setNuetral(data);
+		setNuetral(data.data());
 	}
 
 	if (isMacroRecordingActive) {
-		recordMacro(data);
+		recordMacro(data.data());
 		if (VERBOSE_OUTPUT)
 			std::cout << "Recording\n";
 	}
@@ -194,9 +194,7 @@ void VirtualController::update() {
 		}
 	});
 
-	writeThread = std::thread([&](){
-		char datacpy[8];
-		memcpy(datacpy, data, 8 * sizeof(char));
+	writeThread = std::thread([&](std::array<char, 8> datacpy){
 		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
 
 		if (VERBOSE_OUTPUT) {
@@ -206,7 +204,7 @@ void VirtualController::update() {
 			}
 			std::cout << "\n";
 		}
-	});
+	}, data);
 
 
 }
