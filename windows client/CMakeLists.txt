@@ -7,7 +7,7 @@ find_package(Boost COMPONENTS system thread REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-add_executable(ArduinoController ArduinoController.cpp)
+add_executable(ArduinoController ArduinoController.cpp ArduinoLoader.cpp VirtualController.cpp ImgProc.cpp)
 target_link_libraries(ArduinoController ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES})
 
 target_precompile_headers(ArduinoController PUBLIC pch.h)

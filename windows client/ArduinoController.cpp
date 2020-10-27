@@ -7,6 +7,9 @@
 #include "ImgProc.h"
 #include "ArduinoLoader.h"
 
+extern bool VERBOSE_OUTPUT; //TODO: should probably not use global variables this way
+extern bool DISPLAY_SCREEN_CAP;
+extern bool DISPLAY_IMAGE_MATCH;
 
 int main(int argc, char **argv){
 
