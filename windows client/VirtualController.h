@@ -1,7 +1,9 @@
 #ifndef VIRTUAL_CONTROLLER_H
 #define VIRTUAL_CONTROLLER_H
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
+
+#include "ArduinoStructs.h"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/serial_port.hpp>
@@ -10,18 +12,6 @@
 
 #include <opencv2/core.hpp>
 
-#include "ArduinoStructs.h"
-
-#include <string>
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <iomanip>
-#include <atomic>
-#include <memory>
-#include <chrono>
-#include <ctime>
-#include <thread>
 
 
 bool VERBOSE_OUTPUT = false;

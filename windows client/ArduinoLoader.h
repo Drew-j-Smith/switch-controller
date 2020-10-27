@@ -3,11 +3,6 @@
 
 #include "ArduinoStructs.h"
 
-#include <string>
-#include <vector>
-#include <map>
-#include <sstream>
-
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 

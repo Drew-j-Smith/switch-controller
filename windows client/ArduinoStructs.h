@@ -1,8 +1,6 @@
 #ifndef ARDUINO_STRUCTS_H
 #define ARDUINO_STRUCTS_H
 
-#include <vector>
-#include <string>
 
 struct Macro{
     std::string name;

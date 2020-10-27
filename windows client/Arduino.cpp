@@ -1,10 +1,8 @@
 // #include "pch.h" // for visual studio
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
-#include <iostream>
-#include <thread>
-#include <string>
+#include "pch.h"
 #include "VirtualController.h"
 #include "ImgProc.h"
 #include "ArduinoLoader.h"

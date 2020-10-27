@@ -9,3 +9,5 @@ include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_
 
 add_executable(ArduinoController Arduino.cpp)
 target_link_libraries(ArduinoController ${OpenCV_LIBS} sfml-graphics ${Boost_LIBRARIES})
+
+target_precompile_headers(ArduinoController PUBLIC pch.h)
