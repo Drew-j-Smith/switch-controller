@@ -6,7 +6,7 @@
 VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, 
 	SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
 		: pictures(pictures), macros(macros), switchButtons(switchButtons), timeSinceUpdate(std::chrono::steady_clock::now()), 
-		macroFolder(macroFolder), macrosActive(false), isMacroRecordingActive(false)
+		macroFolder(macroFolder), macrosActive(false), isMacroRecordingActive(false), macroRecordButtonLastUpdate(false)
 {
 
 	try{
@@ -39,17 +39,37 @@ void VirtualController::update() {
 		std::cerr << "Warning, running behind " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() - MIN_DELAY_MS << "ms\n";
 
 	while (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() < MIN_DELAY_MS)
-		now = std::chrono::steady_clock::now();;
+		now = std::chrono::steady_clock::now();
 
 	if (VERBOSE_OUTPUT)
 		std::cout << "Time waited: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() << "ms\n";
 
 	timeSinceUpdate = std::chrono::steady_clock::now();
 
+
+	bool macroRecordButton = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro);
+
 	if (!macrosActive && !isMacroRecordingActive) {
-		if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro)) {
-			outfile.open(/*todo loader.getMacroFolder() +  loader.getMacroRecordingFilename()*/"temp", std::ios::out);
+		if (macroRecordButton && !macroRecordButtonLastUpdate) {
+			std::time_t ctime = std::time(nullptr);
+			char timeString[30];
+			struct tm timeinfo;
+			if(!localtime_s(&timeinfo, &ctime)){
+				if (std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H-%M-%S", &timeinfo)) {
+					outfile.open(macroFolder + std::string(timeString), std::ios::out);
+				}
+				else{
+					std::cerr << "Could not get the time\n";
+					outfile.open(macroFolder + "/error_time.txt", std::ios::out);
+				}
+			}
+			else{
+				std::cerr << "Could not get the time\n";
+				outfile.open(macroFolder + "/error_time.txt", std::ios::out);
+			}
+			
 			isMacroRecordingActive = true;
+			macroRecordButtonLastUpdate = true;
 		}
 		else {
 			for (unsigned int i = 0; i < macros.size(); i++) {
@@ -60,10 +80,11 @@ void VirtualController::update() {
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro)) {
+	if (macroRecordButton && !macroRecordButtonLastUpdate && outfile) {
 		outfile.close();
 		isMacroRecordingActive = false;
 	}
+	macroRecordButtonLastUpdate = macroRecordButton;
 
 	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(28))) { todo
 	// 	cv::Mat img;
