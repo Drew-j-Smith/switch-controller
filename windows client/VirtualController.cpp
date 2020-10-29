@@ -1,10 +1,6 @@
 #include "VirtualController.h"
 #include "pch.h"
 
-bool VERBOSE_OUTPUT = false;
-const bool OUTPUT_MACRO_ACTIVATION = true;
-const int MIN_DELAY_MS = 16;
-const bool ENABLE_KAYBOARD_INPUT = true;
 
 
 VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, 

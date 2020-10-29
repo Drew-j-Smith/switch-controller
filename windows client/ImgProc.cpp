@@ -1,9 +1,6 @@
 #include "ImgProc.h"
 #include "pch.h"
 
-bool DISPLAY_SCREEN_CAP = false;
-bool DISPLAY_IMAGE_MATCH = false;
-
 ImgProc::ImgProc()
 	:windowWidth(0), windowHeight(0)
 {

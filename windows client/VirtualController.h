@@ -29,6 +29,11 @@ public:
 
 	void updateImgMatch(std::vector<bool> newData);
 private:
+	static const bool VERBOSE_OUTPUT = false;
+	static const bool OUTPUT_MACRO_ACTIVATION = true;
+	static const int MIN_DELAY_MS = 16;
+	static const bool ENABLE_KAYBOARD_INPUT = true;
+
 	void getDatafromMacro(char* data);
 	void recordMacro(char* data);
 
