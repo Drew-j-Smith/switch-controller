@@ -2,12 +2,14 @@
 #include "pch.h"
 
 ImgProc::ImgProc()
-	:windowWidth(0), windowHeight(0)
+	:windowWidth(0), windowHeight(0), pictureFolder(""), screenshotButton(-1)
 {
 }
 
-ImgProc::ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, int windowWidth, int windowHeight) 
-	: pictures(pictures), macros(macros), windowWidth(windowWidth), windowHeight(windowHeight)
+ImgProc::ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, 
+int windowWidth, int windowHeight, std::string pictureFolder, int screenshotButton) 
+	: pictures(pictures), macros(macros), windowWidth(windowWidth), windowHeight(windowHeight),
+	pictureFolder(pictureFolder), screenshotButton(screenshotButton)
 {
 	imgMatch.resize(macros.size());
 	critcalVals.resize(macros.size());
@@ -25,6 +27,26 @@ bool ImgProc::update() {
 	screenshot(scrnsht);
 	if(DISPLAY_SCREEN_CAP)
 		showImg(scrnsht, "screenshot");
+
+	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)screenshotButton)){
+		std::time_t ctime = std::time(nullptr);
+		char timeString[30];
+		struct tm timeinfo;
+		if(!localtime_s(&timeinfo, &ctime)){
+			if (std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H-%M-%S", &timeinfo)) {
+				saveImg(scrnsht, pictureFolder + std::string(timeString) + ".png");
+			}
+			else{
+				std::cerr << "Could not get the time\n";
+				saveImg(scrnsht, pictureFolder + "default_name.png");
+			}
+		}
+		else{
+			std::cerr << "Could not get the time\n";
+			saveImg(scrnsht, pictureFolder + "default_name.png");
+		}
+	}
+
 
 	bool update = false;
 	for (unsigned int i = 0; i < macros.size(); i++) {
@@ -92,7 +114,8 @@ bool ImgProc::update() {
 
 
 
-void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, std::string windowName, cv::Mat mask) {
+void ImgProc::matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, 
+cv::Point &matchPoint, std::string windowName, cv::Mat mask) {
 	cv::Mat img_display;
 	img.copyTo(img_display);
 	int result_cols = img.cols - templ.cols + 1;

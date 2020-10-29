@@ -4,9 +4,9 @@
 
 
 VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, 
-	SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
-		: pictures(pictures), macros(macros), switchButtons(switchButtons), timeSinceUpdate(std::chrono::steady_clock::now()), 
-		macroFolder(macroFolder), macrosActive(false), isMacroRecordingActive(false), macroRecordButtonLastUpdate(false)
+SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
+	: pictures(pictures), macros(macros), switchButtons(switchButtons), timeSinceUpdate(std::chrono::steady_clock::now()), 
+	macroFolder(macroFolder), macrosActive(false), isMacroRecordingActive(false), macroRecordButtonLastUpdate(false)
 {
 
 	try{
@@ -86,11 +86,7 @@ void VirtualController::update() {
 	}
 	macroRecordButtonLastUpdate = macroRecordButton;
 
-	// if (sf::Keyboard::isKeyPressed(loader.getKeyCode(28))) { todo
-	// 	cv::Mat img;
-	// 	imgProc.screenshot(img);
-	// 	imgProc.saveImg(img, loader.getPictureFolder() + loader.getPictureRecordingFilename());
-	// }
+
 
 	if (macrosActive && !isMacroRecordingActive) {
 		getDatafromMacro(data.data());

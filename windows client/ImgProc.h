@@ -1,6 +1,7 @@
 #ifndef IMGPROC_H
 #define IMGPROC_H
 
+#include <SFML/Window/Keyboard.hpp>
 
 #include "ArduinoStructs.h"
 #ifdef _WIN32
@@ -16,7 +17,8 @@
 class ImgProc {
 public:
 	ImgProc();
-	ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, int windowWidth, int windowHeight);
+	ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, 
+		int windowWidth, int windowHeight, std::string pictureFolder, int screenshotButton);
 
 	void saveImg(cv::Mat& m, std::string filename);
 	void showImg(cv::Mat& m, std::string windowName);
@@ -27,7 +29,8 @@ public:
 	std::vector<bool> getImgMatch();
 
 	
-	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, cv::Point &matchPoint, std::string windowName = "", cv::Mat mask = cv::Mat());
+	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, 
+		cv::Point &matchPoint, std::string windowName = "", cv::Mat mask = cv::Mat());
 private:
 	static const bool DISPLAY_SCREEN_CAP = false;
 	static const bool DISPLAY_IMAGE_MATCH = false;
@@ -54,7 +57,8 @@ private:
 	std::vector<double> critcalVals;
 	std::vector<cv::Point> matchPoints;
 
-	
+	std::string pictureFolder;
+	int screenshotButton;
 };
 
 

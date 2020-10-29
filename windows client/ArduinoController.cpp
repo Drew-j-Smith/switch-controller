@@ -19,7 +19,8 @@ int main(int argc, char **argv){
 		
 
 	ArduinoLoader l(config);
-	ImgProc i(l.getPictures(), l.getMacros(), l.getOption("window name"), stoi(l.getOption("window width")), stoi(l.getOption("window height")));
+	ImgProc i(l.getPictures(), l.getMacros(), l.getOption("window name"), stoi(l.getOption("window width")), 
+		stoi(l.getOption("window height")), l.getOption("picture folder"), l.getSwitchButtons().screenshot);
 	VirtualController v(l.getPictures(), l.getMacros(), l.getSwitchButtons(), l.getOption("serial port"), l.getOption("macro folder"));
 
 	std::thread th1([&](){
