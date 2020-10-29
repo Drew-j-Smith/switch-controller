@@ -56,16 +56,16 @@ void VirtualController::update() {
 			struct tm timeinfo;
 			if(!localtime_s(&timeinfo, &ctime)){
 				if (std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H-%M-%S", &timeinfo)) {
-					outfile.open(macroFolder + std::string(timeString), std::ios::out);
+					outfile.open(macroFolder + std::string(timeString) + ".txt", std::ios::out);
 				}
 				else{
 					std::cerr << "Could not get the time\n";
-					outfile.open(macroFolder + "error_time.txt", std::ios::out);
+					outfile.open(macroFolder + "default_macro_name.txt", std::ios::out);
 				}
 			}
 			else{
 				std::cerr << "Could not get the time\n";
-				outfile.open(macroFolder + "error_time.txt", std::ios::out);
+				outfile.open(macroFolder + "default_macro_name.txt", std::ios::out);
 			}
 			
 			isMacroRecordingActive = true;

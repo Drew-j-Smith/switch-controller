@@ -38,12 +38,12 @@ bool ImgProc::update() {
 			}
 			else{
 				std::cerr << "Could not get the time\n";
-				saveImg(scrnsht, pictureFolder + "default_name.png");
+				saveImg(scrnsht, pictureFolder + "default_screenshot_name.png");
 			}
 		}
 		else{
 			std::cerr << "Could not get the time\n";
-			saveImg(scrnsht, pictureFolder + "default_name.png");
+			saveImg(scrnsht, pictureFolder + "default_screenshot_name.png");
 		}
 	}
 
