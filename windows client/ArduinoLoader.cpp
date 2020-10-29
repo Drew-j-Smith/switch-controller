@@ -1,9 +1,7 @@
 #include "ArduinoLoader.h"
 #include "pch.h"
 
-ArduinoLoader::ArduinoLoader(){
-    config = boost::property_tree::ptree();
-}
+ArduinoLoader::ArduinoLoader(){}
 
 ArduinoLoader::ArduinoLoader(std::string filename){
     loadConfig(filename);

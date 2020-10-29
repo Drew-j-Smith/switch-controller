@@ -7,38 +7,27 @@ const int MIN_DELAY_MS = 16;
 const bool ENABLE_KAYBOARD_INPUT = true;
 
 
-VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, SwitchButtons switchButtons, std::string serialPort, std::string macroFolder){
-
-	this->pictures = pictures;
-	this->macros = macros;
-	this->switchButtons = switchButtons;
-	this->macroFolder = macroFolder;
+VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, 
+	SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
+		: pictures(pictures), macros(macros), switchButtons(switchButtons), timeSinceUpdate(std::chrono::steady_clock::now()), 
+		macroFolder(macroFolder), macrosActive(false), isMacroRecordingActive(false)
+{
 
 	try{
 		boost::asio::io_service io;
 		port = std::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
 		port->open(serialPort);
 		port->set_option(boost::asio::serial_port_base::baud_rate(9600));
+		if (VERBOSE_OUTPUT)
+			std::cout << "Serial port connected" << std::endl;
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << '\n';
 		std::cerr << "Fatal error opening serial port" << std::endl;
 		exit(-1);
 	}
-	
-
-	
-	if (VERBOSE_OUTPUT)
-		std::cout << "Serial port connected" << std::endl;
-
-
-	timeSinceUpdate = std::chrono::steady_clock::now();
-
-	macrosActive = false;
-	isMacroRecordingActive = false;
 
 	imgMatch.resize(macros.size());
-
 	for(unsigned int i = 0; i < imgMatch.size(); i++){
 		imgMatch[i] = std::unique_ptr<std::atomic<bool>>(new std::atomic<bool>(false));
 	}

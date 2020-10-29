@@ -4,20 +4,14 @@
 bool DISPLAY_SCREEN_CAP = false;
 bool DISPLAY_IMAGE_MATCH = false;
 
-ImgProc::ImgProc(){
-	this->pictures = {};
-	this->macros = {};
-	this->windowWidth = 0;
-	this->windowHeight = 0;
+ImgProc::ImgProc()
+	:windowWidth(0), windowHeight(0)
+{
 }
 
-ImgProc::ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, int windowWidth, int windowHeight) {
-
-	this->pictures = pictures;
-	this->macros = macros;
-	this->windowWidth = windowWidth;
-	this->windowHeight = windowHeight;
-
+ImgProc::ImgProc(std::vector<cv::Mat> pictures, std::vector<Macro> macros, std::string windowName, int windowWidth, int windowHeight) 
+	: pictures(pictures), macros(macros), windowWidth(windowWidth), windowHeight(windowHeight)
+{
 	imgMatch.resize(macros.size());
 	critcalVals.resize(macros.size());
 	matchPoints.resize(macros.size());
