@@ -60,12 +60,12 @@ void VirtualController::update() {
 				}
 				else{
 					std::cerr << "Could not get the time\n";
-					outfile.open(macroFolder + "/error_time.txt", std::ios::out);
+					outfile.open(macroFolder + "error_time.txt", std::ios::out);
 				}
 			}
 			else{
 				std::cerr << "Could not get the time\n";
-				outfile.open(macroFolder + "/error_time.txt", std::ios::out);
+				outfile.open(macroFolder + "error_time.txt", std::ios::out);
 			}
 			
 			isMacroRecordingActive = true;
