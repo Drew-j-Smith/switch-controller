@@ -147,10 +147,10 @@ void VirtualController::update() {
 
 }
 
-void VirtualController::setNuetral(char* data) {
+void VirtualController::setNuetral(unsigned char* data) {
 	data[0] = 85;
-	data[1] = -128;
-	data[2] = -128;
+	data[1] = 128;
+	data[2] = 128;
 	data[3] = 0;
 	data[4] = 0;
 	data[5] = 0;
@@ -158,7 +158,7 @@ void VirtualController::setNuetral(char* data) {
 	data[7] = 8;
 }
 
-void VirtualController::getDataFromKeyboard(char* data) {
+void VirtualController::getDataFromKeyboard(unsigned char* data) {
 	data[0] = 85;
 
 	data[1] = 0;
@@ -170,7 +170,7 @@ void VirtualController::getDataFromKeyboard(char* data) {
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.l      ))data[1] |= (1 << 4);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.r      ))data[1] |= (1 << 5);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xl     ))data[1] |= (1 << 6);
-	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xr     ))data[2] -= 128;
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xr     ))data[2] |= (1 << 7);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.select ))data[2] |= (1 << 0);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.start  ))data[2] |= (1 << 1);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.lClick ))data[2] |= (1 << 2);
@@ -180,13 +180,13 @@ void VirtualController::getDataFromKeyboard(char* data) {
 
 	//control sticks
 	data[3] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickXplus  ) * 127 + 
-			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickXminus ) * 128 + 128;
+			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickXminus ) * -128 + 128;
 	data[4] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickYminus ) * 127 + 
-	          sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickYplus  ) * 128 + 128;
+	          sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.leftStickYplus  ) * -128 + 128;
 	data[5] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickXplus ) * 127 + 
-			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickXminus) * 128 + 128;
+			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickXminus) * -128 + 128;
 	data[6] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickYminus) * 127 + 
-			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickYplus ) * 128 + 128;
+			  sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.rightStickYplus ) * -128 + 128;
 
 	data[7] = 8;
 	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.dpadUp) && 
@@ -212,7 +212,7 @@ void VirtualController::getDataFromKeyboard(char* data) {
 
 };
 
-void VirtualController::getDatafromMacro(char* data) {
+void VirtualController::getDatafromMacro(unsigned char* data) {
 	memcpy(data, &macros[currentMacro].data[currentMarcoLine * 8], sizeof(char) * 8);
 	data[0] = 85;
 	currentMarcoLine++;
@@ -248,7 +248,7 @@ void VirtualController::getDatafromMacro(char* data) {
 	}
 }
 
-void VirtualController::recordMacro(char* data) {
+void VirtualController::recordMacro(unsigned char* data) {//TODO
 	if (outfile)
 	{
 		for (int i = 0; i < 8; i++) {

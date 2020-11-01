@@ -24,14 +24,14 @@ public:
 	void stopMacros();
 	bool isMacroActive();
 
-	void getDataFromKeyboard(char* data);
-	void setNuetral(char* data);
+	void getDataFromKeyboard(unsigned char* data);
+	void setNuetral(unsigned char* data);
 
 	void updateImgMatch(std::vector<bool> newData);
 private:
 
-	void getDatafromMacro(char* data);
-	void recordMacro(char* data);
+	void getDatafromMacro(unsigned char* data);
+	void recordMacro(unsigned char* data);
 
 	int cycleMacros(std::vector<int>& macroList);
 
@@ -41,7 +41,7 @@ private:
 	std::vector<Macro> macros;
 	SwitchButtons switchButtons;
 
-	char data[8];
+	unsigned char data[8];
 
 	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
 
