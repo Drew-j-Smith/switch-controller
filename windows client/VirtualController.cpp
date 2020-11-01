@@ -95,14 +95,14 @@ void VirtualController::update() {
 
 
 	if (macrosActive && !isMacroRecordingActive) {
-		getDatafromMacro(data.data());
+		getDatafromMacro(data);
 		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "Playing macro\n";
 		#endif
 	}
 	else {
 		#if AC_ENABLE_KAYBOARD_INPUT == 1
-			getDataFromKeyboard(data.data());
+			getDataFromKeyboard(data);
 			#if AC_VERBOSE_OUTPUT == 1
 				std::cout << "Taking keyboard input\n";
 			#endif
@@ -112,7 +112,7 @@ void VirtualController::update() {
 	}
 
 	if (isMacroRecordingActive) {
-		recordMacro(data.data());
+		recordMacro(data);
 		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "Recording\n";
 		#endif
@@ -134,7 +134,7 @@ void VirtualController::update() {
 		#endif
 	});
 
-	boost::asio::write(*port, boost::asio::buffer(data.data(), 8));
+	boost::asio::write(*port, boost::asio::buffer(data, 8));
 
 	#if AC_VERBOSE_OUTPUT == 1
 		std::cout << "bytes sent\n";

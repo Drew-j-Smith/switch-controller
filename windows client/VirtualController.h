@@ -41,7 +41,7 @@ private:
 	std::vector<Macro> macros;
 	SwitchButtons switchButtons;
 
-	std::array<char, 8> data;
+	char data[8];
 
 	std::vector<std::unique_ptr<std::atomic<bool>>> imgMatch;
 
