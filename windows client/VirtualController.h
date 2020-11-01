@@ -57,7 +57,6 @@ private:
 	std::ofstream outfile;
 
 	std::thread readThread;
-	std::thread writeThread;
 };
 
 

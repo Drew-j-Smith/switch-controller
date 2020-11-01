@@ -121,9 +121,6 @@ void VirtualController::update() {
 	if(readThread.joinable())
 		readThread.join();
 
-	if(writeThread.joinable())
-		writeThread.join();
-
 	readThread = std::thread([&](){
 		char recievedData[8];
 		boost::asio::read(*port, boost::asio::buffer(recievedData, 8));
@@ -131,23 +128,21 @@ void VirtualController::update() {
 		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "bytes recieved\n";
 			for (int i = 0; i < 8; i++) {
-				std::cout << std::setw(5) << int(recievedData[i]);
+				std::cout << std::setw(5) << (int)recievedData[i];
 			}
 			std::cout << "\n";
 		#endif
 	});
 
-	writeThread = std::thread([&](std::array<char, 8> datacpy){
-		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
+	boost::asio::write(*port, boost::asio::buffer(data.data(), 8));
 
-		#if AC_VERBOSE_OUTPUT == 1
-			std::cout << "bytes sent\n";
-			for (int i = 0; i < 8; i++) {
-				std::cout << std::setw(5) << int(datacpy[i]);
-			}
-			std::cout << "\n";
-		#endif
-	}, data);
+	#if AC_VERBOSE_OUTPUT == 1
+		std::cout << "bytes sent\n";
+		for (int i = 0; i < 8; i++) {
+			std::cout << std::setw(5) << (int)data[i];
+		}
+		std::cout << "\n";
+	#endif
 
 
 }
