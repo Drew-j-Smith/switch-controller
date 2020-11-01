@@ -18,5 +18,8 @@ Win32
 *.cmake
 *.sln
 *.vcxproj
-*filters
+*.filters
 CMakeCache.txt
+
+test
+todo*
