@@ -19,7 +19,7 @@ void ArduinoLoader::loadConfig(std::string filename){
 
 #pragma region privateMethods
 
-void ArduinoLoader::loadMacro(std::string filename, std::shared_ptr<char[]> & data, int & length){
+void ArduinoLoader::loadMacro(std::string filename, std::shared_ptr<unsigned char[]> & data, int & length){
     std::ifstream infile;
     std::string stringLine;
     char inputArray[8];
@@ -45,8 +45,14 @@ void ArduinoLoader::loadMacro(std::string filename, std::shared_ptr<char[]> & da
             std::cerr << "ERROR: Buffer was overrun.\n";
         }
 
-        data = std::shared_ptr<char[]>(new char[bufferPos * 8]);
-        memcpy(data.get(), buffer, bufferPos * 8);
+        data = std::shared_ptr<unsigned char[]>(new unsigned char[bufferPos * 8]);
+        //memcpy(data.get(), buffer, bufferPos * 8);
+        for(int i = 0; i < bufferPos * 8; i++){
+            if(buffer[i] >= 0)
+                data[i] = buffer[i];
+            else
+                data[i] = 256 + buffer[i];
+        }
         length = bufferPos * 8;
     }
     else

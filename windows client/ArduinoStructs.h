@@ -20,7 +20,7 @@ struct Macro{
     int maxX;
     int maxY;
 
-    std::shared_ptr<char[]> data;
+    std::shared_ptr<unsigned char[]> data;
     int macroLength;
 
     std::vector<int> macroSuccessList;
