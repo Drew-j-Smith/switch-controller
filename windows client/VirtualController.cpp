@@ -170,7 +170,7 @@ void VirtualController::getDataFromKeyboard(unsigned char* data) {
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.l      ))data[1] |= (1 << 4);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.r      ))data[1] |= (1 << 5);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xl     ))data[1] |= (1 << 6);
-	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xr     ))data[2] |= (1 << 7);
+	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.xr     ))data[1] |= (1 << 7);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.select ))data[2] |= (1 << 0);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.start  ))data[2] |= (1 << 1);
 	if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.lClick ))data[2] |= (1 << 2);
