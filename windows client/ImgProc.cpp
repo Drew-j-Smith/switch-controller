@@ -1,6 +1,9 @@
 #include "ImgProc.h"
 #include "pch.h"
 
+#define AC_DISPLAY_SCREEN_CAP 0
+#define AC_DISPLAY_IMAGE_MATCH 0
+
 ImgProc::ImgProc()
 	:windowWidth(0), windowHeight(0), pictureFolder(""), screenshotButton(-1)
 {
@@ -25,8 +28,9 @@ int windowWidth, int windowHeight, std::string pictureFolder, int screenshotButt
 
 bool ImgProc::update() {
 	screenshot(scrnsht);
-	if(DISPLAY_SCREEN_CAP)
+	#if AC_DISPLAY_SCREEN_CAP == 1
 		showImg(scrnsht, "screenshot");
+	#endif
 
 	if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)screenshotButton)){
 		std::time_t ctime = std::time(nullptr);
@@ -139,12 +143,12 @@ cv::Point &matchPoint, std::string windowName, cv::Mat mask) {
 		matchPoint = maxLoc;
 		criticalVal = maxVal;
 	}
-	if (DISPLAY_IMAGE_MATCH) {
+	#if AC_DISPLAY_IMAGE_MATCH == 1
 		rectangle(img_display, matchPoint, cv::Point(matchPoint.x + templ.cols, matchPoint.y + templ.rows), cv::Scalar::all(0), 2, 8, 0);
 		rectangle(result, matchPoint, cv::Point(matchPoint.x + templ.cols, matchPoint.y + templ.rows), cv::Scalar::all(0), 2, 8, 0);
 		showImg(img_display, windowName + "-1");
 		showImg(result, windowName + "-2");
-	}
+	#endif
 }
 
 

@@ -32,8 +32,6 @@ public:
 	void matchTemplate(cv::Mat& img, cv::Mat& templ, cv::Mat& result, int match_method, double &criticalVal, 
 		cv::Point &matchPoint, std::string windowName = "", cv::Mat mask = cv::Mat());
 private:
-	static const bool DISPLAY_SCREEN_CAP = false;
-	static const bool DISPLAY_IMAGE_MATCH = false;
 
 	bool isMatch(double value, double threshold, int match_method, cv::Point matchPoint, int minX, int minY, int maxX, int maxY);
 

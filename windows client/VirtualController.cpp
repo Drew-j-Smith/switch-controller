@@ -1,7 +1,10 @@
 #include "VirtualController.h"
 #include "pch.h"
 
-
+#define AC_VERBOSE_OUTPUT 0
+#define AC_OUTPUT_MACRO_ACTIVATION 1
+#define AC_MIN_DELAY_MS 16
+#define AC_ENABLE_KAYBOARD_INPUT 1
 
 VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, 
 SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
@@ -14,8 +17,9 @@ SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
 		port = std::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
 		port->open(serialPort);
 		port->set_option(boost::asio::serial_port_base::baud_rate(9600));
-		if (VERBOSE_OUTPUT)
+		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "Serial port connected" << std::endl;
+		#endif
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << '\n';
@@ -32,17 +36,19 @@ SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
 void VirtualController::update() {
 	auto now = std::chrono::steady_clock::now();
 
-	if (VERBOSE_OUTPUT)
+	#if AC_VERBOSE_OUTPUT == 1
 		std::cout << "\nTime since last update: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() << "ms\n";
+	#endif
 
-	if (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() > MIN_DELAY_MS)
-		std::cerr << "Warning, running behind " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() - MIN_DELAY_MS << "ms\n";
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() > AC_MIN_DELAY_MS)
+		std::cerr << "Warning, running behind " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() - AC_MIN_DELAY_MS << "ms\n";
 
-	while (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() < MIN_DELAY_MS)
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() < AC_MIN_DELAY_MS)
 		now = std::chrono::steady_clock::now();
 
-	if (VERBOSE_OUTPUT)
+	#if AC_VERBOSE_OUTPUT == 1
 		std::cout << "Time waited: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() << "ms\n";
+	#endif
 
 	timeSinceUpdate = std::chrono::steady_clock::now();
 
@@ -90,22 +96,26 @@ void VirtualController::update() {
 
 	if (macrosActive && !isMacroRecordingActive) {
 		getDatafromMacro(data.data());
-		if (VERBOSE_OUTPUT)
+		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "Playing macro\n";
+		#endif
 	}
-	else if (ENABLE_KAYBOARD_INPUT) {
-		getDataFromKeyboard(data.data());
-		if (VERBOSE_OUTPUT)
-			std::cout << "Taking keyboard input\n";
-	}
-	else{
-		setNuetral(data.data());
+	else {
+		#if AC_ENABLE_KAYBOARD_INPUT == 1
+			getDataFromKeyboard(data.data());
+			#if AC_VERBOSE_OUTPUT == 1
+				std::cout << "Taking keyboard input\n";
+			#endif
+		#else
+			setNuetral(data.data());
+		#endif
 	}
 
 	if (isMacroRecordingActive) {
 		recordMacro(data.data());
-		if (VERBOSE_OUTPUT)
+		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "Recording\n";
+		#endif
 	}
 
 	if(readThread.joinable())
@@ -118,25 +128,25 @@ void VirtualController::update() {
 		char recievedData[8];
 		boost::asio::read(*port, boost::asio::buffer(recievedData, 8));
 
-		if (VERBOSE_OUTPUT) {
+		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "bytes recieved\n";
 			for (int i = 0; i < 8; i++) {
 				std::cout << std::setw(5) << int(recievedData[i]);
 			}
 			std::cout << "\n";
-		}
+		#endif
 	});
 
 	writeThread = std::thread([&](std::array<char, 8> datacpy){
 		boost::asio::write(*port, boost::asio::buffer(datacpy, 8));
 
-		if (VERBOSE_OUTPUT) {
+		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "bytes sent\n";
 			for (int i = 0; i < 8; i++) {
 				std::cout << std::setw(5) << int(datacpy[i]);
 			}
 			std::cout << "\n";
-		}
+		#endif
 	}, data);
 
 
@@ -218,23 +228,26 @@ void VirtualController::getDatafromMacro(char* data) {
 			if (imgMatch[currentMacro]->load()) {
 				if (macros[currentMacro].macroSuccessList.size() == 0)
 					return;
-				if (OUTPUT_MACRO_ACTIVATION)
+				#if AC_OUTPUT_MACRO_ACTIVATION == 1
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroSuccessList[0]].name << "\n";
+				#endif
 				activateMacro(cycleMacros(macros[currentMacro].macroSuccessList));
 			}
 			else {
 				if (macros[currentMacro].macroFailList.size() == 0)
 					return;
-				if (OUTPUT_MACRO_ACTIVATION)
+				#if AC_OUTPUT_MACRO_ACTIVATION == 1
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroFailList[0]].name << "\n";
+				#endif
 				activateMacro(cycleMacros(macros[currentMacro].macroFailList));
 			}
 		}
 		else {
 			if (macros[currentMacro].macroDefaultList.size() == 0)
 				return;
-			if (OUTPUT_MACRO_ACTIVATION)
+			#if AC_OUTPUT_MACRO_ACTIVATION == 1
 				std::cout << "Activating macro: " << macros[macros[currentMacro].macroDefaultList[0]].name << "\n";
+			#endif
 			activateMacro(cycleMacros(macros[currentMacro].macroDefaultList));
 		}
 	}
