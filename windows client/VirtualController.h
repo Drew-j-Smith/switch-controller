@@ -51,7 +51,6 @@ private:
 
 	int currentMacro;
 	int currentMarcoLine;
-	bool macrosActive;
 	bool isMacroRecordingActive;
 	bool macroRecordButtonLastUpdate;
 	std::ofstream outfile;

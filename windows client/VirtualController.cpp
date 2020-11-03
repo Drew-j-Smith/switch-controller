@@ -9,7 +9,7 @@
 VirtualController::VirtualController(std::vector<cv::Mat> pictures, std::vector<Macro> macros, 
 SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
 	: pictures(pictures), macros(macros), switchButtons(switchButtons), timeSinceUpdate(std::chrono::steady_clock::now()), 
-	macroFolder(macroFolder), macrosActive(false), isMacroRecordingActive(false), macroRecordButtonLastUpdate(false)
+	macroFolder(macroFolder), currentMacro(-1), isMacroRecordingActive(false), macroRecordButtonLastUpdate(false)
 {
 
 	try{
@@ -55,7 +55,7 @@ void VirtualController::update() {
 
 	bool macroRecordButton = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)switchButtons.recordMacro);
 
-	if (!macrosActive && !isMacroRecordingActive) {
+	if (currentMacro == -1 && !isMacroRecordingActive) {
 		if (macroRecordButton && !macroRecordButtonLastUpdate) {
 			std::time_t ctime = std::time(nullptr);
 			char timeString[30];
@@ -94,7 +94,7 @@ void VirtualController::update() {
 
 
 
-	if (macrosActive && !isMacroRecordingActive) {
+	if (currentMacro != -1 && !isMacroRecordingActive) {
 		getDatafromMacro(data);
 		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "Playing macro\n";
@@ -217,7 +217,7 @@ void VirtualController::getDatafromMacro(unsigned char* data) {
 	data[0] = 85;
 	currentMarcoLine++;
 	if (currentMarcoLine == macros[currentMacro].macroLength / 8) {
-		macrosActive = false;
+		currentMacro = -1;
 		if (macros[currentMacro].enableImgProc) {
 			
 			if (imgMatch[currentMacro]->load()) {
@@ -266,16 +266,15 @@ void VirtualController::recordMacro(unsigned char* data) {//TODO
 
 
 int VirtualController::activateMacro(unsigned int index) {
-	if (index < 0 || index >= macros.size() || macrosActive || isMacroRecordingActive)
+	if (index < 0 || index >= macros.size() || currentMacro != -1 || isMacroRecordingActive)
 		return 0;
-	macrosActive = true;
 	currentMacro = index;
 	currentMarcoLine = 0;
 	return 1;
 }
 
 void VirtualController::stopMacros() {
-	macrosActive = false;
+	currentMacro = -1;
 }
 
 
@@ -286,7 +285,7 @@ void VirtualController::updateImgMatch(std::vector<bool> newData) {
 }
 
 bool VirtualController::isMacroActive() {
-	return macrosActive;
+	return currentMacro != -1;
 }
 
 int VirtualController::cycleMacros(std::vector<int>& macroList){
