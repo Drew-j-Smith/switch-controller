@@ -24,120 +24,33 @@ these buttons for our use.
  *  is responsible for the initial application hardware configuration.
  */
 
+#include <LUFA/Drivers/Peripheral/Serial.h>
 #include "Joystick.h"
-#include <stdlib.h>
 
 
+volatile uint8_t buffer[8];
+volatile uint8_t byteCount = 0;
+ISR(USART1_RX_vect) {
+	buffer[byteCount++] = fgetc(stdin);
 
-//Added by Drew Smith
-void uart_init(void) {
-    UBRR1 = UBRRH_VALUE;
-    UBRR1L = UBRRL_VALUE;
+	if(buffer[0] != 85)
+		byteCount = 0;
 
-#if USE_2X
-    UCSR1A |= _BV(U2X1);
-#else
-    UCSR1A &= ~(_BV(U2X1));
-#endif
-
-    UCSR1C = _BV(UCSZ10) | _BV(UCSZ11); /* 8-bit data */
-    UCSR1B = _BV(RXEN1) | _BV(TXEN1);   /* Enable RX and TX */
-}
-
-void uart_putchar(char c) {
-    loop_until_bit_is_set(UCSR1A, UDRE1); /* Wait until data register empty. */
-    UDR1 = c;
-}
-
-char uart_getchar(void) {
-    loop_until_bit_is_set(UCSR1A, RXC1); /* Wait until data exists. */
-    return UDR1;
-}
-
-void uart_putint(uint8_t c) {
-    loop_until_bit_is_set(UCSR1A, UDRE1); /* Wait until data register empty. */
-    UDR1 = c;
-}
-
-uint8_t uart_getint(void) {
-    loop_until_bit_is_set(UCSR1A, RXC1); /* Wait until data exists. */
-    return UDR1;
-}
-
-
-
-
-
-
-
-/*
-The following ButtonMap variable defines all possible buttons within the
-original 13 bits of space, along with attempting to investigate the remaining
-3 bits that are 'unused'. This is what led to finding that the 'Capture'
-button was operational on the stick.
-*/
-uint16_t ButtonMap[16] = {
-	0x01,
-	0x02,
-	0x04,
-	0x08,
-	0x10,
-	0x20,
-	0x40,
-	0x80,
-	0x100,
-	0x200,
-	0x400,
-	0x800,
-	0x1000,
-	0x2000,
-	0x4000,
-	0x8000,
-};
-
-/*** Debounce ****
-The following is some -really bad- debounce code. I have a more robust library
-that I've used in other personal projects that would be a much better use
-here, especially considering that this is a stick indented for use with arcade
-fighters.
-
-This code exists solely to actually test on. This will eventually be replaced.
-**** Debounce ***/
-// Quick debounce hackery!
-// We're going to capture each port separately and store the contents into a 32-bit value.
-uint32_t pb_debounce = 0;
-uint32_t pd_debounce = 0;
-
-// We also need a port state capture. We'll use a 16-bit value for this.
-uint16_t bd_state = 0;
-
-// We'll also give us some useful macros here.
-#define PINB_DEBOUNCED ((bd_state >> 0) & 0xFF)
-#define PIND_DEBOUNCED ((bd_state >> 8) & 0xFF) 
-
-// So let's do some debounce! Lazily, and really poorly.
-void debounce_ports(void) {
-	// We'll shift the current value of the debounce down one set of 8 bits. We'll also read in the state of the pins.
-	pb_debounce = (pb_debounce << 8) + PINB;
-	pd_debounce = (pd_debounce << 8) + PIND;
-
-	// We'll then iterate through a simple for loop.
-	for (int i = 0; i < 8; i++) {
-		if ((pb_debounce & (0x1010101 << i)) == (0x1010101 << i)) // wat
-			bd_state |= (1 << i);
-		else if ((pb_debounce & (0x1010101 << i)) == (0))
-			bd_state &= ~(uint16_t)(1 << i);
-
-		if ((pd_debounce & (0x1010101 << i)) == (0x1010101 << i))
-			bd_state |= (1 << (8 + i));
-		else if ((pd_debounce & (0x1010101 << i)) == (0))
-			bd_state &= ~(uint16_t)(1 << (8 + i));
+	if(byteCount == 8){
+		byteCount = 0;
+		printf("U");
 	}
 }
 
+
 // Main entry point.
 int main(void) {
-	// We'll start by performing hardware and peripheral setup.
+	Serial_Init(9600, false);
+	Serial_CreateBlockingStream(NULL);
+
+	sei();
+	UCSR1B |= (1 << RXCIE1);
+
 	SetupHardware();
 	// We'll then enable global interrupts for our use.
 	GlobalInterruptEnable();
@@ -148,9 +61,6 @@ int main(void) {
 		HID_Task();
 		// We also need to run the main USB management task.
 		USB_USBTask();
-		// As part of this loop, we'll also run our bad debounce code.
-		// Optimally, we should replace this with something that fires on a timer.
-		debounce_ports();
 	}
 }
 
@@ -160,34 +70,17 @@ void SetupHardware(void) {
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
 	
-	uart_init();
-	
 
 	// We need to disable clock division before initializing the USB hardware.
 	clock_prescale_set(clock_div_1);
 	// We can then initialize our hardware and peripherals, including the USB stack.
 
-	// Both PORTD and PORTB will be used for handling the buttons and stick.
-	DDRD  &= ~0xFF;
-	PORTD |=  0xFF;
-
-	DDRB  &= ~0xFF;
-	PORTB |=  0xFF;
 	// The USB stack should be initialized last.
 	USB_Init();
 	
 	
 }
 
-// Fired to indicate that the device is enumerating.
-void EVENT_USB_Device_Connect(void) {
-	// We can indicate that we're enumerating here (via status LEDs, sound, etc.).
-}
-
-// Fired to indicate that the device is no longer connected to a host.
-void EVENT_USB_Device_Disconnect(void) {
-	// We can indicate that our device is not ready (via status LEDs, sound, etc.).
-}
 
 // Fired when the host set the current configuration of the USB device after enumeration.
 void EVENT_USB_Device_ConfigurationChanged(void) {
@@ -289,48 +182,10 @@ void HID_Task(void) {
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	//Added by Drew
 
-	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
-	
-	uint8_t failCount = 0;
-	
-	while ((uint8_t)uart_getint() != 85){
-		uart_putint(85);
-		failCount++;
-		if (failCount > 50){
-			ReportData->LX = 128;
-			ReportData->LY = 128;
-			ReportData->RX = 128;
-			ReportData->RY = 128;
-			ReportData->Button = 0;
-			ReportData->HAT = 0x08;
-			return;
-		}
-	};
-	uart_putint(85);
-	
-	
-	uint8_t arrInt[7];
-	for (uint8_t i = 0; i < 7; i++){
-		uint8_t c = uart_getint();
-		uart_putint(c);
-		arrInt[i] = c;
-	}
-	
-	
-	uint16_t btn_data = (uint16_t)arrInt[0] + (uint16_t)arrInt[1] * 256;
-
-	ReportData->Button = btn_data;
-	
-	ReportData->LX = arrInt[2];
-	ReportData->LY = arrInt[3];
-	ReportData->RX = arrInt[4];
-	ReportData->RY = arrInt[5];
-	
-	if (arrInt[6] > 8){
-		arrInt[6] = 8;
-	}
-	
-	ReportData->HAT = arrInt[6];
-
-
+	ReportData->Button = (uint16_t)buffer[1] + (uint16_t)buffer[2] * 256;
+	ReportData->LX = buffer[3];
+	ReportData->LY = buffer[4];
+	ReportData->RX = buffer[5];
+	ReportData->RY = buffer[6];
+	ReportData->HAT = buffer[7] > 8 ? 8 : buffer[7];
 }

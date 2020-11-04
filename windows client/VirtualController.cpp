@@ -122,16 +122,8 @@ void VirtualController::update() {
 		readThread.join();
 
 	readThread = std::thread([&](){
-		char recievedData[8];
-		boost::asio::read(*port, boost::asio::buffer(recievedData, 8));
-
-		#if AC_VERBOSE_OUTPUT == 1
-			std::cout << "bytes recieved\n";
-			for (int i = 0; i < 8; i++) {
-				std::cout << std::setw(5) << (int)recievedData[i];
-			}
-			std::cout << "\n";
-		#endif
+		char recievedData[1];
+		boost::asio::read(*port, boost::asio::buffer(recievedData, 1));
 	});
 
 	boost::asio::write(*port, boost::asio::buffer(data, 8));
