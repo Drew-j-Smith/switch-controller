@@ -35,7 +35,7 @@ private:
 
 	int cycleMacros(std::vector<int>& macroList);
 
-	std::shared_ptr<boost::asio::serial_port> port;
+	std::unique_ptr<boost::asio::serial_port> port;
 
 	std::vector<cv::Mat> pictures;
 	std::vector<Macro> macros;

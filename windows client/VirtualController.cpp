@@ -14,9 +14,9 @@ SwitchButtons switchButtons, std::string serialPort, std::string macroFolder)
 
 	try{
 		boost::asio::io_service io;
-		port = std::shared_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
+		port = std::unique_ptr<boost::asio::serial_port>(new boost::asio::serial_port(io));
 		port->open(serialPort);
-		port->set_option(boost::asio::serial_port_base::baud_rate(9600));
+		port->set_option(boost::asio::serial_port_base::baud_rate(57600));
 		#if AC_VERBOSE_OUTPUT == 1
 			std::cout << "Serial port connected" << std::endl;
 		#endif
@@ -122,8 +122,15 @@ void VirtualController::update() {
 		readThread.join();
 
 	readThread = std::thread([&](){
-		char recievedData[1];
-		boost::asio::read(*port, boost::asio::buffer(recievedData, 1));
+		char recievedData;
+		boost::asio::read(*port, boost::asio::buffer(&recievedData, 1));
+
+		#if AC_VERBOSE_OUTPUT == 1
+			if(recievedData == 85)
+				std::cout << "Data recieved successfully.\n";
+			else
+				std::cout << "Data recieved unsuccessfully.\n";
+		#endif
 	});
 
 	boost::asio::write(*port, boost::asio::buffer(data, 8));
