@@ -40,8 +40,10 @@ void VirtualController::update() {
 		std::cout << "\nTime since last update: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() << "ms\n";
 	#endif
 
+	#if AC_VERBOSE_OUTPUT == 1
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() > AC_MIN_DELAY_MS)
 		std::cerr << "Warning, running behind " << std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() - AC_MIN_DELAY_MS << "ms\n";
+	#endif
 
 	while (std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceUpdate).count() < AC_MIN_DELAY_MS)
 		now = std::chrono::steady_clock::now();
@@ -216,33 +218,45 @@ void VirtualController::getDatafromMacro(unsigned char* data) {
 	data[0] = 85;
 	currentMarcoLine++;
 	if (currentMarcoLine == macros[currentMacro].macroLength / 8) {
-		currentMacro = -1;
+		
 		if (macros[currentMacro].enableImgProc) {
 			
 			if (imgMatch[currentMacro]->load()) {
-				if (macros[currentMacro].macroSuccessList.size() == 0)
+				if (macros[currentMacro].macroSuccessList.size() == 0){
+					currentMacro = -1;
 					return;
+				}
 				#if AC_OUTPUT_MACRO_ACTIVATION == 1
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroSuccessList[0]].name << "\n";
 				#endif
-				activateMacro(cycleMacros(macros[currentMacro].macroSuccessList));
+				auto& macroList = macros[currentMacro].macroSuccessList;
+				currentMacro = -1;
+				activateMacro(cycleMacros(macroList));
 			}
 			else {
-				if (macros[currentMacro].macroFailList.size() == 0)
+				if (macros[currentMacro].macroFailList.size() == 0){
+					currentMacro = -1;
 					return;
+				}
 				#if AC_OUTPUT_MACRO_ACTIVATION == 1
 					std::cout << "Activating macro: " << macros[macros[currentMacro].macroFailList[0]].name << "\n";
 				#endif
-				activateMacro(cycleMacros(macros[currentMacro].macroFailList));
+				auto& macroList = macros[currentMacro].macroFailList;
+				currentMacro = -1;
+				activateMacro(cycleMacros(macroList));
 			}
 		}
 		else {
-			if (macros[currentMacro].macroDefaultList.size() == 0)
+			if (macros[currentMacro].macroDefaultList.size() == 0){
+				currentMacro = -1;
 				return;
+			}
 			#if AC_OUTPUT_MACRO_ACTIVATION == 1
 				std::cout << "Activating macro: " << macros[macros[currentMacro].macroDefaultList[0]].name << "\n";
 			#endif
-			activateMacro(cycleMacros(macros[currentMacro].macroDefaultList));
+			auto& macroList = macros[currentMacro].macroDefaultList;
+			currentMacro = -1;
+			activateMacro(cycleMacros(macroList));
 		}
 	}
 }
