@@ -5,6 +5,7 @@
 #include "pch.h"
 
 #include "CharStream.h"
+#include "ArduinoMacro.h"
 
 int main(){
     CharStream<1> a;
