@@ -30,12 +30,7 @@ int main(){
     c.save("test4.txt", false);
 
     c.load("test4.txt", false);
-    for (int i = 0; i < c.size(); i++) {
-        for (int j = 0; j < 16; j++) {
-            std::cout << std::setw(2) << (int)c.at(i).at(j);
-        }
-        std::cout << std::endl;
-    }
+    c.print(std::cout);
 
 
     return 0;

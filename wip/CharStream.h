@@ -66,33 +66,34 @@ public:
     }
 
     void save(const std::string & filename, const bool asHex = true){
-        if (asHex){
-            std::ofstream outfile(filename, std::ios::out);
-            if (outfile) {
-                outfile << std::hex << std::setfill('0');
-                for (int i = 0; i < size(); i++) {
-                    for (int j = 0; j < frameSize; j++) {
-                        outfile << std::setw(2) << (int)at(i).at(j);
-                    }
-                    outfile << std::endl;
-                }
-            }
-            else {
-                std::cerr << "Error writing to file \"" << filename << "\"\n";
-            }
-            outfile.close();
+        std::ofstream outfile;
+        if (asHex)
+            outfile.open(filename, std::ios::out);
+        else
+            outfile.open(filename, std::ios::out | std::ios::binary);
+        if (outfile) {
+            print(outfile, asHex);
         }
         else {
-            std::ofstream outfile(filename, std::ios::out | std::ios::binary);
-            if (outfile) {
-                for (int i = 0; i < size(); i++) {
-                    outfile.write((char*)at(i).data(), frameSize);
+            std::cerr << "Error writing to file \"" << filename << "\"\n";
+        }
+        outfile.close();
+    }
+
+    void print(std::ostream & out, const bool asHex = true){
+        if (asHex){
+            out << std::hex << std::setfill('0');
+            for (int i = 0; i < size(); i++) {
+                for (int j = 0; j < frameSize; j++) {
+                    out << std::setw(2) << (int)at(i).at(j);
                 }
+                out << std::endl;
             }
-            else {
-                std::cerr << "Error writing to file \"" << filename << "\"\n";
+        }
+        else {
+            for (int i = 0; i < size(); i++) {
+                out.write((char*)at(i).data(), frameSize);
             }
-            outfile.close();
         }
     }
 };
