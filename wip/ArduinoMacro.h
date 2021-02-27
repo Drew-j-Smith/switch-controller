@@ -1,5 +1,5 @@
-#ifndef ARDUINO_MACRO
-#define ARDUNIO_MACRO
+#ifndef ARDUINO_MACRO_H
+#define ARDUNIO_MACRO_H
 
 #include "pch.h"
 
@@ -11,8 +11,7 @@
 
 #include "CharStream.h"
 
-class Macro
-{
+class Macro {
 public:
     enum ImageProcessingStatus { disabled = 0, enabled, fromOther };
     struct MacroInfo {
@@ -32,35 +31,44 @@ public:
         int         searchMaxY;
     };
 
-    Macro();
-    Macro(const MacroInfo macroInfo, const ImageProcessingStatus ImageProcessingStatus,
-    const std::vector<std::weak_ptr<Macro>> macroSuccessList, const std::vector<std::weak_ptr<Macro>> macroFailList,
-    const std::vector<std::weak_ptr<Macro>> macroDefaultList, const std::shared_ptr<Macro> sharedImgProcMacro);
-    void loadMacro(boost::property_tree::ptree macro, std::map<std::string, std::shared_ptr<Macro>>);
+    Macro() {};
+    Macro(MacroInfo macroInfo, ImageProcessingStatus ImageProcessingStatus,
+    std::vector<std::weak_ptr<Macro>> macroSuccessList, std::vector<std::weak_ptr<Macro>> macroFailList,
+    std::vector<std::weak_ptr<Macro>> macroDefaultList, std::weak_ptr<Macro> sharedImgProcMacro);
+    void loadMacro(boost::property_tree::ptree macro, std::map<std::string, std::shared_ptr<Macro>> macroList);
 private:
     CharStream<15> data;
     std::shared_ptr<std::atomic_bool> imageMatch = std::shared_ptr<std::atomic_bool>(new std::atomic_bool);
     ImageProcessingStatus imageProcesssingStatus = ImageProcessingStatus::disabled;
     MacroInfo macroInfo = {"", 0, cv::Mat(), cv::Mat(), 0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+    cv::Point matchPoint;
+    double critalMatchVal;
+    std::shared_ptr<Macro> sharedImgProcMacro;
+
     std::vector<std::weak_ptr<Macro>> macroSuccessList;
     std::vector<std::weak_ptr<Macro>> macroFailList;
     std::vector<std::weak_ptr<Macro>> macroDefaultList;
 public:
-    void loadData(const std::string &, bool isHex = true);
-    void saveData(const std::string &, bool asHex = true);
+    void loadData(const std::string & filename, bool isHex = true);
+    void saveData(const std::string & filename, bool asHex = true);
 
-    void getData(const unsigned long, unsigned char[8]) const;
-    void appendData(const unsigned long, unsigned char[8]);
+    const CharStream<15> getData() const { return data; }
+    void getDataframe(const unsigned long long, unsigned char[8]) const;
+    void appendData(const unsigned long long, unsigned char[8]);
     std::shared_ptr<Macro> getNextMacro() const;
 
     void matchImage(const cv::Mat);
 
+    cv::Point getMatchPoint() const;
+    double getCritalMatchVal() const;
+
+    unsigned long long getTime(int index) const { return *(unsigned long long*)data[index].data(); }
 
     std::shared_ptr<std::atomic_bool> getImageMatch() const { return imageMatch;                          }
-    unsigned long         lastTime()                  const { return *(unsigned long*)data.back().data(); }
-    MacroInfo             getMacroInfo()              const { return macroInfo;                           }
-    ImageProcessingStatus getImageProcesssingStatus() const { return imageProcesssingStatus;              }
+    unsigned long long    lastTime()                  const { return *(unsigned long long*)data.back().data(); }
+    MacroInfo             getMacroInfo()              const { return macroInfo;                                }
+    ImageProcessingStatus getImageProcesssingStatus() const { return imageProcesssingStatus;                   }
 
     void setMacroInfo(MacroInfo macroInfo) { this->macroInfo = macroInfo; }
     void setImageProcesssingStatus(ImageProcessingStatus imageProcessingStatus) { this->imageProcesssingStatus = imageProcessingStatus; }
