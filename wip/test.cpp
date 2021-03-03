@@ -6,6 +6,7 @@
 
 #include "CharStream.h"
 #include "ArduinoMacro.h"
+#include "ArduinoMacros.h"
 
 int main(){
     CharStream<1> a;
