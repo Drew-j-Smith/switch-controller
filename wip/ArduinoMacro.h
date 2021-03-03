@@ -1,5 +1,5 @@
 #ifndef ARDUINO_MACRO_H
-#define ARDUNIO_MACRO_H
+#define ARDUINO_MACRO_H
 
 #include "pch.h"
 
