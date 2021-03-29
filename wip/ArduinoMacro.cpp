@@ -14,7 +14,8 @@ Macro::Macro(MacroInfo macroInfo, ImageProcessingStatus ImageProcessingStatus,
 
 }
 
-void Macro::loadMacro(boost::property_tree::ptree macro, std::map<std::string, std::shared_ptr<Macro>> macroList){
+void Macro::loadMacro(boost::property_tree::ptree macro, std::map<std::string, std::shared_ptr<Macro>> macroList,
+    std::map<std::string, cv::Mat> pictureList) {
     //TODO
 }
 
@@ -44,7 +45,7 @@ void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) c
 void Macro::appendData(const unsigned long long time, unsigned char data[8]){
     std::array<unsigned char, 15> dataframe;
     memcpy(dataframe.data(), &time, 8);
-    memcpy(dataframe.data() + 8, data + 1, 8);
+    memcpy(dataframe.data() + 8, data + 1, 7);
     this->data.push_back(dataframe);
 }
 
@@ -59,7 +60,7 @@ static std::shared_ptr<Macro> cycleVector(std::vector<std::weak_ptr<Macro>> macr
 
 std::shared_ptr<Macro> Macro::getNextMacro() const{
     if(imageProcesssingStatus){
-        if(imageMatch->load())
+        if(isImageMatch())
             return cycleVector(macroSuccessList);
         else
             return cycleVector(macroFailList);
@@ -72,5 +73,9 @@ void Macro::matchImage(const cv::Mat sceenshot){
     if(imageProcesssingStatus == ImageProcessingStatus::fromOther)
         return;
 
+    //TODO
+}
+
+bool Macro::isImageMatch() const{
     //TODO
 }
