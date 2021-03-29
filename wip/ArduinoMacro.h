@@ -5,6 +5,8 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -60,6 +62,7 @@ public:
     //thread safe methods
     void getDataframe(const unsigned long long, unsigned char[8]) const;
     std::shared_ptr<Macro> getNextMacro() const;
+    std::shared_ptr<Macro> getSharedImgProcMacro() const{ return sharedImgProcMacro; }
 
     void matchImage(const cv::Mat);
     bool isImageMatch() const;
@@ -74,12 +77,12 @@ public:
 
     void setMatchPoint(const cv::Point matchPoint) { this->matchPoint.store(matchPoint);         }
     void setCritalMatchVal(double critalMatchVal)  { this->critalMatchVal.store(critalMatchVal); }
-    //end thread safe methods
 
     unsigned long long    getTime(int index)          const { return *(unsigned long long*)data[index].data(); }
     unsigned long long    lastTime()                  const { return *(unsigned long long*)data.back().data(); }
-    MacroInfo             getMacroInfo()              const { return macroInfo;                                }
+    const MacroInfo*      getMacroInfo()              const { return &macroInfo;                               }
     ImageProcessingStatus getImageProcesssingStatus() const { return imageProcesssingStatus;                   }
+    //end thread safe methods
 
     void setMacroInfo(MacroInfo macroInfo) { this->macroInfo = macroInfo; }
     void setImageProcesssingStatus(ImageProcessingStatus imageProcessingStatus) { this->imageProcesssingStatus = imageProcessingStatus; }

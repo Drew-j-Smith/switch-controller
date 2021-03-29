@@ -76,6 +76,29 @@ void Macro::matchImage(const cv::Mat sceenshot){
     //TODO
 }
 
+//helper function to Macro::isImageMatch
+static const Macro* getImageProcessingMacro(const Macro* m) {
+    if (m->getImageProcesssingStatus() == Macro::ImageProcessingStatus::fromOther)
+        return m->getSharedImgProcMacro().get();
+    else 
+        return m;
+}
+
 bool Macro::isImageMatch() const{
     //TODO
+    if (getImageProcessingMacro(this)->getMacroInfo()->matchMethod == cv::TM_SQDIFF
+        || getImageProcessingMacro(this)->getMacroInfo()->matchMethod == cv::TM_SQDIFF_NORMED) {
+        return getCritalMatchVal() < macroInfo.matchThreshold && 
+            getMatchPoint().x >= macroInfo.minX && 
+            getMatchPoint().y >= macroInfo.minY && 
+            getMatchPoint().x <= macroInfo.maxX && 
+            getMatchPoint().y <= macroInfo.maxY;
+    }
+    else {
+        return macroInfo.matchThreshold < getCritalMatchVal() && 
+            getMatchPoint().x >= macroInfo.minX &&
+            getMatchPoint().y >= macroInfo.minY &&
+            getMatchPoint().x <= macroInfo.maxX &&
+            getMatchPoint().y <= macroInfo.maxY;
+    }
 }
