@@ -27,7 +27,7 @@ void Macros::getData(const unsigned long long time, unsigned char data[8]){
 void Macros::activateMacros(){
     if(!activeMacro){
         for(auto m : macros){
-            if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)m->getMacroInfo().keyboardButton)){
+            if(sf::Keyboard::isKeyPressed((sf::Keyboard::Key)m->getMacroInfo()->keyboardButton)){
                 activeMacro = m;
                 timeSinceMacroActivation = std::chrono::steady_clock::now();
                 break;
