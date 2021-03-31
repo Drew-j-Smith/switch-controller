@@ -52,27 +52,32 @@ private:
     std::vector<std::weak_ptr<Macro>> macroSuccessList;
     std::vector<std::weak_ptr<Macro>> macroFailList;
     std::vector<std::weak_ptr<Macro>> macroDefaultList;
+
+    static std::shared_ptr<Macro> cycleVector(std::vector<std::weak_ptr<Macro>> macroVector);
 public:
     void loadData(const std::string & filename, bool isHex = true);
     void saveData(const std::string & filename, bool asHex = true);
 
-    const CharStream<15> getData() const { return data; }
+    const CharStream<15>* getData() const { return &data; }
     void appendData(const unsigned long long, unsigned char[8]);
 
     //thread safe methods
     void getDataframe(const unsigned long long, unsigned char[8]) const;
     std::shared_ptr<Macro> getNextMacro() const;
-    std::shared_ptr<Macro> getSharedImgProcMacro() const{ return sharedImgProcMacro; }
+    const Macro* getImageProcessingMacro() const {
+        if (getImageProcesssingStatus() == Macro::ImageProcessingStatus::fromOther) return sharedImgProcMacro.get();
+        else return this;
+    }
 
-    void matchImage(const cv::Mat);
+    void matchImage(const cv::Mat &);
     bool isImageMatch() const;
     cv::Point getMatchPoint() const {
         if (imageProcesssingStatus == ImageProcessingStatus::fromOther) return sharedImgProcMacro->getMatchPoint();
-        return matchPoint.load();
+        else return matchPoint.load();
     }
     double getCritalMatchVal() const {
         if (imageProcesssingStatus == ImageProcessingStatus::fromOther) return sharedImgProcMacro->getCritalMatchVal();
-        return critalMatchVal.load(); 
+        else return critalMatchVal.load(); 
     }
 
     void setMatchPoint(const cv::Point matchPoint) { this->matchPoint.store(matchPoint);         }
