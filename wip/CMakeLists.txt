@@ -7,5 +7,5 @@ find_package(Boost COMPONENTS system thread REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-add_executable(ArduinoController test.cpp ArduinoMacro.cpp ArduinoMacros.cpp)
+add_executable(ArduinoController test.cpp ArduinoMacro.cpp ArduinoMacros.cpp MacroDecider.cpp)
 target_link_libraries(ArduinoController ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES})

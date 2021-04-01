@@ -9,7 +9,6 @@
 #include <opencv2/imgproc.hpp>
 
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 class MacroDecider
 {
@@ -23,7 +22,7 @@ protected:
     std::string name;
 };
 
-class MacroImageProcessingDecider : MacroDecider
+class MacroImageProcessingDecider : public MacroDecider
 {
 public:
     struct ImageProcessingInfo {
@@ -40,6 +39,9 @@ public:
     MacroImageProcessingDecider(const std::string & name, const ImageProcessingInfo & imageProcessingInfo) {
         this->name = name;
         this->imageProcessingInfo = imageProcessingInfo;
+        matchPointX.store(0);
+        matchPointY.store(0);
+        critalMatchVal.store(0);
     }
 
     MacroImageProcessingDecider(const boost::property_tree::ptree & tree);

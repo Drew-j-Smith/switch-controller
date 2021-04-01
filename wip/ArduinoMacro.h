@@ -3,94 +3,41 @@
 
 #include "pch.h"
 
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
-
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include "CharStream.h"
+#include "MacroDecider.h"
 
 class Macro {
 public:
-    enum ImageProcessingStatus { disabled = 0, enabled, fromOther };
-    struct MacroInfo {
-        std::string name;
-        int         keyboardButton;
-        cv::Mat     templatePic;
-        cv::Mat     maskPic;
-        int         matchMethod;
-        double      matchThreshold;
-        int         minX;
-        int         minY;
-        int         maxX;
-        int         maxY;
-        int         searchMinX;
-        int         searchMinY;
-        int         searchMaxX;
-        int         searchMaxY;
-    };
-
     Macro() {};
-    Macro(MacroInfo macroInfo, ImageProcessingStatus ImageProcessingStatus,
-    std::vector<std::weak_ptr<Macro>> macroSuccessList, std::vector<std::weak_ptr<Macro>> macroFailList,
-    std::vector<std::weak_ptr<Macro>> macroDefaultList, std::weak_ptr<Macro> sharedImgProcMacro);
-
-    void loadMacro(boost::property_tree::ptree macro, std::map<std::string, std::shared_ptr<Macro>> macroList,
-    std::map<std::string, cv::Mat> pictureList);
+    Macro(std::string name, CharStream<15> & data, int keyboardButton, std::shared_ptr<MacroDecider> decider);
+    Macro(const boost::property_tree::ptree & tree, const std::map<std::string, MacroDecider> & deciderList);
+    
+    void setMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroList);
+    void setMacroLists(std::vector<std::vector<std::weak_ptr<Macro>>> & nextMacroLists) { this->nextMacroLists = nextMacroLists; }
 private:
+    std::string name;
     CharStream<15> data;
-    ImageProcessingStatus imageProcesssingStatus = ImageProcessingStatus::disabled;
-    MacroInfo macroInfo = {"", 0, cv::Mat(), cv::Mat(), 0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int keyboardButton;
+    std::shared_ptr<MacroDecider> decider;
 
-    std::atomic<cv::Point> matchPoint;
-    std::atomic<double> critalMatchVal;
-    std::shared_ptr<Macro> sharedImgProcMacro;
-
-    std::vector<std::weak_ptr<Macro>> macroSuccessList;
-    std::vector<std::weak_ptr<Macro>> macroFailList;
-    std::vector<std::weak_ptr<Macro>> macroDefaultList;
+    std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
 
     static std::shared_ptr<Macro> cycleVector(std::vector<std::weak_ptr<Macro>> macroVector);
 public:
-    void loadData(const std::string & filename, bool isHex = true);
-    void saveData(const std::string & filename, bool asHex = true);
-
-    const CharStream<15>* getData() const { return &data; }
-    void appendData(const unsigned long long, unsigned char[8]);
+    void setData(CharStream<15>* data) { this->data = *data; }
+    void appendData(const unsigned long long, const unsigned char[8]);
 
     //thread safe methods
+    const CharStream<15>* getData() const { return &data; }
+    int getKeyboardButton() const { return keyboardButton; }
     void getDataframe(const unsigned long long, unsigned char[8]) const;
     std::shared_ptr<Macro> getNextMacro() const;
-    const Macro* getImageProcessingMacro() const {
-        if (getImageProcesssingStatus() == Macro::ImageProcessingStatus::fromOther) return sharedImgProcMacro.get();
-        else return this;
-    }
 
-    void matchImage(const cv::Mat &);
-    bool isImageMatch() const;
-    cv::Point getMatchPoint() const {
-        if (imageProcesssingStatus == ImageProcessingStatus::fromOther) return sharedImgProcMacro->getMatchPoint();
-        else return matchPoint.load();
-    }
-    double getCritalMatchVal() const {
-        if (imageProcesssingStatus == ImageProcessingStatus::fromOther) return sharedImgProcMacro->getCritalMatchVal();
-        else return critalMatchVal.load(); 
-    }
-
-    void setMatchPoint(const cv::Point matchPoint) { this->matchPoint.store(matchPoint);         }
-    void setCritalMatchVal(double critalMatchVal)  { this->critalMatchVal.store(critalMatchVal); }
-
-    unsigned long long    getTime(int index)          const { return *(unsigned long long*)data[index].data(); }
-    unsigned long long    lastTime()                  const { return *(unsigned long long*)data.back().data(); }
-    const MacroInfo*      getMacroInfo()              const { return &macroInfo;                               }
-    ImageProcessingStatus getImageProcesssingStatus() const { return imageProcesssingStatus;                   }
+    unsigned long long getTime(int index) const { return *(unsigned long long*)data[index].data(); }
+    unsigned long long lastTime()         const { return *(unsigned long long*)data.back().data(); }
     //end thread safe methods
-
-    void setMacroInfo(MacroInfo macroInfo) { this->macroInfo = macroInfo; }
-    void setImageProcesssingStatus(ImageProcessingStatus imageProcessingStatus) { this->imageProcesssingStatus = imageProcessingStatus; }
     
 };
 

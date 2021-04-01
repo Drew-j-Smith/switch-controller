@@ -15,7 +15,6 @@ private:
 public:
     Macros(std::vector<std::shared_ptr<Macro>> macros) : macros(macros), activeMacro(nullptr) {}
 
-    std::vector<std::future<void>> matchImages(const cv::Mat);
     void getData(const unsigned long long, unsigned char[8]);
     void activateMacros();
     bool isMacroActive() const { return &activeMacro; }
