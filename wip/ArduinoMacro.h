@@ -14,8 +14,8 @@ public:
     Macro(std::string name, CharStream<15> & data, int keyboardButton, std::shared_ptr<MacroDecider> decider);
     Macro(const boost::property_tree::ptree & tree, const std::map<std::string, MacroDecider> & deciderList);
     
-    void setMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroList);
-    void setMacroLists(std::vector<std::vector<std::weak_ptr<Macro>>> & nextMacroLists) { this->nextMacroLists = nextMacroLists; }
+    void setNextMacroLists(const std::map<std::string, std::shared_ptr<Macro>> & macroList);
+    void setNextMacroLists(std::vector<std::vector<std::weak_ptr<Macro>>> & nextMacroLists) { this->nextMacroLists = nextMacroLists; }
 private:
     std::string name;
     CharStream<15> data;

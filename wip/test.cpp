@@ -13,6 +13,7 @@
 #include "ArduinoMacro.h"
 #include "ArduinoMacros.h"
 #include "MacroDecider.h"
+#include "MacroImageProcessingDecider.h"
 
 bool screenshot(cv::Mat& m, int windowWidth, int windowHeight, HDC & hwindowDC);
 
@@ -89,7 +90,7 @@ int main(){
 
     std::shared_ptr<Macro> f = std::make_shared<Macro>("1", CharStream<15>(), 0, d);
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists = {{f}, {f}};
-    f->setMacroLists(nextMacroLists);
+    f->setNextMacroLists(nextMacroLists);
 
 
     std::thread thd([&](){

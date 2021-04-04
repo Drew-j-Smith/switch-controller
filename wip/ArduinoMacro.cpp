@@ -13,7 +13,7 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
     //TODO
 }
 
-void Macro::setMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroList){
+void Macro::setNextMacroLists(const std::map<std::string, std::shared_ptr<Macro>> & macroList){
     //TODO
 }
 

@@ -1,4 +1,4 @@
-#include "MacroDecider.h"
+#include "MacroImageProcessingDecider.h"
 
 #define AC_DISPLAY_IMAGE_MATCH 1
 
