@@ -2,18 +2,25 @@
 
 #define AC_DISPLAY_IMAGE_MATCH 1
 
-Macro::Macro(std::string name, CharStream<15> & data, std::shared_ptr<InputEvent> inputEvent, std::shared_ptr<MacroDecider> decider){
+Macro::Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent, const std::shared_ptr<MacroDecider> & decider){
     this->name = name;
     this->data = data;
     this->inputEvent = inputEvent;
     this->decider = decider;
 }
 
-Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::string, MacroDecider> & deciderList) {
-    //TODO
+Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<MacroDecider>> & deciderList) {
+    name = tree.get("name", "");
+    std::string filename = tree.get("filename", "");
+    bool storedAsHex = tree.get("stored as hex", false);
+    data.load(filename, storedAsHex);
+    inputEvent = std::make_shared<InputEventCollection>(tree.get_child(boost::property_tree::path("input")));
+    auto deciderIt = deciderList.find(tree.get("decider", ""));
+    if (deciderIt != deciderList.end())
+        decider = deciderIt->second;
 }
 
-void Macro::setNextMacroLists(const std::map<std::string, std::shared_ptr<Macro>> & macroList){
+void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroList){
     //TODO
 }
 

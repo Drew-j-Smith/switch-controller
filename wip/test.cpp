@@ -105,6 +105,14 @@ int main(){
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists = {{f}, {f}};
     f->setNextMacroLists(nextMacroLists);
 
+    boost::property_tree::ptree tree2;
+    boost::property_tree::read_json("test2.json", tree2);
+    std::map<std::string, std::shared_ptr<MacroDecider>> deciderMap;
+    deciderMap.insert({"t", macroImageProcessingDecider});
+    auto g = std::make_shared<Macro>(tree2, deciderMap);
+
+    g->getData()->save("test3.txt");
+    std::cout << g->getName() << std::endl;
 
     std::thread thd([&](){
         while (true) {
@@ -114,8 +122,12 @@ int main(){
             // std::cout << sfJoystickInputEvent->getInputValue() << std::endl;
             // std::cout << sfJoystickInputEvent2->getInputValue() << std::endl;
             // std::cout << inputEventCollection->getInputValue() << std::endl;
-            std::cout << inputEventCollection2->getInputValue() << std::endl;
-            f->getNextMacro();
+            // std::cout << inputEventCollection2->getInputValue() << std::endl;
+
+            std::cout << "input" << g->getInputEvent()->getInputValue() << std::endl;
+            std::cout << "decider" << g->getMacroDecider()->nextMacroListIndex() << std::endl;
+
+            // f->getNextMacro();
             std::this_thread::sleep_for (std::chrono::milliseconds(500));
         }
     });
