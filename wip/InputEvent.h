@@ -23,24 +23,4 @@ public:
     bool isDigital() const override { return true; }
 };
 
-class InputEventCollection : public InputEvent
-{
-private:
-    std::vector<std::shared_ptr<InputEvent>> InputEvents;
-public:
-    InputEventCollection() {};
-    InputEventCollection(const std::vector<std::shared_ptr<InputEvent>> & InputEvents) { this->InputEvents = InputEvents; };
-    int getInputValue() const override { 
-        if (InputEvents.size() == 0)
-            return 0;
-
-        for (int i = 0; i < InputEvents.size(); i++)
-            if (!InputEvents[i]->getInputValue())
-                return 0;
-
-        return 1;
-    };
-    bool isDigital() const override { return true; }
-};
-
 #endif

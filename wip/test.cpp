@@ -7,6 +7,8 @@
 
 #include <windows.h>
 
+#include <boost/property_tree/json_parser.hpp>
+
 #include "pch.h"
 
 #include "CharStream.h"
@@ -16,6 +18,7 @@
 #include "MacroImageProcessingDecider.h"
 #include "SfKeyboardInputEvent.h"
 #include "SfJoystickInputEvent.h"
+#include "InputEventCollection.h"
 
 bool screenshot(cv::Mat& m, int windowWidth, int windowHeight, HDC & hwindowDC);
 
@@ -89,6 +92,9 @@ int main(){
     std::shared_ptr<SfJoystickAnalogInputEvent> sfJoystickInputEvent2 = std::make_shared<SfJoystickAnalogInputEvent>(0, sf::Joystick::X);
     std::vector<std::shared_ptr<InputEvent>> inputEventVector = {sfKeyboardInputEvent, sfJoystickInputEvent};
     std::shared_ptr<InputEventCollection> inputEventCollection = std::make_shared<InputEventCollection>(inputEventVector);
+    boost::property_tree::ptree tree;
+    boost::property_tree::read_json("test.json", tree);
+    std::shared_ptr<InputEventCollection> inputEventCollection2 = std::make_shared<InputEventCollection>(tree);
     
     HWND window = FindWindowA(NULL, "Game Capture HD");
     HDC hwindowDC = GetDC(window);
@@ -107,7 +113,8 @@ int main(){
             // std::cout << f->getInputEvent()->getInputValue() << std::endl;
             // std::cout << sfJoystickInputEvent->getInputValue() << std::endl;
             // std::cout << sfJoystickInputEvent2->getInputValue() << std::endl;
-            std::cout << inputEventCollection->getInputValue() << std::endl;
+            // std::cout << inputEventCollection->getInputValue() << std::endl;
+            std::cout << inputEventCollection2->getInputValue() << std::endl;
             f->getNextMacro();
             std::this_thread::sleep_for (std::chrono::milliseconds(500));
         }

@@ -5,6 +5,8 @@
 
 #include <SFML/Window/Joystick.hpp>
 
+#include<boost/property_tree/ptree.hpp>
+
 #include "InputEvent.h"
 
 class SfJoystickDigitalInputEvent : public InputEvent
@@ -18,8 +20,13 @@ public:
         this->joystickIndex = joystickIndex; 
         this->button = button;
     };
+    SfJoystickDigitalInputEvent(boost::property_tree::ptree tree) { 
+        joystickIndex = tree.get("joystick index", 0);
+        button = tree.get("button", 0);
+    };
 
     int getInputValue() const override { 
+        std::cout << joystickIndex << " " << button << std::endl;
         if (!sf::Joystick::isConnected(joystickIndex) || sf::Joystick::getButtonCount(joystickIndex) < button)
             return 0;
         return sf::Joystick::isButtonPressed(joystickIndex, button);
@@ -37,6 +44,10 @@ public:
     SfJoystickAnalogInputEvent(unsigned int joystickIndex, sf::Joystick::Axis axis) { 
         this->joystickIndex = joystickIndex; 
         this->axis = axis;
+    };
+    SfJoystickAnalogInputEvent(const boost::property_tree::ptree & tree) { 
+        joystickIndex = (sf::Keyboard::Key) tree.get("joystick index", 0);
+        axis = (sf::Joystick::Axis) tree.get("axis", 0);
     };
 
     int getInputValue() const override { 
