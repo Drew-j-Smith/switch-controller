@@ -7,11 +7,12 @@
 
 #include "CharStream.h"
 #include "MacroDecider.h"
+#include "InputEvent.h"
 
 class Macro {
 public:
     Macro() {};
-    Macro(std::string name, CharStream<15> & data, int keyboardButton, std::shared_ptr<MacroDecider> decider);
+    Macro(std::string name, CharStream<15> & data, std::shared_ptr<InputEvent> inputEvent, std::shared_ptr<MacroDecider> decider);
     Macro(const boost::property_tree::ptree & tree, const std::map<std::string, MacroDecider> & deciderList);
     
     void setNextMacroLists(const std::map<std::string, std::shared_ptr<Macro>> & macroList);
@@ -19,25 +20,24 @@ public:
 private:
     std::string name;
     CharStream<15> data;
-    int keyboardButton;
+    std::shared_ptr<InputEvent> inputEvent;
     std::shared_ptr<MacroDecider> decider;
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
 
     static std::shared_ptr<Macro> cycleVector(std::vector<std::weak_ptr<Macro>> macroVector);
 public:
+    const std::string & getName() const { return name; }
+    const std::shared_ptr<InputEvent> getInputEvent() const { return inputEvent; }
+    const std::shared_ptr<MacroDecider> getMacroDecider() const { return decider; }
+    const std::shared_ptr<Macro> getNextMacro() const;
+
+    const CharStream<15>* getData() const { return &data; }
     void setData(CharStream<15>* data) { this->data = *data; }
     void appendData(const unsigned long long, const unsigned char[8]);
-
-    //thread safe methods
-    const CharStream<15>* getData() const { return &data; }
-    int getKeyboardButton() const { return keyboardButton; }
     void getDataframe(const unsigned long long, unsigned char[8]) const;
-    std::shared_ptr<Macro> getNextMacro() const;
-
     unsigned long long getTime(int index) const { return *(unsigned long long*)data[index].data(); }
     unsigned long long lastTime()         const { return *(unsigned long long*)data.back().data(); }
-    //end thread safe methods
     
 };
 

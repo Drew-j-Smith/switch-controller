@@ -14,6 +14,8 @@
 #include "ArduinoMacros.h"
 #include "MacroDecider.h"
 #include "MacroImageProcessingDecider.h"
+#include "SfKeyboardInputEvent.h"
+#include "SfJoystickInputEvent.h"
 
 bool screenshot(cv::Mat& m, int windowWidth, int windowHeight, HDC & hwindowDC);
 
@@ -80,22 +82,32 @@ int main(){
     //MacroImageProcessingDecider c("t", {temp, mask, cv::TM_CCORR_NORMED, .97, 0, 0, 1920, 1080});
 
     //MacroDecider* d = &c;
-    MacroImageProcessingDecider::ImageProcessingInfo t = {temp, mask, cv::TM_CCORR_NORMED, .97, 0, 0, 1920, 1080};
-    std::shared_ptr<MacroImageProcessingDecider> d = std::make_shared<MacroImageProcessingDecider>("t", t);
+    MacroImageProcessingDecider::ImageProcessingInfo imageProcessingInfo = {temp, mask, cv::TM_CCORR_NORMED, .97, 0, 0, 500, 500};
+    std::shared_ptr<MacroImageProcessingDecider> macroImageProcessingDecider = std::make_shared<MacroImageProcessingDecider>("t", imageProcessingInfo);
+    std::shared_ptr<SfKeyboardInputEvent> sfKeyboardInputEvent = std::make_shared<SfKeyboardInputEvent>(sf::Keyboard::T);
+    std::shared_ptr<SfJoystickDigitalInputEvent> sfJoystickInputEvent = std::make_shared<SfJoystickDigitalInputEvent>(0, 0);
+    std::shared_ptr<SfJoystickAnalogInputEvent> sfJoystickInputEvent2 = std::make_shared<SfJoystickAnalogInputEvent>(0, sf::Joystick::X);
+    std::vector<std::shared_ptr<InputEvent>> inputEventVector = {sfKeyboardInputEvent, sfJoystickInputEvent};
+    std::shared_ptr<InputEventCollection> inputEventCollection = std::make_shared<InputEventCollection>(inputEventVector);
     
     HWND window = FindWindowA(NULL, "Game Capture HD");
     HDC hwindowDC = GetDC(window);
 
     cv::Mat img;
 
-    std::shared_ptr<Macro> f = std::make_shared<Macro>("1", CharStream<15>(), 0, d);
+    std::shared_ptr<Macro> f = std::make_shared<Macro>("1", CharStream<15>(), sfKeyboardInputEvent, macroImageProcessingDecider);
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists = {{f}, {f}};
     f->setNextMacroLists(nextMacroLists);
 
 
     std::thread thd([&](){
         while (true) {
+            sf::Joystick::update();
             // std::cout << c.nextMacroListIndex() << std::endl;
+            // std::cout << f->getInputEvent()->getInputValue() << std::endl;
+            // std::cout << sfJoystickInputEvent->getInputValue() << std::endl;
+            // std::cout << sfJoystickInputEvent2->getInputValue() << std::endl;
+            std::cout << inputEventCollection->getInputValue() << std::endl;
             f->getNextMacro();
             std::this_thread::sleep_for (std::chrono::milliseconds(500));
         }
@@ -105,7 +117,7 @@ int main(){
         //auto begin = std::chrono::steady_clock::now();
         screenshot(img, 1920, 1080, hwindowDC);
 
-        d->update(img);
+        macroImageProcessingDecider->update(img);
         // auto end = std::chrono::steady_clock::now();
         //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
 

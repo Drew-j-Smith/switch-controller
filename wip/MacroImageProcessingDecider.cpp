@@ -3,12 +3,12 @@
 #define AC_DISPLAY_IMAGE_MATCH 1
 
 MacroImageProcessingDecider::MacroImageProcessingDecider(const std::string & name, const ImageProcessingInfo & imageProcessingInfo) {
-        this->name = name;
-        this->imageProcessingInfo = imageProcessingInfo;
-        matchPointX.store(0);
-        matchPointY.store(0);
-        critalMatchVal.store(0);
-    }
+    this->name = name;
+    this->imageProcessingInfo = imageProcessingInfo;
+    matchPointX.store(0);
+    matchPointY.store(0);
+    critalMatchVal.store(0);
+}
 
 MacroImageProcessingDecider::MacroImageProcessingDecider(const boost::property_tree::ptree & tree){
     //TODO

@@ -15,7 +15,7 @@ private:
 public:
     Macros(std::vector<std::shared_ptr<Macro>> macros) : macros(macros), activeMacro(nullptr) {}
 
-    void getData(const unsigned long long, unsigned char[8]);
+    void getData(const unsigned long long, unsigned char[8]); //TODO should not have to pass time
     void activateMacros();
     bool isMacroActive() const { return &activeMacro; }
 };

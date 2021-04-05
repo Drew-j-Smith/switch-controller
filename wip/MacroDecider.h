@@ -3,12 +3,10 @@
 
 #include "pch.h"
 
-#include <boost/property_tree/ptree.hpp>
-
 class MacroDecider
 {
 public:
-    std::string getName() { return name; }
+    const std::string & getName() { return name; }
     virtual int nextMacroListIndex() const = 0;
 protected:
     std::string name;

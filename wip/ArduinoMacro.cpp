@@ -2,10 +2,10 @@
 
 #define AC_DISPLAY_IMAGE_MATCH 1
 
-Macro::Macro(std::string name, CharStream<15> & data, int keyboardButton, std::shared_ptr<MacroDecider> decider){
+Macro::Macro(std::string name, CharStream<15> & data, std::shared_ptr<InputEvent> inputEvent, std::shared_ptr<MacroDecider> decider){
     this->name = name;
     this->data = data;
-    this->keyboardButton = keyboardButton;
+    this->inputEvent = inputEvent;
     this->decider = decider;
 }
 
@@ -48,6 +48,6 @@ std::shared_ptr<Macro> Macro::cycleVector(std::vector<std::weak_ptr<Macro>> macr
     return macroVector.back().lock();
 }
 
-std::shared_ptr<Macro> Macro::getNextMacro() const{
+const std::shared_ptr<Macro> Macro::getNextMacro() const{
     return cycleVector(nextMacroLists[decider->nextMacroListIndex()]);
 }
