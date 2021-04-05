@@ -27,14 +27,7 @@ public:
         int     maxY;
     };
 
-    MacroImageProcessingDecider(const std::string & name, const ImageProcessingInfo & imageProcessingInfo) {
-        this->name = name;
-        this->imageProcessingInfo = imageProcessingInfo;
-        matchPointX.store(0);
-        matchPointY.store(0);
-        critalMatchVal.store(0);
-    }
-
+    MacroImageProcessingDecider(const std::string & name, const ImageProcessingInfo & imageProcessingInfo);
     MacroImageProcessingDecider(const boost::property_tree::ptree & tree);
 
     int nextMacroListIndex() const override;
