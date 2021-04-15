@@ -149,23 +149,21 @@ int main(){
     //         }
     //     }
     // });
-    SerialInterface<8, 1> s("COM4", 57600);
+    SerialInterface s("COM4", 57600, 8, 1);
     unsigned char send[] = {85, 0, 1, 2, 3, 4, 5, 6};
-    unsigned char recieve;
-    s.sendData(send);
+    unsigned char recieve[1];
 
     while (true) {
         auto begin = std::chrono::steady_clock::now();
         // screenshot(img, 1920, 1080, hwindowDC);
         
-        s.sendData(send);
-        s.getData(&recieve);
-        if ((int)recieve != 85)
-            std::cout << (int)recieve << std::endl;
+        s.sendData(send, recieve);
+        if ((int)(recieve[0]) != 85)
+            std::cout << (int)(recieve[0]) << std::endl;
 
         // macroImageProcessingDecider->update(img);
         auto end = std::chrono::steady_clock::now();
-        //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
+        std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000. << std::endl;
 
         // cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
         // cv::imshow("test", img);

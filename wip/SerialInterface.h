@@ -8,16 +8,14 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
-template<size_t writeFrameSize, size_t readFrameSize>
 class SerialInterface
 {
 private:
-    std::mutex m_mutex;
     std::unique_ptr<boost::asio::serial_port> port;
-    std::thread readThread;
-    unsigned char readBytes[readFrameSize];
+    size_t writeFrameSize;
+    size_t readFrameSize;
 public:
-    SerialInterface(std::string serialPort, unsigned long long baud) {
+    SerialInterface(std::string serialPort, unsigned long long baud, size_t writeFrameSize, size_t readFrameSize) {
         try{
             boost::asio::io_service io;
             port = std::make_unique<boost::asio::serial_port>(io);
@@ -29,26 +27,13 @@ public:
             std::cerr << "Fatal error opening serial port" << std::endl;
             exit(-1);
         }
-        memset(readBytes, 0, sizeof(readBytes));
+        this->writeFrameSize = writeFrameSize;
+        this->readFrameSize = readFrameSize;
     }
 
-    void sendData(const unsigned char * data) {
-        if (readThread.joinable())
-            readThread.join();
-        
-        readThread = std::thread([&](){
-            unsigned char recevedData[readFrameSize];
-            boost::asio::read(*port, boost::asio::buffer(recevedData, readFrameSize));
-            std::lock_guard<std::mutex> guard(m_mutex);
-            memcpy(readBytes, recevedData, readFrameSize);
-        });
-
-        boost::asio::write(*port, boost::asio::buffer(data, writeFrameSize));
-    }
-
-    void getData(unsigned char* data) {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        memcpy(data, readBytes, readFrameSize);
+    void sendData(const unsigned char * dataToWrite, unsigned char * dataToRead) {
+        boost::asio::write(*port, boost::asio::buffer(dataToWrite, writeFrameSize));
+        boost::asio::read(*port, boost::asio::buffer(dataToRead, readFrameSize)); 
     }
 
 };
