@@ -1,5 +1,5 @@
-#ifndef ARDUINO_MACROS_H
-#define ARDUINO_MACROS_H
+#ifndef MACRO_COLLECTION_H
+#define MACRO_COLLECTION_H
 
 #include "pch.h"
 
@@ -11,7 +11,7 @@
 #include "Macro.h"
 #include "MacroImageProcessingDecider.h"
 
-class Macros
+class MacroCollection
 {
 private:
     std::vector<std::shared_ptr<Macro>> macros;
@@ -19,8 +19,8 @@ private:
     std::chrono::steady_clock::time_point timeSinceMacroActivation;
     std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders;
 public:
-    Macros(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders);
-    Macros(const boost::property_tree::ptree & tree);
+    MacroCollection(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders);
+    MacroCollection(const boost::property_tree::ptree & tree);
 
     void getData(unsigned char data[8]);
     void activateMacros();

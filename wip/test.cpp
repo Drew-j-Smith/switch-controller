@@ -13,7 +13,7 @@
 
 #include "CharStream.h"
 #include "Macro.h"
-#include "Macros.h"
+#include "MacroCollection.h"
 #include "MacroDecider.h"
 #include "MacroImageProcessingDecider.h"
 #include "SfKeyboardInputEvent.h"
@@ -116,7 +116,7 @@ int main(){
 
     boost::property_tree::ptree tree;
     boost::property_tree::read_json("test3.json", tree);
-    Macros m = Macros(tree);
+    MacroCollection m(tree);
     std::cout << "t";
 
     std::thread thd([&](){

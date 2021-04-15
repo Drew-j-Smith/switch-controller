@@ -1,12 +1,12 @@
-#include "Macros.h"
+#include "MacroCollection.h"
 
-Macros::Macros(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>>) {
+MacroCollection::MacroCollection(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>>) {
     this->macros = macros;
     this->deciders = deciders;
     activeMacro.reset();
 }
 
-Macros::Macros(const boost::property_tree::ptree & tree) {
+MacroCollection::MacroCollection(const boost::property_tree::ptree & tree) {
     std::map<std::string, std::shared_ptr<MacroDecider>> deciderList;
     std::map<std::string, std::shared_ptr<Macro>> macroList;
     std::vector<boost::property_tree::ptree> macroTrees;
@@ -35,7 +35,7 @@ Macros::Macros(const boost::property_tree::ptree & tree) {
     }
 }
 
-void Macros::getData(unsigned char data[8]) {
+void MacroCollection::getData(unsigned char data[8]) {
     if(activeMacro != nullptr){
         auto now = std::chrono::steady_clock::now();
         unsigned long long time = std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceMacroActivation).count();
@@ -49,7 +49,7 @@ void Macros::getData(unsigned char data[8]) {
     }
 }
 
-void Macros::activateMacros() {
+void MacroCollection::activateMacros() {
     if(activeMacro == nullptr){
         for(auto m : macros){
             if(m->getInputEvent()->getInputValue()){
@@ -61,7 +61,7 @@ void Macros::activateMacros() {
     }
 }
 
-void Macros::updateImageProcessing(const cv::Mat & screenshot) const {
+void MacroCollection::updateImageProcessing(const cv::Mat & screenshot) const {
     for (auto decider : deciders) {
         decider->update(screenshot);
     }
