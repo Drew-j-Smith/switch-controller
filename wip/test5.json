@@ -1,0 +1,125 @@
+{
+    "a": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 1
+        }
+    ],
+    "b": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 0
+        }
+    ],
+    "x": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 3
+        }
+    ],
+    "y": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 2
+        }
+    ],
+    "l": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 4
+        }
+    ],
+    "r": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 5
+        }
+    ],
+    "xl": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 6
+        }
+    ],
+    "xr": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 7
+        }
+    ],
+    "select": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 8
+        }
+    ],
+    "start": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 9
+        }
+    ],
+    "lClick": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 10
+        }
+    ],
+    "rClick": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 11
+        }
+    ],
+    "home": [
+        {
+            "type": "SF Digital Joystick Input",
+            "joystick index": 0,
+            "button": 12
+        }
+    ],
+
+    "rightStickX": {
+        "type": "SF Analogue Joystick Input",
+        "joystick index": 0,
+        "axis": 4
+    },
+    "rightStickY": {
+        "type": "SF Analogue Joystick Input",
+        "joystick index": 0,
+        "axis": 5
+    },
+    "leftStickX": {
+        "type": "SF Analogue Joystick Input",
+        "joystick index": 0,
+        "axis": 0
+    },
+    "leftStickY": {
+        "type": "SF Analogue Joystick Input",
+        "joystick index": 0,
+        "axis": 1
+    },
+    
+    "dpadX": {
+        "type": "SF Analogue Joystick Input",
+        "joystick index": 0,
+        "axis": 7
+    },
+    "dpadY": {
+        "type": "SF Analogue Joystick Input",
+        "joystick index": 0,
+        "axis": 6
+    }
+}

@@ -25,8 +25,7 @@ public:
         button = tree.get("button", 0);
     };
 
-    int getInputValue() const override { 
-        std::cout << joystickIndex << " " << button << std::endl;
+    int getInputValue() const override {
         if (!sf::Joystick::isConnected(joystickIndex) || sf::Joystick::getButtonCount(joystickIndex) < button)
             return 0;
         return sf::Joystick::isButtonPressed(joystickIndex, button);
@@ -39,6 +38,7 @@ class SfJoystickAnalogInputEvent : public InputEvent
 private:
     unsigned int joystickIndex = 0;
     sf::Joystick::Axis axis = sf::Joystick::X;
+    const double SCALING = 1.4;
 public:
     SfJoystickAnalogInputEvent() {};
     SfJoystickAnalogInputEvent(unsigned int joystickIndex, sf::Joystick::Axis axis) { 
@@ -53,7 +53,12 @@ public:
     int getInputValue() const override { 
         if (!sf::Joystick::isConnected(joystickIndex) || !sf::Joystick::hasAxis(joystickIndex, axis))
             return 0;
-        return (100 + sf::Joystick::getAxisPosition(joystickIndex, axis)) / 200.0 * 255.0;
+        int value = (100 + sf::Joystick::getAxisPosition(joystickIndex, axis) * SCALING) / 200.0 * 255.0;
+        if (value > 255)
+            value = 255;
+        if (value < 0)
+            value = 0;
+        return value;
     };
     bool isDigital() const override { return false; }
 };

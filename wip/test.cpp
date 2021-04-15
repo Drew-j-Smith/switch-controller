@@ -19,6 +19,7 @@
 #include "SfJoystickInputEvent.h"
 #include "InputEventCollection.h"
 #include "SerialInterface.h"
+#include "InputManager.h"
 
 #include <windows.h>
 
@@ -150,20 +151,30 @@ int main(){
     //     }
     // });
     SerialInterface s("COM4", 57600, 8, 1);
-    unsigned char send[] = {85, 0, 1, 2, 3, 4, 5, 6};
+    unsigned char send[8];
     unsigned char recieve[1];
 
+    boost::property_tree::ptree tree;
+    boost::property_tree::read_json("test5.json", tree);
+    InputManager i(tree);
+
     while (true) {
+        sf::Joystick::update();
         auto begin = std::chrono::steady_clock::now();
         // screenshot(img, 1920, 1080, hwindowDC);
         
+        i.getData(send);
         s.sendData(send, recieve);
         if ((int)(recieve[0]) != 85)
             std::cout << (int)(recieve[0]) << std::endl;
+        
+        // for (int i = 0; i < 8; i++)
+        //     std::cout << (int)send[i] << " ";
+        // std::cout << std::endl;
 
         // macroImageProcessingDecider->update(img);
         auto end = std::chrono::steady_clock::now();
-        std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000. << std::endl;
+        //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
 
         // cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
         // cv::imshow("test", img);
