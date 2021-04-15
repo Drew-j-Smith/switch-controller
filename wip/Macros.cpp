@@ -1,4 +1,4 @@
-#include "ArduinoMacros.h"
+#include "Macros.h"
 
 Macros::Macros(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>>) {
     this->macros = macros;

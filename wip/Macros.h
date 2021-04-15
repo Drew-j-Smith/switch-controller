@@ -8,7 +8,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "ArduinoMacro.h"
+#include "Macro.h"
 #include "MacroImageProcessingDecider.h"
 
 class Macros

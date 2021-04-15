@@ -12,8 +12,8 @@
 #include "pch.h"
 
 #include "CharStream.h"
-#include "ArduinoMacro.h"
-#include "ArduinoMacros.h"
+#include "Macro.h"
+#include "Macros.h"
 #include "MacroDecider.h"
 #include "MacroImageProcessingDecider.h"
 #include "SfKeyboardInputEvent.h"
