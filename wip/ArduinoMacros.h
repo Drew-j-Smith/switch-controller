@@ -3,8 +3,13 @@
 
 #include "pch.h"
 
-#include <SFML/Window/Keyboard.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+
 #include "ArduinoMacro.h"
+#include "MacroImageProcessingDecider.h"
 
 class Macros
 {
@@ -12,12 +17,15 @@ private:
     std::vector<std::shared_ptr<Macro>> macros;
     std::shared_ptr<Macro> activeMacro;
     std::chrono::steady_clock::time_point timeSinceMacroActivation;
+    std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders;
 public:
-    Macros(std::vector<std::shared_ptr<Macro>> macros) : macros(macros), activeMacro(nullptr) {}
+    Macros(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders);
+    Macros(const boost::property_tree::ptree & tree);
 
-    void getData(const unsigned long long, unsigned char[8]); //TODO should not have to pass time
+    void getData(unsigned char data[8]);
     void activateMacros();
-    bool isMacroActive() const { return &activeMacro; }
+    bool isMacroActive() const { return activeMacro != nullptr; }
+    void updateImageProcessing(const cv::Mat & screenshot) const;
 };
 
 

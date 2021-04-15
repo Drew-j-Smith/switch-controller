@@ -32,7 +32,7 @@ public:
 
     int nextMacroListIndex() const override;
 
-    void update(cv::Mat &);
+    void update(const cv::Mat & screenshot);
 private:
     ImageProcessingInfo imageProcessingInfo;
 

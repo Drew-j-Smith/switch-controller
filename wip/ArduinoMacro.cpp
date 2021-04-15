@@ -49,7 +49,7 @@ void Macro::appendData(const unsigned long long time, const unsigned char data[8
 //helper function to Macro::getNextMacro()
 std::shared_ptr<Macro> Macro::cycleVector(std::vector<std::weak_ptr<Macro>> macroVector){
     if(macroVector.size() == 0)
-        return std::shared_ptr<Macro>(nullptr);
+        return nullptr;
     else if(macroVector.size() != 1)
         std::rotate(macroVector.begin(), macroVector.begin() + 1, macroVector.end());
     return macroVector.back().lock();

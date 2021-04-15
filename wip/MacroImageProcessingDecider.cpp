@@ -11,8 +11,19 @@ MacroImageProcessingDecider::MacroImageProcessingDecider(const std::string & nam
 }
 
 MacroImageProcessingDecider::MacroImageProcessingDecider(const boost::property_tree::ptree & tree){
-    //TODO
-
+    name = tree.get("name", "");
+    imageProcessingInfo.templatePic = cv::imread(tree.get("template pic filename", ""));
+    if (tree.get("mask pic filename", "") != "")
+        imageProcessingInfo.maskPic = cv::imread(tree.get("mask pic filename", ""));
+    imageProcessingInfo.matchMethod = tree.get("match method", 0);
+    imageProcessingInfo.matchThreshold = tree.get("match threshold", 0.0);
+    imageProcessingInfo.minX = tree.get("min x", 0);
+    imageProcessingInfo.minY = tree.get("min y", 0);
+    imageProcessingInfo.maxX = tree.get("max x", 0);
+    imageProcessingInfo.maxY = tree.get("max y", 0);
+    matchPointX.store(0);
+    matchPointY.store(0);
+    critalMatchVal.store(0);
 }
 
 int MacroImageProcessingDecider::nextMacroListIndex() const {
@@ -35,7 +46,7 @@ int MacroImageProcessingDecider::nextMacroListIndex() const {
     }
 }
 
-void MacroImageProcessingDecider::update(cv::Mat & screenshot){
+void MacroImageProcessingDecider::update(const cv::Mat & screenshot){
     cv::Rect rectCrop = cv::Rect(imageProcessingInfo.minX,
         imageProcessingInfo.minY,
         imageProcessingInfo.maxX - imageProcessingInfo.minX,

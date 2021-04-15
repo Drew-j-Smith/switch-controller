@@ -79,40 +79,45 @@ int main(){
     // std::cout << b.getName() << std::endl;
     // std::cout << b.nextMacroListIndex() << std::endl;
     
-    cv::Mat temp = cv::imread("haanit.png");
-    cv::Mat mask = cv::imread("haanit mask.png");
+    // cv::Mat temp = cv::imread("haanit.png");
+    // cv::Mat mask = cv::imread("haanit mask.png");
 
-    //MacroImageProcessingDecider c("t", {temp, mask, cv::TM_CCORR_NORMED, .97, 0, 0, 1920, 1080});
+    // //MacroImageProcessingDecider c("t", {temp, mask, cv::TM_CCORR_NORMED, .97, 0, 0, 1920, 1080});
 
-    //MacroDecider* d = &c;
-    MacroImageProcessingDecider::ImageProcessingInfo imageProcessingInfo = {temp, mask, cv::TM_CCORR_NORMED, .97, 0, 0, 500, 500};
-    std::shared_ptr<MacroImageProcessingDecider> macroImageProcessingDecider = std::make_shared<MacroImageProcessingDecider>("t", imageProcessingInfo);
-    std::shared_ptr<SfKeyboardInputEvent> sfKeyboardInputEvent = std::make_shared<SfKeyboardInputEvent>(sf::Keyboard::T);
-    std::shared_ptr<SfJoystickDigitalInputEvent> sfJoystickInputEvent = std::make_shared<SfJoystickDigitalInputEvent>(0, 0);
-    std::shared_ptr<SfJoystickAnalogInputEvent> sfJoystickInputEvent2 = std::make_shared<SfJoystickAnalogInputEvent>(0, sf::Joystick::X);
-    std::vector<std::shared_ptr<InputEvent>> inputEventVector = {sfKeyboardInputEvent, sfJoystickInputEvent};
-    std::shared_ptr<InputEventCollection> inputEventCollection = std::make_shared<InputEventCollection>(inputEventVector);
-    boost::property_tree::ptree tree;
-    boost::property_tree::read_json("test.json", tree);
-    std::shared_ptr<InputEventCollection> inputEventCollection2 = std::make_shared<InputEventCollection>(tree);
+    // //MacroDecider* d = &c;
+    // MacroImageProcessingDecider::ImageProcessingInfo imageProcessingInfo = {temp, mask, cv::TM_CCORR_NORMED, .97, 0, 0, 500, 500};
+    // std::shared_ptr<MacroImageProcessingDecider> macroImageProcessingDecider = std::make_shared<MacroImageProcessingDecider>("t", imageProcessingInfo);
+    // std::shared_ptr<SfKeyboardInputEvent> sfKeyboardInputEvent = std::make_shared<SfKeyboardInputEvent>(sf::Keyboard::T);
+    // std::shared_ptr<SfJoystickDigitalInputEvent> sfJoystickInputEvent = std::make_shared<SfJoystickDigitalInputEvent>(0, 0);
+    // std::shared_ptr<SfJoystickAnalogInputEvent> sfJoystickInputEvent2 = std::make_shared<SfJoystickAnalogInputEvent>(0, sf::Joystick::X);
+    // std::vector<std::shared_ptr<InputEvent>> inputEventVector = {sfKeyboardInputEvent, sfJoystickInputEvent};
+    // std::shared_ptr<InputEventCollection> inputEventCollection = std::make_shared<InputEventCollection>(inputEventVector);
+    // boost::property_tree::ptree tree;
+    // boost::property_tree::read_json("test.json", tree);
+    // std::shared_ptr<InputEventCollection> inputEventCollection2 = std::make_shared<InputEventCollection>(tree);
     
     HWND window = FindWindowA(NULL, "Game Capture HD");
     HDC hwindowDC = GetDC(window);
 
     cv::Mat img;
 
-    std::shared_ptr<Macro> f = std::make_shared<Macro>("1", CharStream<15>(), sfKeyboardInputEvent, macroImageProcessingDecider);
-    std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists = {{f}, {f}};
-    f->setNextMacroLists(nextMacroLists);
+    // std::shared_ptr<Macro> f = std::make_shared<Macro>("1", CharStream<15>(), sfKeyboardInputEvent, macroImageProcessingDecider);
+    // std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists = {{f}, {f}};
+    // f->setNextMacroLists(nextMacroLists);
 
-    boost::property_tree::ptree tree2;
-    boost::property_tree::read_json("test2.json", tree2);
-    std::map<std::string, std::shared_ptr<MacroDecider>> deciderMap;
-    deciderMap.insert({"t", macroImageProcessingDecider});
-    auto g = std::make_shared<Macro>(tree2, deciderMap);
+    // boost::property_tree::ptree tree2;
+    // boost::property_tree::read_json("test2.json", tree2);
+    // std::map<std::string, std::shared_ptr<MacroDecider>> deciderMap;
+    // deciderMap.insert({"t", macroImageProcessingDecider});
+    // auto g = std::make_shared<Macro>(tree2, deciderMap);
 
-    g->getData()->save("test3.txt");
-    std::cout << g->getName() << std::endl;
+    // g->getData()->save("test3.txt");
+    // std::cout << g->getName() << std::endl;
+
+    boost::property_tree::ptree tree;
+    boost::property_tree::read_json("test3.json", tree);
+    Macros m = Macros(tree);
+    std::cout << "t";
 
     std::thread thd([&](){
         while (true) {
@@ -124,11 +129,22 @@ int main(){
             // std::cout << inputEventCollection->getInputValue() << std::endl;
             // std::cout << inputEventCollection2->getInputValue() << std::endl;
 
-            std::cout << "input" << g->getInputEvent()->getInputValue() << std::endl;
-            std::cout << "decider" << g->getMacroDecider()->nextMacroListIndex() << std::endl;
+            // std::cout << "input" << g->getInputEvent()->getInputValue() << std::endl;
+            // std::cout << "decider" << g->getMacroDecider()->nextMacroListIndex() << std::endl;
 
             // f->getNextMacro();
-            std::this_thread::sleep_for (std::chrono::milliseconds(500));
+            // std::this_thread::sleep_for (std::chrono::milliseconds(500));
+            unsigned char data[8];
+            if (m.isMacroActive()) {
+                m.getData(data);
+                for (int i = 0; i < 8; i++) {
+                    std::cout << (int)data[i] << " ";
+                }
+                std::cout << std::endl;
+            }
+            else {
+                m.activateMacros();
+            }
         }
     });
 
@@ -136,13 +152,14 @@ int main(){
         //auto begin = std::chrono::steady_clock::now();
         screenshot(img, 1920, 1080, hwindowDC);
 
-        macroImageProcessingDecider->update(img);
+        // macroImageProcessingDecider->update(img);
         // auto end = std::chrono::steady_clock::now();
         //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
 
         // cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
         // cv::imshow("test", img);
         // cv::waitKey(1);
+        m.updateImageProcessing(img);
     }
 
     return 0;

@@ -15,7 +15,7 @@ protected:
 class MacroDefaultDecider : public MacroDecider
 {
 public:
-    MacroDefaultDecider() { name = ""; }
+    MacroDefaultDecider() { name = "default"; }
     MacroDefaultDecider(const std::string & name) { this->name = name; }
 
     int nextMacroListIndex() const override { return 0; };
