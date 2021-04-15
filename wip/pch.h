@@ -17,6 +17,7 @@
 
 #include <thread>
 #include <atomic>
+#include <mutex>
 #include <memory>
 #include <future>
 

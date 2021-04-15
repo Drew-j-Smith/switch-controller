@@ -5,7 +5,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
-#include <windows.h>
 
 #include <boost/property_tree/json_parser.hpp>
 
@@ -19,6 +18,9 @@
 #include "SfKeyboardInputEvent.h"
 #include "SfJoystickInputEvent.h"
 #include "InputEventCollection.h"
+#include "SerialInterface.h"
+
+#include <windows.h>
 
 bool screenshot(cv::Mat& m, int windowWidth, int windowHeight, HDC & hwindowDC);
 
@@ -96,10 +98,10 @@ int main(){
     // boost::property_tree::read_json("test.json", tree);
     // std::shared_ptr<InputEventCollection> inputEventCollection2 = std::make_shared<InputEventCollection>(tree);
     
-    HWND window = FindWindowA(NULL, "Game Capture HD");
-    HDC hwindowDC = GetDC(window);
+    // HWND window = FindWindowA(NULL, "Game Capture HD");
+    // HDC hwindowDC = GetDC(window);
 
-    cv::Mat img;
+    // cv::Mat img;
 
     // std::shared_ptr<Macro> f = std::make_shared<Macro>("1", CharStream<15>(), sfKeyboardInputEvent, macroImageProcessingDecider);
     // std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists = {{f}, {f}};
@@ -114,52 +116,61 @@ int main(){
     // g->getData()->save("test3.txt");
     // std::cout << g->getName() << std::endl;
 
-    boost::property_tree::ptree tree;
-    boost::property_tree::read_json("test3.json", tree);
-    MacroCollection m(tree);
-    std::cout << "t";
+    // boost::property_tree::ptree tree;
+    // boost::property_tree::read_json("test3.json", tree);
+    // MacroCollection m(tree);
+    // std::cout << "t";
 
-    std::thread thd([&](){
-        while (true) {
-            sf::Joystick::update();
-            // std::cout << c.nextMacroListIndex() << std::endl;
-            // std::cout << f->getInputEvent()->getInputValue() << std::endl;
-            // std::cout << sfJoystickInputEvent->getInputValue() << std::endl;
-            // std::cout << sfJoystickInputEvent2->getInputValue() << std::endl;
-            // std::cout << inputEventCollection->getInputValue() << std::endl;
-            // std::cout << inputEventCollection2->getInputValue() << std::endl;
+    // std::thread thd([&](){
+    //     while (true) {
+    //         sf::Joystick::update();
+    //         // std::cout << c.nextMacroListIndex() << std::endl;
+    //         // std::cout << f->getInputEvent()->getInputValue() << std::endl;
+    //         // std::cout << sfJoystickInputEvent->getInputValue() << std::endl;
+    //         // std::cout << sfJoystickInputEvent2->getInputValue() << std::endl;
+    //         // std::cout << inputEventCollection->getInputValue() << std::endl;
+    //         // std::cout << inputEventCollection2->getInputValue() << std::endl;
 
-            // std::cout << "input" << g->getInputEvent()->getInputValue() << std::endl;
-            // std::cout << "decider" << g->getMacroDecider()->nextMacroListIndex() << std::endl;
+    //         // std::cout << "input" << g->getInputEvent()->getInputValue() << std::endl;
+    //         // std::cout << "decider" << g->getMacroDecider()->nextMacroListIndex() << std::endl;
 
-            // f->getNextMacro();
-            // std::this_thread::sleep_for (std::chrono::milliseconds(500));
-            unsigned char data[8];
-            if (m.isMacroActive()) {
-                m.getData(data);
-                for (int i = 0; i < 8; i++) {
-                    std::cout << (int)data[i] << " ";
-                }
-                std::cout << std::endl;
-            }
-            else {
-                m.activateMacros();
-            }
-        }
-    });
+    //         // f->getNextMacro();
+    //         // std::this_thread::sleep_for (std::chrono::milliseconds(500));
+    //         unsigned char data[8];
+    //         if (m.isMacroActive()) {
+    //             m.getData(data);
+    //             for (int i = 0; i < 8; i++) {
+    //                 std::cout << (int)data[i] << " ";
+    //             }
+    //             std::cout << std::endl;
+    //         }
+    //         else {
+    //             m.activateMacros();
+    //         }
+    //     }
+    // });
+    SerialInterface<8, 1> s("COM4", 57600);
+    unsigned char send[] = {85, 0, 1, 2, 3, 4, 5, 6};
+    unsigned char recieve;
+    s.sendData(send);
 
     while (true) {
-        //auto begin = std::chrono::steady_clock::now();
-        screenshot(img, 1920, 1080, hwindowDC);
+        auto begin = std::chrono::steady_clock::now();
+        // screenshot(img, 1920, 1080, hwindowDC);
+        
+        s.sendData(send);
+        s.getData(&recieve);
+        if ((int)recieve != 85)
+            std::cout << (int)recieve << std::endl;
 
         // macroImageProcessingDecider->update(img);
-        // auto end = std::chrono::steady_clock::now();
+        auto end = std::chrono::steady_clock::now();
         //std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
 
         // cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
         // cv::imshow("test", img);
         // cv::waitKey(1);
-        m.updateImageProcessing(img);
+        // m.updateImageProcessing(img);
     }
 
     return 0;
