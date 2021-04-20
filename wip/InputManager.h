@@ -7,6 +7,7 @@
 
 #include "InputEventCollection.h"
 #include "SfJoystickInputEvent.h"
+#include "Macro.h"
 
 class InputManager
 {
@@ -47,14 +48,25 @@ private:
         {"dpadDown", 24},
         {"dpadLeft", 25},
         {"dpadX", 22},
-        {"dpadY", 23}
+        {"dpadY", 23},
+
+        {"record", 26}
     };
 
     std::shared_ptr<InputEvent> buttons[14];
     std::shared_ptr<InputEvent> controlSticks[8];
     std::shared_ptr<InputEvent> dpad[4];
+    std::shared_ptr<InputEvent> record;
+
+    std::thread recordingThread;
+    std::atomic<bool> recording;
+
+    int RECORDING_BUTTON_COOLDOWN = 1000;
 public:
     InputManager(const boost::property_tree::ptree & tree);
+    ~InputManager() {
+        stopRecordingThread();
+    }
 
     void getData(unsigned char* data) const;
 
@@ -62,6 +74,13 @@ private:
     unsigned char getControlStickData(int stick) const;
     unsigned char getDpadData() const;
     unsigned char getDpadData(bool up, bool right, bool down, bool left) const;
+
+    void startRecordingThread();
+    void stopRecordingThread() {
+        recording.store(false);
+        if (recordingThread.joinable())
+            recordingThread.join();
+    }
 };
 
 #endif

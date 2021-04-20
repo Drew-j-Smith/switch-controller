@@ -28,7 +28,7 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
                 controlSticks[index - 14] = std::make_shared<InputEventCollection>(it.second);
             }
         }
-        else {
+        else if (index < 26) {
             if (it.first == "dpadX" || it.first == "dpadY") {
                 dpad[index - 22] = std::make_shared<SfJoystickAnalogInputEvent>(it.second);
             }
@@ -36,10 +36,16 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
                 dpad[index - 22] = std::make_shared<InputEventCollection>(it.second);
             }
         }
+        else {
+            record = std::make_shared<InputEventCollection>(it.second);
+        }
     }
+    if (record != nullptr)
+        startRecordingThread();
 }
 
 void InputManager::getData(unsigned char* data) const {
+    sf::Joystick::update();
     data[0] = 85;
     data[1] = 0;
     data[2] = 0;
@@ -110,4 +116,40 @@ unsigned char InputManager::getDpadData(bool up, bool right, bool down, bool lef
 		if(result == 0) result = 7; //up left
 	}
     return result;
+}
+
+
+void InputManager::startRecordingThread() {
+    recording.store(true);
+    recordingThread = std::thread([&](){
+        auto activationTime = std::chrono::steady_clock::now();
+        Macro macro;
+        unsigned char data[8];
+        bool active = false;
+        
+        while (recording.load()) {
+            auto begin = std::chrono::steady_clock::now();
+            
+            if (record->getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count() > RECORDING_BUTTON_COOLDOWN) {
+                activationTime = begin;
+                if (active) {
+                    //getting the time as a string
+                    auto t = std::time(nullptr);
+                    auto tm = *std::localtime(&t);
+                    std::ostringstream oss;
+                    oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+                    std::string str = oss.str();
+                    std::cout << str << std::endl;
+
+                    macro.getData()->save(str);
+                    macro = Macro();
+                }
+                active = !active;
+            }
+            if (active && std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count() > macro.lastTime()) {
+                getData(data);
+                macro.appendData(std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count(), data);
+            }
+        }
+    });
 }
