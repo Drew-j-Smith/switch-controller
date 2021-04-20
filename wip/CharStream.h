@@ -33,7 +33,7 @@ void CharStream<frameSize>::load(const std::string & filename, const bool isHex 
     if (infile) {
         if (isHex){
             std::array<unsigned char, frameSize> buffer;
-            char currentChar;
+            unsigned char currentChar;
             while (!infile.eof()) {
                 int i;
                 for (i = 0; i < frameSize * 2; i++) {

@@ -27,6 +27,8 @@ void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const st
 }
 
 void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) const{
+    if (this->data.size() == 0)
+        return;
     int low = 0;
     int high = this->data.size();
     int mid;

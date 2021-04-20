@@ -36,8 +36,8 @@ public:
     void setData(CharStream<15>* data) { this->data = *data; }
     void appendData(const unsigned long long, const unsigned char[8]);
     void getDataframe(const unsigned long long, unsigned char[8]) const;
-    unsigned long long getTime(int index) const { return *(unsigned long long*)data[index].data(); }
-    unsigned long long lastTime()         const { return *(unsigned long long*)data.back().data(); }
+    unsigned long long getTime(int index) const { return data.size() > 0 ? *(unsigned long long*)data[index].data() : 0; }
+    unsigned long long lastTime()         const { return data.size() > 0 ? *(unsigned long long*)data.back().data() : 0; }
     
 };
 
