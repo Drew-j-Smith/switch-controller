@@ -8,6 +8,7 @@
 #include "InputEvent.h"
 #include "SfKeyboardInputEvent.h"
 #include "SfJoystickInputEvent.h"
+#include "InputEventNegator.h"
 
 class InputEventCollection : public InputEvent
 {
@@ -27,6 +28,11 @@ public:
             }
             else if (it->second.get("type", "") == "SF Digital Joystick Input") {
                 inputEvents.push_back(std::make_shared<SfJoystickDigitalInputEvent>(it->second));
+            }
+            if (it->second.get("negated", false)) {
+                std::shared_ptr<InputEvent> negatedEvent = std::make_shared<InputEventNegator>(inputEvents.back());
+                inputEvents.pop_back();
+                inputEvents.push_back(negatedEvent);
             }
         }
     };

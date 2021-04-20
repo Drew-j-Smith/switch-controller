@@ -139,7 +139,7 @@ void InputManager::startRecordingThread() {
                     std::ostringstream oss;
                     oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
                     std::string str = oss.str();
-                    std::cout << str << std::endl;
+                    std::cout << "Saved recording to \"" << str << "\"" << std::endl;
 
                     macro.getData()->save(str);
                     macro = Macro();

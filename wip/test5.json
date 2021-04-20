@@ -5,6 +5,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 1
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "b": [
@@ -12,6 +18,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 0
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "x": [
@@ -19,6 +31,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 3
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "y": [
@@ -26,6 +44,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 2
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "l": [
@@ -33,6 +57,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 4
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "r": [
@@ -40,6 +70,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 5
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "xl": [
@@ -47,6 +83,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 6
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "xr": [
@@ -54,6 +96,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 7
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "select": [
@@ -61,6 +109,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 8
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "start": [
@@ -68,6 +122,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 9
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "lClick": [
@@ -75,6 +135,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 10
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "rClick": [
@@ -82,6 +148,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 11
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
         "home": [
@@ -89,6 +161,12 @@
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
                 "button": 12
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13,
+                "negated": true
             }
         ],
 
@@ -125,8 +203,14 @@
         },
         "record": [
             {
-                "type": "SF Keyboard Input",
-                "key": "a"
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 1
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13
             }
         ]
     },
