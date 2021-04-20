@@ -25,12 +25,12 @@ private:
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
 
-    static std::shared_ptr<Macro> cycleVector(std::vector<std::weak_ptr<Macro>> macroVector);
+    std::shared_ptr<Macro> cycleVector(int macroIndex);
 public:
     const std::string & getName() const { return name; }
     const std::shared_ptr<InputEvent> getInputEvent() const { return inputEvent; }
     const std::shared_ptr<MacroDecider> getMacroDecider() const { return decider; }
-    const std::shared_ptr<Macro> getNextMacro() const;
+    std::shared_ptr<Macro> getNextMacro();
 
     const CharStream<15>* getData() const { return &data; }
     void setData(CharStream<15>* data) { this->data = *data; }

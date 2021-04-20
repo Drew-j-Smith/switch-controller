@@ -18,6 +18,8 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
     auto deciderIt = deciderList.find(tree.get("decider", ""));
     if (deciderIt != deciderList.end())
         decider = deciderIt->second;
+    else
+        decider = std::make_shared<MacroDefaultDecider>();
 }
 
 void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroList){
@@ -40,21 +42,25 @@ void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) c
 }
 
 void Macro::appendData(const unsigned long long time, const unsigned char data[8]){
-    std::array<unsigned char, 15> dataframe;
-    memcpy(dataframe.data(), &time, 8);
-    memcpy(dataframe.data() + 8, data + 1, 7);
-    this->data.push_back(dataframe);
+    if (this->data.size() == 0 || memcmp(this->data.back().data() + 8, data + 1, 7) != 0) {
+        std::array<unsigned char, 15> dataframe;
+        memcpy(dataframe.data(), &time, 8);
+        memcpy(dataframe.data() + 8, data + 1, 7);
+        this->data.push_back(dataframe);
+    }
 }
 
 //helper function to Macro::getNextMacro()
-std::shared_ptr<Macro> Macro::cycleVector(std::vector<std::weak_ptr<Macro>> macroVector){
-    if(macroVector.size() == 0)
+std::shared_ptr<Macro> Macro::cycleVector(int macroIndex) {
+    if (nextMacroLists.size() == 0)
         return nullptr;
-    else if(macroVector.size() != 1)
-        std::rotate(macroVector.begin(), macroVector.begin() + 1, macroVector.end());
-    return macroVector.back().lock();
+    if(nextMacroLists[macroIndex].size() == 0)
+        return nullptr;
+    if(nextMacroLists[macroIndex].size() != 1)
+        std::rotate(nextMacroLists[macroIndex].begin(), nextMacroLists[macroIndex].begin() + 1, nextMacroLists[macroIndex].end());
+    return nextMacroLists[macroIndex].back().lock();
 }
 
-const std::shared_ptr<Macro> Macro::getNextMacro() const{
-    return cycleVector(nextMacroLists[decider->nextMacroListIndex()]);
+std::shared_ptr<Macro> Macro::getNextMacro() {
+    return cycleVector(decider->nextMacroListIndex());
 }

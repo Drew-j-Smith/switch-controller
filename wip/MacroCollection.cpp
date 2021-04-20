@@ -12,15 +12,11 @@ MacroCollection::MacroCollection(const boost::property_tree::ptree & tree) {
     std::vector<boost::property_tree::ptree> macroTrees;
 
     auto decidersTree = tree.get_child(boost::property_tree::path("deciders"));
-    std::cout << "t\n";
+
     for (auto it = decidersTree.begin(); it != decidersTree.end(); ++it) {
         if (it->second.get("type", "") == "image processing") {
             deciders.push_back(std::make_shared<MacroImageProcessingDecider>(it->second));
             deciderList.insert({deciders.back()->getName(), deciders.back()});
-        }
-        else if (it->second.get("type", "") == "default") {
-            auto defaultDecider = std::make_shared<MacroDefaultDecider>(it->second.get("name", ""));
-            deciderList.insert({defaultDecider->getName(), defaultDecider});
         }
     }
 
@@ -39,7 +35,7 @@ void MacroCollection::getData(unsigned char data[8]) {
     if(activeMacro != nullptr){
         auto now = std::chrono::steady_clock::now();
         unsigned long long time = std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceMacroActivation).count();
-        std::cout << time << std::endl;
+
         activeMacro->getDataframe(time, data);
 
         if (activeMacro->lastTime() < time){

@@ -14,6 +14,8 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
     }
 
     for (auto it : tree) {
+        if (buttonMap.find(it.first) == buttonMap.end())
+            continue;
         int index = buttonMap.at(it.first);
         if (index < 14) {
             buttons[index] = std::make_shared<InputEventCollection>(it.second);

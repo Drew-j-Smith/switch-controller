@@ -156,17 +156,42 @@ int main(){
 
     boost::property_tree::ptree tree;
     boost::property_tree::read_json("test5.json", tree);
-    InputManager i(tree);
+
+    InputManager i(tree.find("controls")->second);
+
+    InputEventCollection input(tree.find("controls")->second.find("record")->second);
+    bool active = false;
+    auto activationTime = std::chrono::steady_clock::now();
+    int cooldown = 1000;
+    MacroCollection macroCollection(tree);
+
+    Macro macro;
 
     while (true) {
         sf::Joystick::update();
         auto begin = std::chrono::steady_clock::now();
         // screenshot(img, 1920, 1080, hwindowDC);
         
-        i.getData(send);
+        macroCollection.activateMacros();
+        if (macroCollection.isMacroActive()){
+            macroCollection.getData(send);
+        }
+        else {
+            i.getData(send);
+        }
+
         s.sendData(send, recieve);
         if ((int)(recieve[0]) != 85)
             std::cout << (int)(recieve[0]) << std::endl;
+        
+        if (input.getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count() > cooldown) {
+            activationTime = begin;
+            active = !active;
+            macro.getData()->save("test5.txt");
+        }
+        if (active) {
+            macro.appendData(std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count(), send);
+        }
         
         // for (int i = 0; i < 8; i++)
         //     std::cout << (int)send[i] << " ";
