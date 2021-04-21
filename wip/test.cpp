@@ -13,7 +13,7 @@
 #include "SerialInterface.h"
 #include "MacroCollection.h"
 #include "InputManager.h"
-#include "ScreenshotUtility.h"
+#include "WindowsScreenshotUtility.h"
 #include "MacroImageProcessingDeciderCollection.h"
 
 #include <windows.h>
@@ -29,7 +29,7 @@ int main(){
 
     InputManager i(tree.find("controls")->second);
 
-    auto screenshotUtil = std::make_shared<ScreenshotUtility>(1920, 1080, "Game Capture HD");
+    auto screenshotUtil = std::make_shared<WindowsScreenshotUtility>(1920, 1080, "Game Capture HD");
     auto deciders = std::make_shared<MacroImageProcessingDeciderCollection>(tree.find("deciders")->second, screenshotUtil);
     MacroCollection macroCollection(tree.find("macros")->second, deciders);
 
