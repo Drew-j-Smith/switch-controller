@@ -1,33 +1,21 @@
 #include "MacroCollection.h"
 
-MacroCollection::MacroCollection(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>>) {
+MacroCollection::MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders) {
     this->macros = macros;
     this->deciders = deciders;
-    activeMacro.reset();
 }
 
-MacroCollection::MacroCollection(const boost::property_tree::ptree & tree) {
-    std::map<std::string, std::shared_ptr<MacroDecider>> deciderList;
-    std::map<std::string, std::shared_ptr<Macro>> macroList;
-    std::vector<boost::property_tree::ptree> macroTrees;
+MacroCollection::MacroCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders) {
+    this->deciders = deciders;
+    std::map<std::string, std::shared_ptr<Macro>> macroMap;
+    auto deciderMap = deciders->generateMap();
 
-    auto decidersTree = tree.get_child(boost::property_tree::path("deciders"));
-
-    for (auto it = decidersTree.begin(); it != decidersTree.end(); ++it) {
-        if (it->second.get("type", "") == "image processing") {
-            deciders.push_back(std::make_shared<MacroImageProcessingDecider>(it->second));
-            deciderList.insert({deciders.back()->getName(), deciders.back()});
-        }
+    for (auto macro : tree) {
+        macros.push_back(std::make_shared<Macro>(macro.second, deciderMap));
+        macroMap.insert({macros.back()->getName(), macros.back()});
     }
-
-    auto macrosTree = tree.get_child(boost::property_tree::path("macros"));
-    for (auto it = macrosTree.begin(); it != macrosTree.end(); ++it) {
-        macros.push_back(std::make_shared<Macro>(it->second, deciderList));
-        macroList.insert({macros.back()->getName(), macros.back()});
-        macroTrees.push_back(it->second);
-    }
-    for (int i = 0; i < macros.size(); i++) {
-        macros[i]->setNextMacroLists(macroTrees[i], macroList);
+    for (auto macro : macros) {
+        macro->setNextMacroLists(tree, macroMap);
     }
 }
 
@@ -54,11 +42,5 @@ void MacroCollection::activateMacros() {
                 break;
             }
         }
-    }
-}
-
-void MacroCollection::updateImageProcessing(const cv::Mat & screenshot) const {
-    for (auto decider : deciders) {
-        decider->update(screenshot);
     }
 }

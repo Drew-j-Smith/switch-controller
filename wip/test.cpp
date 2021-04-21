@@ -5,20 +5,21 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
-
+#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 #include "pch.h"
 
-#include "MacroCollection.h"
 #include "SerialInterface.h"
+#include "MacroCollection.h"
 #include "InputManager.h"
 #include "ScreenshotUtility.h"
+#include "MacroImageProcessingDeciderCollection.h"
 
 #include <windows.h>
 
 
-int main(){
+int main(){ 
     SerialInterface s("COM4", 57600, 8, 1);
     unsigned char send[8];
     unsigned char recieve[1];
@@ -28,14 +29,12 @@ int main(){
 
     InputManager i(tree.find("controls")->second);
 
-    MacroCollection macroCollection(tree);
-
-    ScreenshotUtility screenshotUtil(1920, 1080, "Game Capture HD");
-    cv::Mat img;
+    auto screenshotUtil = std::make_shared<ScreenshotUtility>(1920, 1080, "Game Capture HD");
+    auto deciders = std::make_shared<MacroImageProcessingDeciderCollection>(tree.find("deciders")->second, screenshotUtil);
+    MacroCollection macroCollection(tree.find("macros")->second, deciders);
 
     while (true) {
-        auto begin = std::chrono::steady_clock::now();
-        //screenshotUtil.screenshot(img);
+        // auto begin = std::chrono::steady_clock::now();
         
         macroCollection.activateMacros();
         if (macroCollection.isMacroActive()){
@@ -50,13 +49,8 @@ int main(){
             std::cout << (int)(recieve[0]) << std::endl;
         
 
-        // cv::namedWindow("test", cv::WINDOW_AUTOSIZE);
-        // cv::imshow("test", img);
-        // cv::waitKey(1);
-        // macroCollection.updateImageProcessing(img);
-
-        auto end = std::chrono::steady_clock::now();
-        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
+        // auto end = std::chrono::steady_clock::now();
+        // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
     }
 
     return 0;

@@ -9,7 +9,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include "Macro.h"
-#include "MacroImageProcessingDecider.h"
+#include "MacroImageProcessingDeciderCollection.h"
 
 class MacroCollection
 {
@@ -17,15 +17,14 @@ private:
     std::vector<std::shared_ptr<Macro>> macros;
     std::shared_ptr<Macro> activeMacro;
     std::chrono::steady_clock::time_point timeSinceMacroActivation;
-    std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders;
+    std::shared_ptr<MacroImageProcessingDeciderCollection> deciders;
 public:
-    MacroCollection(std::vector<std::shared_ptr<Macro>> macros, std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders);
-    MacroCollection(const boost::property_tree::ptree & tree);
+    MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders);
+    MacroCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders);
 
     void getData(unsigned char data[8]);
     void activateMacros();
     bool isMacroActive() const { return activeMacro != nullptr; }
-    void updateImageProcessing(const cv::Mat & screenshot) const;
 };
 
 
