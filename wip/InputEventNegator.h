@@ -1,5 +1,5 @@
-#ifndef INPUT_EVENT_NEGATOR
-#define INPUT_EVENT_NEGATOR
+#ifndef INPUT_EVENT_NEGATOR_H
+#define INPUT_EVENT_NEGATOR_H
 
 #include "pch.h"
 
