@@ -52,7 +52,7 @@ public:
 
     int getInputValue() const override { 
         if (!sf::Joystick::isConnected(joystickIndex) || !sf::Joystick::hasAxis(joystickIndex, axis))
-            return 0;
+            return 128;
         int value = (100 + sf::Joystick::getAxisPosition(joystickIndex, axis) * SCALING) / 200.0 * 255.0;
         if (value > 255)
             value = 255;
