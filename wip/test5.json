@@ -212,6 +212,18 @@
                 "joystick index": 0,
                 "button": 13
             }
+        ],
+        "playLastRecorded": [
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 0
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13
+            }
         ]
     },
     "deciders":[

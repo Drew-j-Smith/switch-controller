@@ -32,8 +32,11 @@ int main(){
     auto screenshotUtil = std::make_shared<WindowsScreenshotUtility>(1920, 1080, "Game Capture HD");
     auto deciders = std::make_shared<MacroImageProcessingDeciderCollection>(tree.find("deciders")->second, screenshotUtil);
     MacroCollection macroCollection(tree.find("macros")->second, deciders);
+    macroCollection.pushBackMacro(i.getLastRecordedMacro());
 
     while (true) {
+        sf::Joystick::update();
+        
         // auto begin = std::chrono::steady_clock::now();
         
         macroCollection.activateMacros();

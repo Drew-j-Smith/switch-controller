@@ -2,6 +2,8 @@
 
 
 InputManager::InputManager(const boost::property_tree::ptree & tree) {
+    lastRecordedMacro = std::make_shared<Macro>();
+
     std::shared_ptr<InputEvent> defaultInput = std::make_shared<DefaultInputEvent>();
     for (int i = 0; i < 14; i++) {
         buttons[i] = defaultInput;
@@ -36,8 +38,11 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
                 dpad[index - 22] = std::make_shared<InputEventCollection>(it.second);
             }
         }
-        else {
+        else if (index == 26) {
             record = std::make_shared<InputEventCollection>(it.second);
+        }
+        else if (index == 27) {
+            this->lastRecordedMacro->setInputEvent(std::make_shared<InputEventCollection>(it.second));
         }
     }
     if (record != nullptr)
@@ -45,7 +50,6 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
 }
 
 void InputManager::getData(unsigned char* data) const {
-    sf::Joystick::update();
     data[0] = 85;
     data[1] = 0;
     data[2] = 0;
@@ -141,7 +145,10 @@ void InputManager::startRecordingThread() {
                     std::string str = oss.str();
                     std::cout << "Saved recording to \"" << str << "\"" << std::endl;
 
-                    macro.getData()->save(str);
+                    auto macroData = macro.getData();
+                    macroData.save(str);
+                    std::lock_guard<std::mutex> guard(mutex);
+                    lastRecordedMacro->setData(macroData);
                     macro = Macro();
                 }
                 active = !active;

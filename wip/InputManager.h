@@ -50,13 +50,17 @@ private:
         {"dpadX", 22},
         {"dpadY", 23},
 
-        {"record", 26}
+        {"record", 26},
+        {"playLastRecorded", 27}
     };
 
     std::shared_ptr<InputEvent> buttons[14];
     std::shared_ptr<InputEvent> controlSticks[8];
     std::shared_ptr<InputEvent> dpad[4];
     std::shared_ptr<InputEvent> record;
+
+    std::shared_ptr<Macro> lastRecordedMacro;
+    std::mutex mutex;
 
     std::thread recordingThread;
     std::atomic<bool> recording;
@@ -70,6 +74,7 @@ public:
 
     void getData(unsigned char* data) const;
 
+    std::shared_ptr<Macro> getLastRecordedMacro() { return lastRecordedMacro; }
 private:
     unsigned char getControlStickData(int stick) const;
     unsigned char getDpadData() const;
