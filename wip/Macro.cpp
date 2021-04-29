@@ -14,7 +14,7 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
     std::string filename = tree.get("filename", "");
     bool storedAsHex = tree.get("stored as hex", false);
     data.load(filename, storedAsHex);
-    inputEvent = std::make_shared<InputEventCollection>(tree.get_child(boost::property_tree::path("input")));
+    inputEvent = std::make_shared<InputEventCollection>(tree.find("input")->second);
     auto deciderIt = deciderList.find(tree.get("decider", ""));
     if (deciderIt != deciderList.end())
         decider = deciderIt->second;
@@ -22,8 +22,20 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
         decider = std::make_shared<MacroDefaultDecider>();
 }
 
-void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroList){
-    //TODO
+void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroMap){
+    boost::property_tree::ptree nextMacroTree;
+    for (auto macroTree : tree) {
+        if (macroTree.second.get("name", "") == name) {
+            nextMacroTree = macroTree.second.find("next macro list")->second;
+        }
+    }
+    for (auto macroListTree : nextMacroTree) {
+        std::vector<std::weak_ptr<Macro>> macroList;
+        for (auto macroTree : macroListTree.second) {
+            macroList.push_back(macroMap.at(macroTree.second.get("", "")));
+        }
+        nextMacroLists.push_back(macroList);
+    }
 }
 
 void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) const{
