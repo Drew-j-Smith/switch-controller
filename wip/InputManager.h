@@ -59,7 +59,7 @@ private:
     std::shared_ptr<InputEvent> dpad[4];
     std::shared_ptr<InputEvent> record;
 
-    std::shared_ptr<Macro> lastRecordedMacro;
+    std::shared_ptr<Macro> lastRecordedMacro = std::make_shared<Macro>();
     std::mutex mutex;
 
     std::thread recordingThread;

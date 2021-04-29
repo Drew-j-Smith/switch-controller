@@ -32,9 +32,9 @@ public:
             }
         }
         
-    };
+    }
 
-    int getInputValue() const override { return sf::Keyboard::isKeyPressed(key); };
+    int getInputValue() const override { return sf::Keyboard::isKeyPressed(key); }
     bool isDigital() const override { return true; }
 };
 

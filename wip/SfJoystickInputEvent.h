@@ -19,17 +19,17 @@ public:
     SfJoystickDigitalInputEvent(unsigned int joystickIndex, unsigned int button) { 
         this->joystickIndex = joystickIndex; 
         this->button = button;
-    };
+    }
     SfJoystickDigitalInputEvent(boost::property_tree::ptree tree) { 
         joystickIndex = tree.get("joystick index", 0);
         button = tree.get("button", 0);
-    };
+    }
 
     int getInputValue() const override {
         if (!sf::Joystick::isConnected(joystickIndex) || sf::Joystick::getButtonCount(joystickIndex) < button)
             return 0;
         return sf::Joystick::isButtonPressed(joystickIndex, button);
-    };
+    }
     bool isDigital() const override { return true; }
 };
 
@@ -44,11 +44,11 @@ public:
     SfJoystickAnalogInputEvent(unsigned int joystickIndex, sf::Joystick::Axis axis) { 
         this->joystickIndex = joystickIndex; 
         this->axis = axis;
-    };
+    }
     SfJoystickAnalogInputEvent(const boost::property_tree::ptree & tree) { 
         joystickIndex = (sf::Keyboard::Key) tree.get("joystick index", 0);
         axis = (sf::Joystick::Axis) tree.get("axis", 0);
-    };
+    }
 
     int getInputValue() const override { 
         if (!sf::Joystick::isConnected(joystickIndex) || !sf::Joystick::hasAxis(joystickIndex, axis))
@@ -59,7 +59,7 @@ public:
         if (value < 0)
             value = 0;
         return value;
-    };
+    }
     bool isDigital() const override { return false; }
 };
 

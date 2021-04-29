@@ -33,7 +33,9 @@ public:
 
     void sendData(const unsigned char * dataToWrite, unsigned char * dataToRead) {
         boost::asio::write(*port, boost::asio::buffer(dataToWrite, writeFrameSize));
-        boost::asio::read(*port, boost::asio::buffer(dataToRead, readFrameSize)); 
+        if (!boost::asio::read(*port, boost::asio::buffer(dataToRead, readFrameSize))) {
+            std::cerr << "Error reading from serial port";
+        }
     }
 
 };

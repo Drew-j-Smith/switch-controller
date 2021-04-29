@@ -102,8 +102,7 @@ void CharStream<frameSize>::load(const std::string & filename, const bool isHex 
         else {
             std::array<unsigned char, frameSize> buffer;
             while (!infile.eof()) {
-                infile.read((char*)buffer.data(), frameSize);
-                if (infile.good())
+                if (infile.read((char*)buffer.data(), frameSize))
                     push_back(buffer);
             }
         }

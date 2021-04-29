@@ -2,8 +2,6 @@
 
 
 InputManager::InputManager(const boost::property_tree::ptree & tree) {
-    lastRecordedMacro = std::make_shared<Macro>();
-
     std::shared_ptr<InputEvent> defaultInput = std::make_shared<DefaultInputEvent>();
     for (int i = 0; i < 14; i++) {
         buttons[i] = defaultInput;

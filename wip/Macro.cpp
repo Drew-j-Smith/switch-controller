@@ -43,9 +43,8 @@ void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) c
         return;
     int low = 0;
     int high = this->data.size();
-    int mid;
     while(high - low > 1){
-        mid = (low + high) / 2;
+        int mid = (low + high) / 2;
         if(getTime(mid) > time)
             high = mid;
         else
