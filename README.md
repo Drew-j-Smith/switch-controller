@@ -1,5 +1,5 @@
 ## Switch-Contoller
-This is repo to help compile and run code for a switch controller emulator with image processing
+This is a repo to help compile and run code for a switch controller emulator with image processing
 
 ### Source code
 [Origial code](https://github.com/progmem/Switch-Fightstick)
