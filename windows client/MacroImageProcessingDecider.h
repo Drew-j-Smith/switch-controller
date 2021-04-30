@@ -16,25 +16,30 @@
 class MacroImageProcessingDecider : public MacroDecider
 {
 public:
-    struct ImageProcessingInfo {
-        cv::Mat templatePic;
-        cv::Mat maskPic;
-        int     matchMethod;
-        double  matchThreshold;
-        int     minX;
-        int     minY;
-        int     maxX;
-        int     maxY;
-    };
+    
 
-    MacroImageProcessingDecider(const std::string & name, const ImageProcessingInfo & imageProcessingInfo);
+    MacroImageProcessingDecider(const std::string & name, cv::Mat & templatePic,
+        const cv::Mat & maskPic,
+        const int     matchMethod,
+        const double  matchThreshold,
+        const int     minX,
+        const int     minY,
+        const int     maxX,
+        const int     maxY);
     MacroImageProcessingDecider(const boost::property_tree::ptree & tree);
 
     int nextMacroListIndex() const override;
 
     void update(const cv::Mat & screenshot);
 private:
-    ImageProcessingInfo imageProcessingInfo;
+    cv::Mat templatePic;
+    cv::Mat maskPic;
+    int     matchMethod;
+    double  matchThreshold;
+    int     minX;
+    int     minY;
+    int     maxX;
+    int     maxY;
 
     std::atomic<double> matchPointX;
     std::atomic<double> matchPointY;
