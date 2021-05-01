@@ -25,6 +25,7 @@ public:
     void getData(unsigned char data[8]);
     void activateMacros();
     bool isMacroActive() const { return activeMacro != nullptr; }
+    void deactivateMacros() { activeMacro = nullptr; }
     const std::vector<std::shared_ptr<Macro>> getMacros() const { return macros; }
     const std::shared_ptr<Macro> lastMacro() const { return macros.back(); }
     void popLastMacro() { macros.pop_back(); }

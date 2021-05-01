@@ -224,6 +224,18 @@
                 "joystick index": 0,
                 "button": 13
             }
+        ],
+        "stopMacros": [
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 3
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13
+            }
         ]
     },
     "deciders":[

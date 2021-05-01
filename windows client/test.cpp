@@ -36,7 +36,8 @@ int main(){
     MacroRecorder recorder(tree.find("controls")->second);
     macroCollection.pushBackMacro(recorder.getLastRecordedMacro());
     
-    
+    InputEventCollection stopMacrosEvent(tree.find("controls")->second.find("stopMacros")->second);
+
 
     while (true) {
         sf::Joystick::update();
@@ -44,6 +45,9 @@ int main(){
         // auto begin = std::chrono::steady_clock::now();
         
         macroCollection.activateMacros();
+        if (macroCollection.isMacroActive() && stopMacrosEvent.getInputValue()) {
+            macroCollection.deactivateMacros();
+        }
         if (macroCollection.isMacroActive()){
             macroCollection.getData(send);
         }
