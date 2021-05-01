@@ -7,6 +7,7 @@
 
 #include "Macro.h"
 #include "InputEventCollection.h"
+#include "TimeString.h"
 
 class MacroRecorder
 {
@@ -31,12 +32,7 @@ public:
         if (record->getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(now - activationTime).count() > RECORDING_BUTTON_COOLDOWN) {
             activationTime = now;
             if (recording) {
-                //getting the time as a string
-                auto t = std::time(nullptr);
-                auto tm = *std::localtime(&t);
-                std::ostringstream oss;
-                oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
-                std::string str = oss.str();
+                std::string str = getTimeStr();
                 std::cout << "Saved recording to \"" << str << "\"" << std::endl;
 
                 auto macroData = currentRecordingMacro->getData();
