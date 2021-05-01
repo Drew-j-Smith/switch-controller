@@ -12,6 +12,7 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
     for (int i = 0; i < 4; i++) {
         dpad[i] = defaultInput;
     }
+    record = defaultInput;
 
     for (auto it : tree) {
         if (buttonMap.find(it.first) == buttonMap.end())
@@ -43,8 +44,6 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
             this->lastRecordedMacro->setInputEvent(std::make_shared<InputEventCollection>(it.second));
         }
     }
-    if (record != nullptr)
-        startRecordingThread();
 }
 
 void InputManager::getData(unsigned char* data) const {
@@ -121,40 +120,31 @@ unsigned char InputManager::getDpadData(bool up, bool right, bool down, bool lef
 }
 
 
-void InputManager::startRecordingThread() {
-    recording.store(true);
-    recordingThread = std::thread([&](){
-        auto activationTime = std::chrono::steady_clock::now();
-        Macro macro;
-        unsigned char data[8];
-        bool active = false;
-        
-        while (recording.load()) {
-            auto begin = std::chrono::steady_clock::now();
-            
-            if (record->getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count() > RECORDING_BUTTON_COOLDOWN) {
-                activationTime = begin;
-                if (active) {
-                    //getting the time as a string
-                    auto t = std::time(nullptr);
-                    auto tm = *std::localtime(&t);
-                    std::ostringstream oss;
-                    oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
-                    std::string str = oss.str();
-                    std::cout << "Saved recording to \"" << str << "\"" << std::endl;
+void InputManager::updateRecording() {
+    
+    auto now = std::chrono::steady_clock::now();
+    
+    if (record->getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(now - activationTime).count() > RECORDING_BUTTON_COOLDOWN) {
+        activationTime = now;
+        if (recording) {
+            //getting the time as a string
+            auto t = std::time(nullptr);
+            auto tm = *std::localtime(&t);
+            std::ostringstream oss;
+            oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+            std::string str = oss.str();
+            std::cout << "Saved recording to \"" << str << "\"" << std::endl;
 
-                    auto macroData = macro.getData();
-                    macroData.save(str);
-                    std::lock_guard<std::mutex> guard(mutex);
-                    lastRecordedMacro->setData(macroData);
-                    macro = Macro();
-                }
-                active = !active;
-            }
-            if (active && std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count() > macro.lastTime()) {
-                getData(data);
-                macro.appendData(std::chrono::duration_cast<std::chrono::milliseconds>(begin - activationTime).count(), data);
-            }
+            auto macroData = currentRecordingMacro->getData();
+            macroData.save(str);
+            lastRecordedMacro->setData(macroData);
+            currentRecordingMacro->setData({});
         }
-    });
+        recording = !recording;
+    }
+    if (recording) {
+        unsigned char data[8];
+        getData(data);
+        currentRecordingMacro->appendData(std::chrono::duration_cast<std::chrono::milliseconds>(now - activationTime).count(), data);
+    }
 }

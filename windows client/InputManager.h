@@ -59,20 +59,17 @@ private:
     std::shared_ptr<InputEvent> dpad[4];
     std::shared_ptr<InputEvent> record;
 
+    std::shared_ptr<Macro> currentRecordingMacro = std::make_shared<Macro>();
     std::shared_ptr<Macro> lastRecordedMacro = std::make_shared<Macro>();
-    std::mutex mutex;
-
-    std::thread recordingThread;
-    std::atomic<bool> recording;
+    std::chrono::steady_clock::time_point activationTime = std::chrono::steady_clock::now();
+    bool recording = false;
 
     int RECORDING_BUTTON_COOLDOWN = 1000;
 public:
     InputManager(const boost::property_tree::ptree & tree);
-    ~InputManager() {
-        stopRecordingThread();
-    }
 
     void getData(unsigned char* data) const;
+    void updateRecording();
 
     std::shared_ptr<Macro> getLastRecordedMacro() { return lastRecordedMacro; }
 private:
@@ -80,12 +77,6 @@ private:
     unsigned char getDpadData() const;
     unsigned char getDpadData(bool up, bool right, bool down, bool left) const;
 
-    void startRecordingThread();
-    void stopRecordingThread() {
-        recording.store(false);
-        if (recordingThread.joinable())
-            recordingThread.join();
-    }
 };
 
 #endif

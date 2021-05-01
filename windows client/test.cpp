@@ -39,6 +39,8 @@ int main(){
         
         // auto begin = std::chrono::steady_clock::now();
         
+        i.updateRecording();
+        
         macroCollection.activateMacros();
         if (macroCollection.isMacroActive()){
             macroCollection.getData(send);
