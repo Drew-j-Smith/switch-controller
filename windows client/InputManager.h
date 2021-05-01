@@ -48,30 +48,17 @@ private:
         {"dpadDown", 24},
         {"dpadLeft", 25},
         {"dpadX", 22},
-        {"dpadY", 23},
-
-        {"record", 26},
-        {"playLastRecorded", 27}
+        {"dpadY", 23}
     };
 
     std::shared_ptr<InputEvent> buttons[14];
     std::shared_ptr<InputEvent> controlSticks[8];
     std::shared_ptr<InputEvent> dpad[4];
-    std::shared_ptr<InputEvent> record;
 
-    std::shared_ptr<Macro> currentRecordingMacro = std::make_shared<Macro>();
-    std::shared_ptr<Macro> lastRecordedMacro = std::make_shared<Macro>();
-    std::chrono::steady_clock::time_point activationTime = std::chrono::steady_clock::now();
-    bool recording = false;
-
-    int RECORDING_BUTTON_COOLDOWN = 1000;
 public:
     InputManager(const boost::property_tree::ptree & tree);
 
     void getData(unsigned char* data) const;
-    void updateRecording();
-
-    std::shared_ptr<Macro> getLastRecordedMacro() { return lastRecordedMacro; }
 private:
     unsigned char getControlStickData(int stick) const;
     unsigned char getDpadData() const;

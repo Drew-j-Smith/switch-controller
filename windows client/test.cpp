@@ -15,8 +15,8 @@
 #include "InputManager.h"
 #include "WindowsScreenshotUtility.h"
 #include "MacroImageProcessingDeciderCollection.h"
+#include "MacroRecorder.h"
 
-#include <windows.h>
 
 
 int main(){ 
@@ -27,26 +27,29 @@ int main(){
     boost::property_tree::ptree tree;
     boost::property_tree::read_json("test5.json", tree);
 
-    InputManager i(tree.find("controls")->second);
+    InputManager inputManager(tree.find("controls")->second);
 
     auto screenshotUtil = std::make_shared<WindowsScreenshotUtility>(1920, 1080, "Game Capture HD");
     auto deciders = std::make_shared<MacroImageProcessingDeciderCollection>(tree.find("deciders")->second, screenshotUtil);
     MacroCollection macroCollection(tree.find("macros")->second, deciders);
-    macroCollection.pushBackMacro(i.getLastRecordedMacro());
+
+    MacroRecorder recorder(tree.find("controls")->second);
+    macroCollection.pushBackMacro(recorder.getLastRecordedMacro());
+    
+    
 
     while (true) {
         sf::Joystick::update();
         
         // auto begin = std::chrono::steady_clock::now();
         
-        i.updateRecording();
-        
         macroCollection.activateMacros();
         if (macroCollection.isMacroActive()){
             macroCollection.getData(send);
         }
         else {
-            i.getData(send);
+            inputManager.getData(send);
+            recorder.update(send);
         }
 
         s.sendData(send, recieve);
