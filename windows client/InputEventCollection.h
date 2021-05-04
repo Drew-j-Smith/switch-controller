@@ -9,6 +9,7 @@
 #include "SfKeyboardInputEvent.h"
 #include "SfJoystickInputEvent.h"
 #include "InputEventInverter.h"
+#include "InputEventToggle.h"
 
 class InputEventCollection : public InputEvent
 {
@@ -30,9 +31,14 @@ public:
                 inputEvents.push_back(std::make_shared<SfJoystickDigitalInputEvent>(it->second));
             }
             if (it->second.get("negated", false)) {
-                std::shared_ptr<InputEvent> negatedEvent = std::make_shared<InputEventInverter>(inputEvents.back());
+                std::shared_ptr<InputEvent> invertedEvent = std::make_shared<InputEventInverter>(inputEvents.back());
                 inputEvents.pop_back();
-                inputEvents.push_back(negatedEvent);
+                inputEvents.push_back(invertedEvent);
+            }
+            if (it->second.get("toggle", false)) {
+                std::shared_ptr<InputEvent> toggleEvent = std::make_shared<InputEventToggle>(it->second.get("toggle cooldown", 1000), inputEvents.back());
+                inputEvents.pop_back();
+                inputEvents.push_back(toggleEvent);
             }
         }
     };
