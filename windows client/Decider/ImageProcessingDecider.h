@@ -1,7 +1,7 @@
-#ifndef MACRO_IMAGE_PROCESSING_DECIDER_H
-#define MACRO_IMAGE_PROCESSING_DECIDER_H
+#ifndef IMAGE_PROCESSING_DECIDER_H
+#define IMAGE_PROCESSING_DECIDER_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -10,15 +10,15 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "MacroDecider.h"
+#include "Decider.h"
 
 
-class MacroImageProcessingDecider : public MacroDecider
+class ImageProcessingDecider : public Decider
 {
 public:
     
 
-    MacroImageProcessingDecider(const std::string & name, cv::Mat & templatePic,
+    ImageProcessingDecider(const std::string & name, cv::Mat & templatePic,
         const cv::Mat & maskPic,
         const int     matchMethod,
         const double  matchThreshold,
@@ -26,9 +26,9 @@ public:
         const int     minY,
         const int     maxX,
         const int     maxY);
-    MacroImageProcessingDecider(const boost::property_tree::ptree & tree);
+    ImageProcessingDecider(const boost::property_tree::ptree & tree);
 
-    int nextMacroListIndex() const override;
+    int nextListIndex() const override;
 
     void update(const cv::Mat & screenshot);
 private:

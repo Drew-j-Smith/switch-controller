@@ -1,7 +1,7 @@
 #ifndef MACRO_COLLECTION_H
 #define MACRO_COLLECTION_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -9,7 +9,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include "Macro.h"
-#include "MacroImageProcessingDeciderCollection.h"
+#include "../Decider/ImageProcessingDeciderCollection.h"
 
 class MacroCollection
 {
@@ -17,10 +17,10 @@ private:
     std::vector<std::shared_ptr<Macro>> macros;
     std::shared_ptr<Macro> activeMacro;
     std::chrono::steady_clock::time_point timeSinceMacroActivation;
-    std::shared_ptr<MacroImageProcessingDeciderCollection> deciders;
+    std::shared_ptr<ImageProcessingDeciderCollection> deciders;
 public:
-    MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders);
-    MacroCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders);
+    MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<ImageProcessingDeciderCollection> & deciders);
+    MacroCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<ImageProcessingDeciderCollection> & deciders);
 
     void getData(unsigned char data[8]);
     void activateMacros();

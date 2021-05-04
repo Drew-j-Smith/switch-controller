@@ -1,7 +1,7 @@
 #ifndef SF_KEYBOARD_INPUT_EVENT_H
 #define SF_KEYBOARD_INPUT_EVENT_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <SFML/Window/Keyboard.hpp>
 

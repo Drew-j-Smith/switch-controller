@@ -1,13 +1,13 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "InputEventCollection.h"
-#include "SfJoystickInputEvent.h"
-#include "Macro.h"
+#include "../InputEvent/InputEventCollection.h"
+#include "../InputEvent/SfJoystickInputEvent.h"
+#include "../Macro/Macro.h"
 
 class InputManager
 {

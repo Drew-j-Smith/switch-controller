@@ -3,7 +3,7 @@
 #define AC_DISPLAY_IMAGE_MATCH 1
 
 Macro::Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent,
-    const std::shared_ptr<MacroDecider> & decider, const InputMergeMode mode){
+    const std::shared_ptr<Decider> & decider, const InputMergeMode mode){
     this->name = name;
     this->data = data;
     this->inputEvent = inputEvent;
@@ -11,7 +11,7 @@ Macro::Macro(const std::string & name, const CharStream<15> & data, const std::s
     this->mode = mode;
 }
 
-Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<MacroDecider>> & deciderList) {
+Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Decider>> & deciderList) {
     name = tree.get("name", "");
     std::string filename = tree.get("filename", "");
     bool storedAsHex = tree.get("stored as hex", false);
@@ -21,7 +21,7 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
     if (deciderIt != deciderList.end())
         decider = deciderIt->second;
     else
-        decider = std::make_shared<MacroDefaultDecider>();
+        decider = std::make_shared<DefaultDecider>();
     
     std::string modeStr = tree.get("input merge mode", "");
     if (modeStr == "block input")
@@ -96,7 +96,7 @@ std::shared_ptr<Macro> Macro::cycleVector(int macroIndex) {
 }
 
 std::shared_ptr<Macro> Macro::getNextMacro() {
-    return cycleVector(decider->nextMacroListIndex());
+    return cycleVector(decider->nextListIndex());
 }
 
 void Macro::mergeData(unsigned char priortyData[8], const unsigned char dataToMerge[8]){

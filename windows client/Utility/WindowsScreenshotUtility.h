@@ -1,7 +1,7 @@
 #ifndef WINDOWS_SCREENSHOT_UTILITY_H
 #define WINDOWS_SCREENSHOT_UTILITY_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>

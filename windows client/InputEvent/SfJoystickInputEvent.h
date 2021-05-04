@@ -1,11 +1,11 @@
 #ifndef SF_JOYSTICK_INPUT_EVENT_H
 #define SF_JOYSTICK_INPUT_EVENT_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <SFML/Window/Joystick.hpp>
 
-#include<boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "InputEvent.h"
 

@@ -1,11 +1,11 @@
 #include "MacroCollection.h"
 
-MacroCollection::MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders) {
+MacroCollection::MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<ImageProcessingDeciderCollection> & deciders) {
     this->macros = macros;
     this->deciders = deciders;
 }
 
-MacroCollection::MacroCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<MacroImageProcessingDeciderCollection> & deciders) {
+MacroCollection::MacroCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<ImageProcessingDeciderCollection> & deciders) {
     this->deciders = deciders;
     std::map<std::string, std::shared_ptr<Macro>> macroMap;
     auto deciderMap = deciders->generateMap();

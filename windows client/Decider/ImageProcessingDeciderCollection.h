@@ -1,23 +1,23 @@
-#ifndef MACRO_IMAGE_PROCESSING_DECIDER_COLLECTION_H
-#define MACRO_IMAGE_PROCESSING_DECIDER_COLLECTION_H
+#ifndef IMAGE_PROCESSING_DECIDER_COLLECTION_H
+#define IMAGE_PROCESSING_DECIDER_COLLECTION_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "MacroImageProcessingDecider.h"
-#include "ScreenshotUtility.h"
+#include "ImageProcessingDecider.h"
+#include "../Utility/ScreenshotUtility.h"
 
 
-class MacroImageProcessingDeciderCollection
+class ImageProcessingDeciderCollection
 {
 private:
-    std::vector<std::shared_ptr<MacroImageProcessingDecider>> deciders;
+    std::vector<std::shared_ptr<ImageProcessingDecider>> deciders;
     std::shared_ptr<ScreenshotUtility> screenshotUtility;
     std::thread imageProcessingThread;
     std::atomic<bool> imageProcessing;
 
-    static void matchImage(std::shared_ptr<MacroImageProcessingDecider> decider, const cv::Mat & screenshot){
+    static void matchImage(std::shared_ptr<ImageProcessingDecider> decider, const cv::Mat & screenshot){
         decider->update(screenshot);
     }
 
@@ -43,31 +43,31 @@ private:
     }
 
 public:
-    MacroImageProcessingDeciderCollection(const std::vector<std::shared_ptr<MacroImageProcessingDecider>> & deciders, const std::shared_ptr<ScreenshotUtility> & screenshotUtility) {
+    ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<ScreenshotUtility> & screenshotUtility) {
         this->deciders = deciders;
         this->screenshotUtility = screenshotUtility;
         startImageProcessingThread(); 
     }
-    MacroImageProcessingDeciderCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<ScreenshotUtility> & screenshotUtility) {
+    ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<ScreenshotUtility> & screenshotUtility) {
         this->screenshotUtility = screenshotUtility;
         for (auto decider : tree) {
             if (decider.second.get("type", "") == "image processing") {
-                deciders.push_back(std::make_shared<MacroImageProcessingDecider>(decider.second));
+                deciders.push_back(std::make_shared<ImageProcessingDecider>(decider.second));
             }
         }
         startImageProcessingThread();
     }
-    ~MacroImageProcessingDeciderCollection() {
+    ~ImageProcessingDeciderCollection() {
         stopImageProcessingThread();
     }
 
-    void setDeciders(const std::vector<std::shared_ptr<MacroImageProcessingDecider>> & deciders) { this->deciders = deciders; }
+    void setDeciders(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders) { this->deciders = deciders; }
     void setScreenshotUtility(const std::shared_ptr<ScreenshotUtility> & screenshotUtility) { this->screenshotUtility = screenshotUtility; }
-    const std::vector<std::shared_ptr<MacroImageProcessingDecider>> getDeciders() const { return deciders; }
+    const std::vector<std::shared_ptr<ImageProcessingDecider>> getDeciders() const { return deciders; }
     const std::shared_ptr<ScreenshotUtility> getScreenshotUtility() { return screenshotUtility; }
 
-    const std::map<std::string, std::shared_ptr<MacroDecider>> generateMap() {
-        std::map<std::string, std::shared_ptr<MacroDecider>> map;
+    const std::map<std::string, std::shared_ptr<Decider>> generateMap() {
+        std::map<std::string, std::shared_ptr<Decider>> map;
         for (auto decider : deciders) {
             map.insert({decider->getName(), decider});
         }

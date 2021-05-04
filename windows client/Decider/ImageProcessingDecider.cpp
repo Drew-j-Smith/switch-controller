@@ -1,8 +1,8 @@
-#include "MacroImageProcessingDecider.h"
+#include "ImageProcessingDecider.h"
 
-#define AC_DISPLAY_IMAGE_MATCH 1
+#define AC_DISPLAY_IMAGE_MATCH 0
 
-MacroImageProcessingDecider::MacroImageProcessingDecider(const std::string & name, cv::Mat & templatePic,
+ImageProcessingDecider::ImageProcessingDecider(const std::string & name, cv::Mat & templatePic,
     const cv::Mat & maskPic,
     const int     matchMethod,
     const double  matchThreshold,
@@ -27,7 +27,7 @@ MacroImageProcessingDecider::MacroImageProcessingDecider(const std::string & nam
     critalMatchVal.store(0);
 }
 
-MacroImageProcessingDecider::MacroImageProcessingDecider(const boost::property_tree::ptree & tree){
+ImageProcessingDecider::ImageProcessingDecider(const boost::property_tree::ptree & tree){
     name = tree.get("name", "");
     templatePic = cv::imread(tree.get("template pic filename", ""));
     if (tree.get("mask pic filename", "") != "")
@@ -43,7 +43,7 @@ MacroImageProcessingDecider::MacroImageProcessingDecider(const boost::property_t
     critalMatchVal.store(0);
 }
 
-int MacroImageProcessingDecider::nextMacroListIndex() const {
+int ImageProcessingDecider::nextListIndex() const {
     double matchX = matchPointX.load();
     double matchY = matchPointY.load();
     if (matchMethod == cv::TM_SQDIFF
@@ -59,7 +59,7 @@ int MacroImageProcessingDecider::nextMacroListIndex() const {
     }
 }
 
-void MacroImageProcessingDecider::update(const cv::Mat & screenshot){
+void ImageProcessingDecider::update(const cv::Mat & screenshot){
     cv::Rect rectCrop = cv::Rect(minX,
         minY,
         maxX - minX,

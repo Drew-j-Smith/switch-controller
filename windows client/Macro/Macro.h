@@ -1,13 +1,13 @@
 #ifndef MACRO_H
 #define MACRO_H
 
-#include "pch.h"
+#include "../pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
 #include "CharStream.h"
-#include "MacroDecider.h"
-#include "InputEventCollection.h"
+#include "../Decider/Decider.h"
+#include "../InputEvent/InputEventCollection.h"
 
 class Macro {
 public:
@@ -15,8 +15,8 @@ public:
 
     Macro() {};
     Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent,
-        const std::shared_ptr<MacroDecider> & decider, const InputMergeMode mode);
-    Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<MacroDecider>> & deciderList);
+        const std::shared_ptr<Decider> & decider, const InputMergeMode mode);
+    Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Decider>> & deciderList);
     
     void setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroMap);
     void setNextMacroLists(const std::vector<std::vector<std::weak_ptr<Macro>>> & nextMacroLists) { this->nextMacroLists = nextMacroLists; }
@@ -24,7 +24,7 @@ private:
     std::string name = "";
     CharStream<15> data = {};
     std::shared_ptr<InputEvent> inputEvent = std::make_shared<DefaultInputEvent>();
-    std::shared_ptr<MacroDecider> decider = std::make_shared<MacroDefaultDecider>();
+    std::shared_ptr<Decider> decider = std::make_shared<DefaultDecider>();
     InputMergeMode mode = inputPriority;
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
@@ -35,8 +35,8 @@ public:
     void setName(const std::string & name) { this->name = name; }
     const std::shared_ptr<InputEvent> getInputEvent() const { return inputEvent; }
     void setInputEvent(const std::shared_ptr<InputEvent> inputEvent) { this->inputEvent = inputEvent; }
-    const std::shared_ptr<MacroDecider> getMacroDecider() const { return decider; }
-    void setMacroDecider(const std::shared_ptr<MacroDecider> & decider) { this->decider = decider; }
+    const std::shared_ptr<Decider> getMacroDecider() const { return decider; }
+    void setMacroDecider(const std::shared_ptr<Decider> & decider) { this->decider = decider; }
     std::shared_ptr<Macro> getNextMacro();
     InputMergeMode getMode() { return mode; }
     void setMode(const InputMergeMode mode) { this->mode = mode; }

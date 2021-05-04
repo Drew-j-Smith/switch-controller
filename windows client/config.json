@@ -4,10 +4,7 @@
             {
                 "type": "SF Digital Joystick Input",
                 "joystick index": 0,
-                "button": 1,
-                "toggle": true,
-                "turbo": true,
-                "turbo loop": 15
+                "button": 1
             },
             {
                 "type": "SF Digital Joystick Input",
