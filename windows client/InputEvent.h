@@ -27,7 +27,7 @@ public:
      * 
      * @return int 
      */
-    virtual int getInputValue() const = 0;
+    virtual int getInputValue() = 0;
 
     /**
      * @brief The value decides if the input acts as a digital or analogue input
@@ -47,7 +47,7 @@ class DefaultInputEvent : public InputEvent
 {
 public:
     DefaultInputEvent() {};
-    int getInputValue() const override { return 0; };
+    int getInputValue() override { return 0; };
     bool isDigital() const override { return true; }
 };
 

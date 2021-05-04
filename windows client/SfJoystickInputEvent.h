@@ -25,7 +25,7 @@ public:
         button = tree.get("button", 0);
     }
 
-    int getInputValue() const override {
+    int getInputValue() override {
         if (!sf::Joystick::isConnected(joystickIndex) || sf::Joystick::getButtonCount(joystickIndex) < button)
             return 0;
         return sf::Joystick::isButtonPressed(joystickIndex, button);
@@ -50,7 +50,7 @@ public:
         axis = (sf::Joystick::Axis) tree.get("axis", 0);
     }
 
-    int getInputValue() const override { 
+    int getInputValue() override { 
         if (!sf::Joystick::isConnected(joystickIndex) || !sf::Joystick::hasAxis(joystickIndex, axis))
             return 128;
         int value = (100 + sf::Joystick::getAxisPosition(joystickIndex, axis) * SCALING) / 200.0 * 255.0;

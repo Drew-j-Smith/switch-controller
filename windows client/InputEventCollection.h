@@ -37,7 +37,7 @@ public:
         }
     };
 
-    int getInputValue() const override { 
+    int getInputValue() override { 
         if (inputEvents.size() == 0)
             return 0;
 
