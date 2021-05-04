@@ -21,8 +21,6 @@
 
 int main(){ 
     SerialInterface s("COM4", 57600, 8, 1);
-    unsigned char send[8];
-    unsigned char recieve[1];
 
     boost::property_tree::ptree tree;
     boost::property_tree::read_json("test5.json", tree);
@@ -44,16 +42,18 @@ int main(){
         
         // auto begin = std::chrono::steady_clock::now();
         
+        unsigned char send[8];
+        unsigned char recieve[1];
+
+        inputManager.getData(send);
+        recorder.update(send);
+        
         macroCollection.activateMacros();
         if (macroCollection.isMacroActive() && stopMacrosEvent.getInputValue()) {
             macroCollection.deactivateMacros();
         }
         if (macroCollection.isMacroActive()){
             macroCollection.getData(send);
-        }
-        else {
-            inputManager.getData(send);
-            recorder.update(send);
         }
 
         s.sendData(send, recieve);

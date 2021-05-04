@@ -11,8 +11,11 @@
 
 class Macro {
 public:
+    enum InputMergeMode {blockInput, macroPriority, inputPriority};
+
     Macro() {};
-    Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent, const std::shared_ptr<MacroDecider> & decider);
+    Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent,
+        const std::shared_ptr<MacroDecider> & decider, const InputMergeMode mode);
     Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<MacroDecider>> & deciderList);
     
     void setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroMap);
@@ -22,6 +25,7 @@ private:
     CharStream<15> data = {};
     std::shared_ptr<InputEvent> inputEvent = std::make_shared<DefaultInputEvent>();
     std::shared_ptr<MacroDecider> decider = std::make_shared<MacroDefaultDecider>();
+    InputMergeMode mode = inputPriority;
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
 
@@ -34,6 +38,8 @@ public:
     const std::shared_ptr<MacroDecider> getMacroDecider() const { return decider; }
     void setMacroDecider(const std::shared_ptr<MacroDecider> & decider) { this->decider = decider; }
     std::shared_ptr<Macro> getNextMacro();
+    InputMergeMode getMode() { return mode; }
+    void setMode(const InputMergeMode mode) { this->mode = mode; }
 
     const CharStream<15> getData() const { return data; }
     void setData(const CharStream<15> data) { this->data = data; }
@@ -41,7 +47,8 @@ public:
     void getDataframe(const unsigned long long, unsigned char[8]) const;
     unsigned long long getTime(int index) const { return data.size() > 0 ? *(unsigned long long*)data[index].data() : 0; }
     unsigned long long lastTime()         const { return data.size() > 0 ? *(unsigned long long*)data.back().data() : 0; }
-    
+
+    static void mergeData(unsigned char priortyData[8], const unsigned char dataToMerge[8]);
 };
 
 

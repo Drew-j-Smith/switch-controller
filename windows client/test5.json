@@ -257,6 +257,7 @@
             "name": "1",
             "filename": "test5.txt",
             "stored as hex": true,
+            "input merge mode": "input priority",
             "input":
             [
                 {

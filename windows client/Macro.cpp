@@ -2,11 +2,13 @@
 
 #define AC_DISPLAY_IMAGE_MATCH 1
 
-Macro::Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent, const std::shared_ptr<MacroDecider> & decider){
+Macro::Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent,
+    const std::shared_ptr<MacroDecider> & decider, const InputMergeMode mode){
     this->name = name;
     this->data = data;
     this->inputEvent = inputEvent;
     this->decider = decider;
+    this->mode = mode;
 }
 
 Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<MacroDecider>> & deciderList) {
@@ -20,6 +22,16 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
         decider = deciderIt->second;
     else
         decider = std::make_shared<MacroDefaultDecider>();
+    
+    std::string modeStr = tree.get("input merge mode", "");
+    if (modeStr == "block input")
+        mode = blockInput;
+    else if (modeStr == "input priority")
+        mode = inputPriority;
+    else if (modeStr == "macro priority")
+        mode = macroPriority;
+    else
+        std::cerr << "unrecognized input merge mode \"" << modeStr << "\"\n";
 }
 
 void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroMap){
@@ -50,8 +62,17 @@ void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) c
         else
             low = mid;
     }
-    data[0] = 85;
-    memcpy(data + 1, this->data[low].data() + 8, 7);
+    unsigned char macroData[8];
+    macroData[0] = 85;
+    memcpy(macroData + 1, this->data[low].data() + 8, 7);
+
+    if (mode == macroPriority)
+        mergeData(macroData, data);
+    else if (mode == inputPriority)
+        mergeData(data, macroData);
+
+    if (mode == blockInput || mode == macroPriority)
+        memcpy(data, macroData, 8);
 }
 
 void Macro::appendData(const unsigned long long time, const unsigned char data[8]){
@@ -76,4 +97,14 @@ std::shared_ptr<Macro> Macro::cycleVector(int macroIndex) {
 
 std::shared_ptr<Macro> Macro::getNextMacro() {
     return cycleVector(decider->nextMacroListIndex());
+}
+
+void Macro::mergeData(unsigned char priortyData[8], const unsigned char dataToMerge[8]){
+    priortyData[1] |= dataToMerge[1];
+    priortyData[2] |= dataToMerge[2];
+    for (int i = 0; i < 4; i++)
+        if (priortyData[i + 3] == 128)
+            priortyData[i + 3] = dataToMerge[i + 3];
+    if (priortyData[7] == 8)
+        priortyData[7] = dataToMerge[7];
 }
