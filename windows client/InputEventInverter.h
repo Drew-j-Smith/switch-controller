@@ -1,10 +1,10 @@
-#ifndef INPUT_EVENT_NEGATOR_H
-#define INPUT_EVENT_NEGATOR_H
+#ifndef INPUT_EVENT_IVERTER_H
+#define INPUT_EVENT_IVERTER_H
 
 /**
- * @file InputEventNegator.h
+ * @file InputEventInverter.h
  * @author Drew Smith
- * @brief The InputNegator class inverts any input recieved from a InputEvent class.
+ * @brief The InputInverter class inverts any input recieved from a InputEvent class.
  * @date 2021-04-21
  * 
  */
@@ -14,21 +14,21 @@
 #include "InputEvent.h"
 
 /**
- * @brief The InputNegator class inverts any input recieved from a InputEvent class.
+ * @brief The InputInverter class inverts any input recieved from a InputEvent class.
  * It contains one event.
  * 
  */
-class InputEventNegator : public InputEvent
+class InputEventInverter : public InputEvent
 {
 private:
     std::shared_ptr<InputEvent> event;
 public:
     /**
-     * @brief Construct a new InputEventNegator object.
+     * @brief Construct a new InputEventInverter object.
      * 
      * @param event The event to be negated
      */
-    InputEventNegator(std::shared_ptr<InputEvent> event) : event(event) {};
+    InputEventInverter(std::shared_ptr<InputEvent> event) : event(event) {};
 
     int getInputValue() const override {
         if (isDigital()) {
