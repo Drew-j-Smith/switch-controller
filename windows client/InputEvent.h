@@ -40,7 +40,7 @@ public:
 
 /**
  * @brief The DefaultInputEvent is a basic implementation of InputEvent
- * which is a digital input that allways returns 0.
+ * which is a digital input that always returns 0.
  * 
  */
 class DefaultInputEvent : public InputEvent
@@ -48,6 +48,19 @@ class DefaultInputEvent : public InputEvent
 public:
     DefaultInputEvent() {};
     int getInputValue() override { return 0; };
+    bool isDigital() const override { return true; }
+};
+
+/**
+ * @brief The ActiveInputEvent is a basic implementation of InputEvent
+ * which is a digital input that always returns 1.
+ * 
+ */
+class ActiveInputEvent : public InputEvent
+{
+public:
+    ActiveInputEvent() {};
+    int getInputValue() override { return 1; };
     bool isDigital() const override { return true; }
 };
 

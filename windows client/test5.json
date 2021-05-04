@@ -6,7 +6,8 @@
                 "joystick index": 0,
                 "button": 1,
                 "toggle": true,
-                "toggle cooldown": 15
+                "turbo": true,
+                "turbo loop": 15
             },
             {
                 "type": "SF Digital Joystick Input",

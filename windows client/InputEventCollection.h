@@ -10,6 +10,7 @@
 #include "SfJoystickInputEvent.h"
 #include "InputEventInverter.h"
 #include "InputEventToggle.h"
+#include "InputEventTurbo.h"
 
 class InputEventCollection : public InputEvent
 {
@@ -36,9 +37,13 @@ public:
                 inputEvents.push_back(invertedEvent);
             }
             if (it->second.get("toggle", false)) {
-                std::shared_ptr<InputEvent> toggleEvent = std::make_shared<InputEventToggle>(it->second.get("toggle cooldown", 1000), inputEvents.back());
+                std::shared_ptr<InputEvent> toggleEvent = std::make_shared<InputEventToggle>(1000, inputEvents.back());
                 inputEvents.pop_back();
                 inputEvents.push_back(toggleEvent);
+            }
+            if (it->second.get("turbo", false)) {
+                std::shared_ptr<InputEvent> turboEvent = std::make_shared<InputEventTurbo>(it->second.get("turbo loop", 500));
+                inputEvents.push_back(turboEvent);
             }
         }
     };
