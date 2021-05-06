@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.18)
 project(ArduinoController)
 
+# needed for boost json parser to not give a warning
+add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+
+# defining the windows version
+add_definitions(-D_WIN32_WINNT=0x0A00)
+
 find_package(OpenCV REQUIRED)
 find_package(SFML 2 COMPONENTS window REQUIRED)
 find_package(Boost COMPONENTS system thread REQUIRED)
