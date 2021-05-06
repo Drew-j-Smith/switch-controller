@@ -12,7 +12,7 @@
 
 #include "Utility/SerialInterface.h"
 #include "Macro/MacroCollection.h"
-#include "Utility/InputManager.h"
+#include "InputEvent/InputManager.h"
 #include "Utility/WindowsScreenshotUtility.h"
 #include "Decider/ImageProcessingDeciderCollection.h"
 #include "Macro/MacroRecorder.h"

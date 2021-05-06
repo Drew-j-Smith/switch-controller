@@ -18,6 +18,10 @@ public:
         this->event = event;
     }
 
+    void setActive(const bool active) {
+        this->active = active;
+    }
+
 
     int getInputValue() override {
         if (event->getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - lastActivation).count() > cooldown) {

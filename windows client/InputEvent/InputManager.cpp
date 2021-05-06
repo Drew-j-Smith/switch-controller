@@ -3,6 +3,7 @@
 
 InputManager::InputManager(const boost::property_tree::ptree & tree) {
     std::shared_ptr<InputEvent> defaultInput = std::make_shared<DefaultInputEvent>();
+    std::shared_ptr<InputEvent> turboSwitch = defaultInput;
     for (int i = 0; i < 14; i++) {
         buttons[i] = defaultInput;
     }
@@ -36,6 +37,13 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
                 dpad[index - 22] = std::make_shared<InputEventCollection>(it.second);
             }
         }
+        else if (index == 26) {
+            turboSwitch = std::make_shared<InputEventToggle>(500, std::make_shared<InputEventCollection>(it.second));
+        }
+    }
+
+    for (int i = 0; i < 14; i++) {
+        buttons[i] = std::make_shared<InputEventSwitch>(std::make_shared<InputEventTurbo>(tree.get("turbo loop time", 15), buttons[i]), buttons[i], turboSwitch);
     }
 }
 

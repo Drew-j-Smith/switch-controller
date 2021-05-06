@@ -5,9 +5,11 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "../InputEvent/InputEventCollection.h"
-#include "../InputEvent/SfJoystickInputEvent.h"
+#include "InputEventCollection.h"
+#include "SfJoystickInputEvent.h"
 #include "../Macro/Macro.h"
+#include "InputEventSwitch.h"
+#include "InputEventTurbo.h"
 
 class InputManager
 {
@@ -48,7 +50,9 @@ private:
         {"dpadDown", 24},
         {"dpadLeft", 25},
         {"dpadX", 22},
-        {"dpadY", 23}
+        {"dpadY", 23},
+
+        {"turboButtonToggle", 26}
     };
 
     std::shared_ptr<InputEvent> buttons[14];

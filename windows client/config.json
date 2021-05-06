@@ -236,7 +236,20 @@
                 "joystick index": 0,
                 "button": 13
             }
-        ]
+        ],
+        "turboButtonToggle": [
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 2
+            },
+            {
+                "type": "SF Digital Joystick Input",
+                "joystick index": 0,
+                "button": 13
+            }
+        ],
+        "turbo loop time": 15
     },
     "deciders":[
         {

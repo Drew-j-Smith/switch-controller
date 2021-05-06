@@ -8,13 +8,19 @@
 class InputEventTurbo : public InputEvent 
 {
 private:
+    std::shared_ptr<InputEventToggle> toggleEvent;
     std::shared_ptr<InputEvent> event;
 public:
-    InputEventTurbo(const int loopTime) { 
-        event = std::make_shared<InputEventToggle>(loopTime, std::make_shared<ActiveInputEvent>());
+    InputEventTurbo(const int loopTime, std::shared_ptr<InputEvent> event) { 
+        this->toggleEvent = std::make_shared<InputEventToggle>(loopTime, event);
+        this->event = event;
     }
 
-    int getInputValue() override { return event->getInputValue(); };
+    int getInputValue() override {
+        if (!event->getInputValue())
+            toggleEvent->setActive(false);
+        return toggleEvent->getInputValue(); 
+    };
     bool isDigital() const override { return true; }
 };
 

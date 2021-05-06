@@ -42,7 +42,8 @@ public:
                 inputEvents.push_back(toggleEvent);
             }
             if (it->second.get("turbo", false)) {
-                std::shared_ptr<InputEvent> turboEvent = std::make_shared<InputEventTurbo>(it->second.get("turbo loop", 500));
+                std::shared_ptr<InputEvent> turboEvent = std::make_shared<InputEventTurbo>(it->second.get("turbo loop", 500), inputEvents.back());
+                inputEvents.pop_back();
                 inputEvents.push_back(turboEvent);
             }
         }
