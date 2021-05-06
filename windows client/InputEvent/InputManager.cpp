@@ -70,21 +70,11 @@ unsigned char InputManager::getControlStickData(int stick) const {
         return controlSticks[stick * 2]->getInputValue() * 127
             - !(controlSticks[stick * 2 + 1]->getInputValue()) * 128;
     } else {
-        if (stick < 2){
-            if (controlSticks[0]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[0]->getInputValue() < 128 + JOYSTICK_DEADZONE &&
-                controlSticks[2]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[2]->getInputValue() < 128 + JOYSTICK_DEADZONE)
-                return 128;
-            else 
-                return controlSticks[stick * 2]->getInputValue();
-        }
-        else {
-            if (controlSticks[4]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[4]->getInputValue() < 128 + JOYSTICK_DEADZONE &&
-                controlSticks[6]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[6]->getInputValue() < 128 + JOYSTICK_DEADZONE)
-                return 128;
-            else 
-                return controlSticks[stick * 2]->getInputValue();
-        }
-        
+        if (controlSticks[0 + (stick >= 2) * 4]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[0 + (stick >= 2) * 4]->getInputValue() < 128 + JOYSTICK_DEADZONE &&
+            controlSticks[2 + (stick >= 2) * 4]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[2 + (stick >= 2) * 4]->getInputValue() < 128 + JOYSTICK_DEADZONE)
+            return 128;
+        else 
+            return controlSticks[stick * 2]->getInputValue();
     }
 }
     
@@ -100,7 +90,6 @@ unsigned char InputManager::getDpadData() const {
 
 unsigned char InputManager::getDpadData(bool up, bool right, bool down, bool left) const {
     unsigned char result = 8;
-    result = 8;
 	if (up && !down){
 		result = 0; //up
 	}
