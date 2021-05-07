@@ -1,5 +1,9 @@
 #include "InputManager.h"
 
+#include "InputEventCollection.h"
+#include "SfJoystickAnalogInputEvent.h"
+#include "InputEventSwitch.h"
+#include "InputEventTurbo.h"
 
 InputManager::InputManager(const boost::property_tree::ptree & tree) {
     std::shared_ptr<InputEvent> defaultInput = std::make_shared<DefaultInputEvent>();

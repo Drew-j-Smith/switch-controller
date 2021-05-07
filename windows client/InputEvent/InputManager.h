@@ -5,11 +5,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "InputEventCollection.h"
-#include "SfJoystickInputEvent.h"
-#include "../Macro/Macro.h"
-#include "InputEventSwitch.h"
-#include "InputEventTurbo.h"
+#include "InputEvent.h"
 
 class InputManager
 {
