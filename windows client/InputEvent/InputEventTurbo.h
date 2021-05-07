@@ -16,7 +16,7 @@ public:
         this->event = event;
     }
 
-    int getInputValue() override {
+    int getInputValue() const override {
         if (!event->getInputValue())
             toggleEvent->setActive(false);
         return toggleEvent->getInputValue(); 

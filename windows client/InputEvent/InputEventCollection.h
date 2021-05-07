@@ -16,7 +16,7 @@ public:
     InputEventCollection(const std::vector<std::shared_ptr<InputEvent>> & inputEvents) { this->inputEvents = inputEvents; };
     InputEventCollection(const boost::property_tree::ptree & tree);
 
-    int getInputValue() override;
+    int getInputValue() const override;
     bool isDigital() const override { return true; }
 };
 

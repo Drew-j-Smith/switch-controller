@@ -30,7 +30,7 @@ public:
      */
     InputEventInverter(std::shared_ptr<InputEvent> event) : event(event) {};
 
-    int getInputValue() override {
+    int getInputValue() const override {
         if (isDigital()) {
             return !event->getInputValue(); 
         } else {

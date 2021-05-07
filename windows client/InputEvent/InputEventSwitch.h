@@ -18,7 +18,7 @@ public:
         this->deciderEvent = deciderEvent;
     }
 
-    int getInputValue() override {
+    int getInputValue() const override {
         if (deciderEvent->getInputValue())
             return event1->getInputValue();
         else

@@ -26,7 +26,7 @@ public:
         axis = (sf::Joystick::Axis) tree.get("axis", 0);
     }
 
-    int getInputValue() override { 
+    int getInputValue() const override { 
         if (!sf::Joystick::isConnected(joystickIndex) || !sf::Joystick::hasAxis(joystickIndex, axis))
             return 128;
         int value = (100 + sf::Joystick::getAxisPosition(joystickIndex, axis) * SCALING) / 200.0 * 255.0;

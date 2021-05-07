@@ -25,7 +25,7 @@ public:
         button = tree.get("button", 0);
     }
 
-    int getInputValue() override {
+    int getInputValue() const override {
         if (!sf::Joystick::isConnected(joystickIndex) || sf::Joystick::getButtonCount(joystickIndex) < button)
             return 0;
         return sf::Joystick::isButtonPressed(joystickIndex, button);

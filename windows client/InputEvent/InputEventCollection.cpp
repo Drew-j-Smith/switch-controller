@@ -39,7 +39,7 @@ InputEventCollection::InputEventCollection(const boost::property_tree::ptree & t
     }
 }
 
-int InputEventCollection::getInputValue() { 
+int InputEventCollection::getInputValue() const { 
     if (inputEvents.size() == 0)
         return 0;
 

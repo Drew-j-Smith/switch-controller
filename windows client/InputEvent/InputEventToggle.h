@@ -42,7 +42,7 @@ public:
         this->active = active;
     }
 
-    int getInputValue() override {
+    int getInputValue() const override {
         return active;
     };
 
