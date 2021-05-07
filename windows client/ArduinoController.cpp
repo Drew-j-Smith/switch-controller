@@ -16,7 +16,7 @@
 #include "Utility/WindowsScreenshotUtility.h"
 #include "Decider/ImageProcessingDeciderCollection.h"
 #include "Macro/MacroRecorder.h"
-
+#include "InputEvent/InputEventToggle.h"
 
 
 int main(){ 
@@ -39,6 +39,7 @@ int main(){
 
     while (true) {
         sf::Joystick::update();
+        InputEventToggle::updateAll();
         
         // auto begin = std::chrono::steady_clock::now();
         

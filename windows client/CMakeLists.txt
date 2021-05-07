@@ -15,7 +15,7 @@ include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_
 
 add_executable(ArduinoController ArduinoController.cpp Macro/Macro.cpp Macro/MacroCollection.cpp
 Decider/ImageProcessingDecider.cpp Decider/ImageProcessingDeciderCollection.cpp
-InputEvent/InputManager.cpp InputEvent/InputEventCollection.cpp Utility/TimeString.cpp)
+InputEvent/InputManager.cpp InputEvent/InputEventCollection.cpp InputEvent/InputEventToggle.cpp Utility/TimeString.cpp)
 target_link_libraries(ArduinoController ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES})
 
 target_precompile_headers(ArduinoController PUBLIC pch.h)
