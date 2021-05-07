@@ -19,7 +19,7 @@ InputEventCollection::InputEventCollection(const boost::property_tree::ptree & t
             inputEvents.push_back(std::make_shared<SfJoystickDigitalInputEvent>(it->second));
         }
         else {
-            std::cerr << "Unkown type in macro collection \"" << it->second.get("type", "") << "\"";
+            std::cerr << "Unkown type in macro collection \"" << it->second.get("type", "") << "\"\n";
         }
         if (it->second.get("negated", false)) {
             std::shared_ptr<InputEvent> invertedEvent = std::make_shared<InputEventInverter>(inputEvents.back());

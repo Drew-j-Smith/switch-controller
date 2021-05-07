@@ -28,16 +28,29 @@ ImageProcessingDecider::ImageProcessingDecider(const std::string & name, cv::Mat
 }
 
 ImageProcessingDecider::ImageProcessingDecider(const boost::property_tree::ptree & tree){
-    name = tree.get("name", "");
-    templatePic = cv::imread(tree.get("template pic filename", ""));
-    if (tree.get("mask pic filename", "") != "")
-        maskPic = cv::imread(tree.get("mask pic filename", ""));
-    matchMethod = tree.get("match method", 0);
-    matchThreshold = tree.get("match threshold", 0.0);
-    minX = tree.get("min x", 0);
-    minY = tree.get("min y", 0);
-    maxX = tree.get("max x", 0);
-    maxY = tree.get("max y", 0);
+    name = "";
+    templatePic = cv::Mat();
+    maskPic = cv::Mat();
+    matchMethod = 0;
+    matchThreshold = 0;
+    minX = 0;
+    minY = 0;
+    maxX = 0;
+    maxY = 0;
+    for (auto it : tree) {
+        if (it.first == "name") name = it.second.get_value<std::string>();
+        else if (it.first == "template pic filename") templatePic = cv::imread(it.second.get_value<std::string>());
+        else if (it.first == "mask pic filename") maskPic = cv::imread(it.second.get_value<std::string>());
+        else if (it.first == "match method") matchMethod = it.second.get_value<int>();
+        else if (it.first == "match threshold") matchThreshold = it.second.get_value<double>();
+        else if (it.first == "min x") minX = it.second.get_value<int>();
+        else if (it.first == "min y") minY = it.second.get_value<int>();
+        else if (it.first == "max x") maxX = it.second.get_value<int>();
+        else if (it.first == "max y") maxY = it.second.get_value<int>();
+        else if (it.first != "type") {
+            std::cerr << "Unrecognized field \"" << it.first << "\" when loading ImageProcessingDecider\n";
+        }
+    }
     matchPointX.store(0);
     matchPointY.store(0);
     critalMatchVal.store(0);

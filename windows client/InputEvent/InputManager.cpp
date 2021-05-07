@@ -5,7 +5,51 @@
 #include "InputEventSwitch.h"
 #include "InputEventTurbo.h"
 
-InputManager::InputManager(const boost::property_tree::ptree & tree) {
+InputManager::InputManager(const boost::property_tree::ptree & tree, const int turboButtonLoopTime) {
+    const std::map<std::string, int> buttonMap = {
+        {"y", 0},
+        {"b", 1},
+        {"a", 2},
+        {"x", 3},
+        {"l", 4},
+        {"r", 5},
+        {"xl", 6},
+        {"xr", 7},
+        {"select", 8},
+        {"start", 9},
+        {"lClick", 10},
+        {"rClick", 11},
+        {"home", 12},
+        {"capture", 13},
+
+        {"leftStickXplus", 14},
+        {"leftStickXminus", 15},
+        {"leftStickYplus", 16},
+        {"leftStickYminus", 17},
+        {"leftStickX", 14},
+        {"leftStickY", 16},
+
+        {"rightStickXplus", 18},
+        {"rightStickXminus", 19},
+        {"rightStickYplus", 20},
+        {"rightStickYminus", 21},
+        {"rightStickX", 18},
+        {"rightStickY", 20},
+
+        {"dpadUp", 22},
+        {"dpadRight", 23},
+        {"dpadDown", 24},
+        {"dpadLeft", 25},
+        {"dpadX", 22},
+        {"dpadY", 23},
+
+        {"turboButtonToggle", 26},
+        
+        {"record", 1000},
+        {"playLastRecorded", 1000},
+        {"stopMacros", 1000}
+    };
+
     std::shared_ptr<InputEvent> defaultInput = std::make_shared<DefaultInputEvent>();
     std::shared_ptr<InputEvent> turboSwitch = defaultInput;
     for (int i = 0; i < 14; i++) {
@@ -19,8 +63,10 @@ InputManager::InputManager(const boost::property_tree::ptree & tree) {
     }
 
     for (auto it : tree) {
-        if (buttonMap.find(it.first) == buttonMap.end())
+        if (buttonMap.find(it.first) == buttonMap.end()) {
+            std::cerr << "Unknown button type \"" << it.first << "\"\n";
             continue;
+        }
         int index = buttonMap.at(it.first);
         if (index < 14) {
             buttons[index] = std::make_shared<InputEventCollection>(it.second);

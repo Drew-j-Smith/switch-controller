@@ -25,7 +25,7 @@ int main(){
     boost::property_tree::ptree tree;
     boost::property_tree::read_json("config.json", tree);
 
-    InputManager inputManager(tree.find("controls")->second);
+    InputManager inputManager(tree.find("controls")->second, 15);
 
     auto screenshotUtil = std::make_shared<WindowsScreenshotUtility>(1920, 1080, "Game Capture HD");
     auto deciders = std::make_shared<ImageProcessingDeciderCollection>(tree.find("deciders")->second, screenshotUtil);
