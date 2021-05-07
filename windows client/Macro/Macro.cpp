@@ -1,7 +1,5 @@
 #include "Macro.h"
 
-#define AC_DISPLAY_IMAGE_MATCH 1
-
 Macro::Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent,
     const std::shared_ptr<Decider> & decider, const InputMergeMode mode){
     this->name = name;
