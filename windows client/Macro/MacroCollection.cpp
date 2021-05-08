@@ -20,27 +20,34 @@ MacroCollection::MacroCollection(const boost::property_tree::ptree & tree, const
 }
 
 void MacroCollection::getData(unsigned char data[8]) {
-    if(activeMacro != nullptr){
+    if(activeMacros.size()){
         auto now = std::chrono::steady_clock::now();
-        unsigned long long time = std::chrono::duration_cast<std::chrono::milliseconds>(now - timeSinceMacroActivation).count();
+        std::vector<std::shared_ptr<Macro>> toAdd;
+        std::vector<std::shared_ptr<Macro>> toRemove;
 
-        activeMacro->getDataframe(time, data);
+        for (auto it : activeMacros) {
+            unsigned long long time = std::chrono::duration_cast<std::chrono::milliseconds>(now - it.second).count();
+            it.first->getDataframe(time, data);
 
-        if (activeMacro->lastTime() < time){
-            activeMacro = activeMacro->getNextMacro();
-            timeSinceMacroActivation = std::chrono::steady_clock::now();
+            if (it.first->lastTime() < time){
+                toAdd.push_back(it.first->getNextMacro());
+                toRemove.push_back(it.first);
+            }
         }
+
+        for (auto m : toRemove)
+            activeMacros.erase(m);
+
+        for (auto m : toAdd)
+            if (m)
+                activeMacros.insert({m, std::chrono::steady_clock::now()});
     }
 }
 
 void MacroCollection::activateMacros() {
-    if(activeMacro == nullptr){
-        for(auto m : macros){
-            if(m->getInputEvent()->getInputValue()){
-                activeMacro = m;
-                timeSinceMacroActivation = std::chrono::steady_clock::now();
-                break;
-            }
+    for(auto m : macros){
+        if(activeMacros.find(m) == activeMacros.end() && m->getInputEvent()->getInputValue()) {
+            activeMacros.insert({m, std::chrono::steady_clock::now()});
         }
     }
 }

@@ -12,8 +12,7 @@ class MacroCollection
 {
 private:
     std::vector<std::shared_ptr<Macro>> macros;
-    std::shared_ptr<Macro> activeMacro;
-    std::chrono::steady_clock::time_point timeSinceMacroActivation;
+    std::map<std::shared_ptr<Macro>, std::chrono::steady_clock::time_point> activeMacros;
     std::shared_ptr<ImageProcessingDeciderCollection> deciders;
 public:
     MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<ImageProcessingDeciderCollection> & deciders);
@@ -21,8 +20,8 @@ public:
 
     void getData(unsigned char data[8]);
     void activateMacros();
-    bool isMacroActive() const { return activeMacro != nullptr; }
-    void deactivateMacros() { activeMacro = nullptr; }
+    bool isMacroActive() const { return activeMacros.size(); }
+    void deactivateMacros() { activeMacros.clear(); }
     const std::vector<std::shared_ptr<Macro>> getMacros() const { return macros; }
     const std::shared_ptr<Macro> lastMacro() const { return macros.back(); }
     void popLastMacro() { macros.pop_back(); }
