@@ -2,10 +2,10 @@
 #define CHAR_STREAM_H
 
 /**
- * @file CharStream.h
+ * @file NByteVector.h
  * @author Drew Smith
- * @brief The CharStream class is a data storage container for blocks
- * of bytes separted by constant intervals.
+ * @brief The NByteVector class is a data storage container for blocks
+ * of bytes separted by constant intervals with the ability to save to a file.
  * @date 2021-04-21
  * 
  * 
@@ -16,14 +16,14 @@
 
 
 /**
- * @brief The CharStream class is a data storage container for blocks
- * of bytes separted by constant intervals. This class stores the data
- * in std::array's size of frameSize, wraped by a std::vector.
+ * @brief The NByteVector class is a data storage container for blocks
+ * of bytes separted by constant intervals with the ability to save to a file. 
+ * This class stores the data in std::array's size of frameSize, wraped by a std::vector.
  * 
  * @tparam frameSize The size of blocks
  */
 template<size_t frameSize>
-class CharStream : public std::vector<std::array<unsigned char, frameSize>>{
+class NByteVector : public std::vector<std::array<unsigned char, frameSize>>{
 private:
 
     /**
@@ -35,7 +35,7 @@ private:
     int hexToInt(char t) const;
 public:
     /**
-     * @brief Loads the contents of CharStream from a file.
+     * @brief Loads the contents of NByteVector from a file.
      * 
      * @param filename the filename to load
      * @param isHex determines if the file is loaded as raw or as hex data
@@ -43,7 +43,7 @@ public:
     void load(const std::string & filename, const bool isHex = true);
 
     /**
-     * @brief Saves the contents of CharStream to a file.
+     * @brief Saves the contents of NByteVector to a file.
      * 
      * @param filename the filename to save
      * @param isHex determines the file is saved as raw or as hex with
@@ -52,7 +52,7 @@ public:
     void save(const std::string & filename, const bool asHex = true) const;
 
     /**
-     * @brief Prints the contents of CharStream to a std::ostream.
+     * @brief Prints the contents of NByteVector to a std::ostream.
      * 
      * @param out The ostream to print the contents
      * @param asHex determines if the contents are printed raw or as hex data with
@@ -63,7 +63,7 @@ public:
 
 
 template<size_t frameSize>
-int CharStream<frameSize>::hexToInt(char t) const{
+int NByteVector<frameSize>::hexToInt(char t) const{
     if(isdigit(t))
         return t - '0';
     else
@@ -71,7 +71,7 @@ int CharStream<frameSize>::hexToInt(char t) const{
 }
 
 template<size_t frameSize>
-void CharStream<frameSize>::load(const std::string & filename, const bool isHex = true){
+void NByteVector<frameSize>::load(const std::string & filename, const bool isHex = true){
     clear();
     reserve(10000);
     std::ifstream infile(filename, std::ios::in | std::ios::binary);
@@ -116,7 +116,7 @@ void CharStream<frameSize>::load(const std::string & filename, const bool isHex 
 }
 
 template<size_t frameSize>
-void CharStream<frameSize>::save(const std::string & filename, const bool asHex = true) const{
+void NByteVector<frameSize>::save(const std::string & filename, const bool asHex = true) const{
     std::ofstream outfile(filename, std::ios::out | std::ios::binary);
 
     if (outfile)
@@ -128,7 +128,7 @@ void CharStream<frameSize>::save(const std::string & filename, const bool asHex 
 }
 
 template<size_t frameSize>
-void CharStream<frameSize>::print(std::ostream & out, const bool asHex = true) const{
+void NByteVector<frameSize>::print(std::ostream & out, const bool asHex = true) const{
     if (asHex){
         out << std::hex << std::setfill('0');
         for (int i = 0; i < size(); i++) {

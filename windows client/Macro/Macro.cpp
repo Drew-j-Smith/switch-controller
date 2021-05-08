@@ -1,6 +1,6 @@
 #include "Macro.h"
 
-Macro::Macro(const std::string & name, const CharStream<sizeof(unsigned long long) + 7> & data, const std::shared_ptr<InputEvent> & inputEvent,
+Macro::Macro(const std::string & name, const NByteVector<sizeof(unsigned long long) + 7> & data, const std::shared_ptr<InputEvent> & inputEvent,
     const std::shared_ptr<Decider> & decider, const InputMergeMode mode){
     this->name = name;
     this->data = data;
