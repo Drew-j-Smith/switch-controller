@@ -14,7 +14,7 @@ public:
     enum InputMergeMode {blockInput, macroPriority, inputPriority};
 
     Macro() {};
-    Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent,
+    Macro(const std::string & name, const CharStream<sizeof(unsigned long long) + 7> & data, const std::shared_ptr<InputEvent> & inputEvent,
         const std::shared_ptr<Decider> & decider, const InputMergeMode mode);
     Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Decider>> & deciderList);
     
@@ -22,7 +22,7 @@ public:
     void setNextMacroLists(const std::vector<std::vector<std::weak_ptr<Macro>>> & nextMacroLists) { this->nextMacroLists = nextMacroLists; }
 private:
     std::string name = "";
-    CharStream<15> data = {};
+    CharStream<sizeof(unsigned long long) + 7> data = {};
     std::shared_ptr<InputEvent> inputEvent = std::make_shared<DefaultInputEvent>();
     std::shared_ptr<Decider> decider = std::make_shared<DefaultDecider>();
     InputMergeMode mode = inputPriority;
@@ -41,8 +41,8 @@ public:
     InputMergeMode getMode() { return mode; }
     void setMode(const InputMergeMode mode) { this->mode = mode; }
 
-    const CharStream<15> getData() const { return data; }
-    void setData(const CharStream<15> data) { this->data = data; }
+    const CharStream<sizeof(unsigned long long) + 7> getData() const { return data; }
+    void setData(const CharStream<sizeof(unsigned long long) + 7> data) { this->data = data; }
     void appendData(const unsigned long long, const unsigned char[8]);
     void getDataframe(const unsigned long long, unsigned char[8]) const;
     unsigned long long getTime(int index) const { return data.size() > 0 ? *(unsigned long long*)data[index].data() : 0; }

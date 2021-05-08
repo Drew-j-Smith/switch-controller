@@ -1,6 +1,6 @@
 #include "Macro.h"
 
-Macro::Macro(const std::string & name, const CharStream<15> & data, const std::shared_ptr<InputEvent> & inputEvent,
+Macro::Macro(const std::string & name, const CharStream<sizeof(unsigned long long) + 7> & data, const std::shared_ptr<InputEvent> & inputEvent,
     const std::shared_ptr<Decider> & decider, const InputMergeMode mode){
     this->name = name;
     this->data = data;
@@ -62,7 +62,7 @@ void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) c
     }
     unsigned char macroData[8];
     macroData[0] = 85;
-    memcpy(macroData + 1, this->data[low].data() + 8, 7);
+    memcpy(macroData + 1, this->data[low].data() + sizeof(unsigned long long), 7);
 
     if (mode == macroPriority)
         mergeData(macroData, data);
@@ -74,10 +74,10 @@ void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) c
 }
 
 void Macro::appendData(const unsigned long long time, const unsigned char data[8]){
-    if (this->data.size() == 0 || memcmp(this->data.back().data() + 8, data + 1, 7) != 0) {
-        std::array<unsigned char, 15> dataframe;
-        memcpy(dataframe.data(), &time, 8);
-        memcpy(dataframe.data() + 8, data + 1, 7);
+    if (this->data.size() == 0 || memcmp(this->data.back().data() + sizeof(unsigned long long), data + 1, 7) != 0) {
+        std::array<unsigned char, sizeof(unsigned long long) + 7> dataframe;
+        memcpy(dataframe.data(), &time, sizeof(unsigned long long));
+        memcpy(dataframe.data() + sizeof(unsigned long long), data + 1, 7);
         this->data.push_back(dataframe);
     }
 }
