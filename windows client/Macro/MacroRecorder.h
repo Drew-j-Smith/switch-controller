@@ -33,10 +33,10 @@ public:
             activationTime = now;
             if (recording) {
                 std::string str = getTimeStr();
-                std::cout << "Saved recording to \"" << str << "\"" << std::endl;
+                std::cout << "Saved recording to \"RecordedMacros/" << str << "\"" << std::endl;
 
                 auto macroData = currentRecordingMacro->getData();
-                macroData.save(str);
+                macroData.save("RecordedMacros/" + str);
                 lastRecordedMacro->setData(macroData);
                 currentRecordingMacro->setData({});
             }
