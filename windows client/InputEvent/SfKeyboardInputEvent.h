@@ -20,18 +20,17 @@ public:
         std::string keycode = tree.get("key", "-1");
         if(isalpha(keycode.at(0))){
             key = (sf::Keyboard::Key) (tolower(keycode.at(0)) - 'a');
+            return;
         }
-        else{
-            try{
-                key = (sf::Keyboard::Key) stoi(keycode);
-            }
-            catch(const std::exception& e){
-                std::cerr << e.what() << '\n';
-                std::cerr << "Error loading key \"" << keycode << "\"\n";
-                sf::Keyboard::Key key = sf::Keyboard::Unknown;
-            }
+
+        try{
+            key = (sf::Keyboard::Key) stoi(keycode);
         }
-        
+        catch(const std::exception& e){
+            std::cerr << e.what() << '\n';
+            std::cerr << "Error loading key \"" << keycode << "\"\n";
+            sf::Keyboard::Key key = sf::Keyboard::Unknown;
+        }
     }
 
     int getInputValue() const override { return sf::Keyboard::isKeyPressed(key); }
