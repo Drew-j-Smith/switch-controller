@@ -49,6 +49,7 @@ public:
     unsigned long long lastTime()         const { return data.size() > 0 ? *(unsigned long long*)data.back().data() : 0; }
 
     static void mergeData(unsigned char priortyData[8], const unsigned char dataToMerge[8]);
+    static InputMergeMode strToInputMergeMode(const std::string & str);
 };
 
 

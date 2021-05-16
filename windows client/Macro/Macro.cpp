@@ -14,22 +14,28 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
     std::string filename = tree.get("filename", "");
     bool storedAsHex = tree.get("stored as hex", false);
     data.load(filename, storedAsHex);
-    inputEvent = std::make_shared<InputEventCollection>(tree.find("input")->second);
+
+    auto inputIt = tree.find("input");
+    if (inputIt != tree.not_found())
+        inputEvent = std::make_shared<InputEventCollection>(inputIt->second);
+
     auto deciderIt = deciderList.find(tree.get("decider", ""));
     if (deciderIt != deciderList.end())
         decider = deciderIt->second;
-    else
-        decider = std::make_shared<DefaultDecider>();
+
+    mode = strToInputMergeMode(tree.get("input merge mode", ""));
+}
+
+Macro::InputMergeMode Macro::strToInputMergeMode(const std::string & str) {
+    if (str == "block input")
+        return blockInput;
+    if (str == "input priority")
+        return inputPriority;
+    if (str == "macro priority")
+        return macroPriority;
     
-    std::string modeStr = tree.get("input merge mode", "");
-    if (modeStr == "block input")
-        mode = blockInput;
-    else if (modeStr == "input priority")
-        mode = inputPriority;
-    else if (modeStr == "macro priority")
-        mode = macroPriority;
-    else
-        std::cerr << "unrecognized input merge mode \"" << modeStr << "\"\n";
+    std::cerr << "unrecognized input merge mode \"" << str << "\"\n";
+    return inputPriority;
 }
 
 void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroMap){
