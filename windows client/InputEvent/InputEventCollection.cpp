@@ -8,34 +8,38 @@
 
 InputEventCollection::InputEventCollection(const boost::property_tree::ptree & tree) {
     for (auto it = tree.begin(); it != tree.end(); ++it) {
-        if (it->second.get("type", "") == "Default") {
-            inputEvents.clear();
-            return;
-        }
-        else if (it->second.get("type", "") == "SF Keyboard Input") {
-            inputEvents.push_back(std::make_shared<SfKeyboardInputEvent>(it->second));
-        }
-        else if (it->second.get("type", "") == "SF Digital Joystick Input") {
-            inputEvents.push_back(std::make_shared<SfJoystickDigitalInputEvent>(it->second));
-        }
-        else {
-            std::cerr << "Unkown type in macro collection \"" << it->second.get("type", "") << "\"\n";
-        }
-        if (it->second.get("negated", false)) {
-            std::shared_ptr<InputEvent> invertedEvent = std::make_shared<InputEventInverter>(inputEvents.back());
-            inputEvents.pop_back();
-            inputEvents.push_back(invertedEvent);
-        }
-        if (it->second.get("toggle", false)) {
-            std::shared_ptr<InputEvent> toggleEvent = std::make_shared<InputEventToggle>(1000, inputEvents.back());
-            inputEvents.pop_back();
-            inputEvents.push_back(toggleEvent);
-        }
-        if (it->second.get("turbo", false)) {
-            std::shared_ptr<InputEvent> turboEvent = std::make_shared<InputEventTurbo>(it->second.get("turbo loop", 500), inputEvents.back());
-            inputEvents.pop_back();
-            inputEvents.push_back(turboEvent);
-        }
+        if (loadEventType(it))
+            addEventModifiers(it);
+    }
+}
+
+bool InputEventCollection::loadEventType(const boost::property_tree::ptree::const_iterator & it) {
+    if (it->second.get("type", "") == "Default") {
+        inputEvents.push_back(std::make_shared<DefaultInputEvent>());
+        return true;
+    }
+    if (it->second.get("type", "") == "SF Keyboard Input") {
+        inputEvents.push_back(std::make_shared<SfKeyboardInputEvent>(it->second));
+        return true;
+    }
+    if (it->second.get("type", "") == "SF Digital Joystick Input") {
+        inputEvents.push_back(std::make_shared<SfJoystickDigitalInputEvent>(it->second));
+        return true;
+    }
+
+    std::cerr << "Unkown type in macro collection \"" << it->second.get("type", "") << "\"\n";
+    return false;
+}
+
+void InputEventCollection::addEventModifiers(const boost::property_tree::ptree::const_iterator & it) {
+    if (it->second.get("negated", false)) {
+        inputEvents.back() = std::make_shared<InputEventInverter>(inputEvents.back());
+    }
+    if (it->second.get("toggle", false)) {
+        inputEvents.back() = std::make_shared<InputEventToggle>(1000, inputEvents.back());
+    }
+    if (it->second.get("turbo", false)) {
+        inputEvents.back() = std::make_shared<InputEventTurbo>(it->second.get("turbo loop", 500), inputEvents.back());
     }
 }
 

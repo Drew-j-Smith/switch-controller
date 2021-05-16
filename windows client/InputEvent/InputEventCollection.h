@@ -11,6 +11,9 @@ class InputEventCollection : public InputEvent
 {
 private:
     std::vector<std::shared_ptr<InputEvent>> inputEvents;
+
+    bool loadEventType(const boost::property_tree::ptree::const_iterator & it);
+    void addEventModifiers(const boost::property_tree::ptree::const_iterator & it);
 public:
     InputEventCollection() {};
     InputEventCollection(const std::vector<std::shared_ptr<InputEvent>> & inputEvents) { this->inputEvents = inputEvents; };
