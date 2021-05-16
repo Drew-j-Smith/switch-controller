@@ -11,7 +11,10 @@ class InputEventDecider : public Decider
 private:
     std::shared_ptr<InputEvent> event;
 public:
-    InputEventDecider(std::string name, std::shared_ptr<InputEvent> event);
+    InputEventDecider(std::string name, std::shared_ptr<InputEvent> event) {
+        this->name = name;
+        this->event = event;
+    }
 
     int nextListIndex() const override { return event->getInputValue(); };
 };
