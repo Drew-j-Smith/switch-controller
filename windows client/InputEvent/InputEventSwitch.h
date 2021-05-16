@@ -1,7 +1,7 @@
 #ifndef INPUT_EVENT_SWITCH_H
 #define INPUT_EVENT_SWITCH_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include "InputEvent.h"
 

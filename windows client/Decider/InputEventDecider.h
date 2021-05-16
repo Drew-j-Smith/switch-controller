@@ -1,9 +1,9 @@
 #ifndef INPUT_EVENT_DECIDER_H
 #define INPUT_EVENT_DECIDER_H
 
-#include "../pch.h"
+#include "pch.h"
 
-#include "../InputEvent/InputEvent.h"
+#include "InputEvent/InputEvent.h"
 #include "Decider.h"
 
 class InputEventDecider : public Decider

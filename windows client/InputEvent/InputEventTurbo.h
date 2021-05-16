@@ -1,7 +1,7 @@
 #ifndef INPUT_EVENT_TURBO_H
 #define INPUT_EVENT_TURBO_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include "InputEventToggle.h"
 

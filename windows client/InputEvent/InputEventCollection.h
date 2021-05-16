@@ -1,7 +1,7 @@
 #ifndef INPUT_EVENT_COLLECTION_H
 #define INPUT_EVENT_COLLECTION_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 

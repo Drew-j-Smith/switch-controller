@@ -1,7 +1,7 @@
 #ifndef SERIAL_INTERFACE_H
 #define SERIAL_INTERFACE_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/serial_port.hpp>

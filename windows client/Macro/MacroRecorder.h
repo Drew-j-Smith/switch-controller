@@ -1,13 +1,13 @@
 #ifndef MACRO_RECORDER_H
 #define MACRO_RECORDER_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
 #include "Macro.h"
-#include "../InputEvent/InputEventCollection.h"
-#include "../Utility/TimeString.h"
+#include "InputEvent/InputEventCollection.h"
+#include "Utility/TimeString.h"
 
 class MacroRecorder
 {

@@ -1,7 +1,7 @@
 #ifndef SF_JOYSTICK_DIGITAL_INPUT_EVENT_H
 #define SF_JOYSTICK_DIGITAL_INPUT_EVENT_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <SFML/Window/Joystick.hpp>
 

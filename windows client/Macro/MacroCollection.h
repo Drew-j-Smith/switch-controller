@@ -1,12 +1,12 @@
 #ifndef MACRO_COLLECTION_H
 #define MACRO_COLLECTION_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
 #include "Macro.h"
-#include "../Decider/ImageProcessingDeciderCollection.h"
+#include "Decider/ImageProcessingDeciderCollection.h"
 
 class MacroCollection
 {

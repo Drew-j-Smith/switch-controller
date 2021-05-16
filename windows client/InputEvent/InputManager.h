@@ -1,7 +1,7 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 

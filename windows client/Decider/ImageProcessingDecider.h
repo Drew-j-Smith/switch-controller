@@ -1,7 +1,7 @@
 #ifndef IMAGE_PROCESSING_DECIDER_H
 #define IMAGE_PROCESSING_DECIDER_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 

@@ -11,6 +11,7 @@ find_package(OpenCV REQUIRED)
 find_package(SFML 2 COMPONENTS window REQUIRED)
 find_package(Boost COMPONENTS system thread REQUIRED)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_executable(ArduinoController ArduinoController.cpp Macro/Macro.cpp Macro/MacroCollection.cpp

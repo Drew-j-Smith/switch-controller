@@ -1,13 +1,13 @@
 #ifndef MACRO_H
 #define MACRO_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
 #include "NByteVector.h"
-#include "../Decider/Decider.h"
-#include "../InputEvent/InputEventCollection.h"
+#include "Decider/Decider.h"
+#include "InputEvent/InputEventCollection.h"
 
 class Macro {
 public:

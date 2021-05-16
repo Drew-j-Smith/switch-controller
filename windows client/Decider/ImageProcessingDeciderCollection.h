@@ -1,12 +1,12 @@
 #ifndef IMAGE_PROCESSING_DECIDER_COLLECTION_H
 #define IMAGE_PROCESSING_DECIDER_COLLECTION_H
 
-#include "../pch.h"
+#include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
 #include "ImageProcessingDecider.h"
-#include "../Utility/ScreenshotUtility.h"
+#include "Utility/ScreenshotUtility.h"
 
 
 class ImageProcessingDeciderCollection
