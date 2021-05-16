@@ -23,13 +23,13 @@ InputManager::InputManager(const boost::property_tree::ptree & tree, const int t
     }
 }
 
-const std::set<std::string> unusedButtons = {
+static const std::set<std::string> unusedButtons = {
     "record",
     "playLastRecorded",
     "stopMacros"
 };
 
-const std::map<std::string, int> digitalInputMap = { 
+static const std::map<std::string, int> digitalInputMap = { 
     {"y", 0},
     {"b", 1},
     {"a", 2},
@@ -58,7 +58,7 @@ const std::map<std::string, int> digitalInputMap = {
     {"dpadLeft", 25}
 };
 
-const std::map<std::string, int> analogInputMap = {
+static const std::map<std::string, int> analogInputMap = {
     {"leftStickX", 14},
     {"leftStickY", 16},
     {"rightStickX", 18},
