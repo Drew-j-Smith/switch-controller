@@ -30,6 +30,7 @@ these buttons for our use.
 
 volatile uint8_t buffer[8];
 volatile uint8_t byteCount = 0;
+volatile uint8_t cyclesMissed = 0;
 ISR(USART1_RX_vect) {
 	buffer[byteCount++] = fgetc(stdin);
 
@@ -37,6 +38,7 @@ ISR(USART1_RX_vect) {
 		byteCount = 0;
 
 	if(byteCount == 8){
+		cyclesMissed = 0;
 		byteCount = 0;
 		printf("U");
 	}
@@ -181,6 +183,17 @@ void HID_Task(void) {
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	//Added by Drew
+	cyclesMissed++;
+	if (cyclesMissed > 200) {
+		cyclesMissed = 200;
+		buffer[1] = 0;
+		buffer[2] = 0;
+		buffer[3] = 128;
+		buffer[4] = 128;
+		buffer[5] = 128;
+		buffer[6] = 128;
+		buffer[7] = 8;
+	}
 
 	ReportData->Button = (uint16_t)buffer[1] + (uint16_t)buffer[2] * 256;
 	ReportData->LX = buffer[3];
