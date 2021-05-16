@@ -12,15 +12,20 @@ class InputManager
 private:
     const int JOYSTICK_DEADZONE = 30;
 
-    std::shared_ptr<InputEvent> buttons[14];
-    std::shared_ptr<InputEvent> controlSticks[8];
-    std::shared_ptr<InputEvent> dpad[4];
+    // 0-13 buttons
+    // 14-21 controlSticks
+    // 22-25 dpad
+    // 26 turbo button
+    std::shared_ptr<InputEvent> inputs[27];
 
 public:
     InputManager(const boost::property_tree::ptree & tree, const int turboButtonLoopTime);
 
     void getData(unsigned char* data) const;
 private:
+    void loadInputEvent(const std::pair<const std::string, boost::property_tree::ptree> & it);
+    bool testInMap(const std::map<std::string, int> & map, const std::string & key, std::shared_ptr<InputEvent>* & event);
+
     unsigned char getControlStickData(int stick) const;
     unsigned char getDpadData() const;
     unsigned char getDpadData(bool up, bool right, bool down, bool left) const;
