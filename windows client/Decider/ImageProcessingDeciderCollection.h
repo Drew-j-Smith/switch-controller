@@ -5,11 +5,12 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "DeciderCollectionBase.h"
 #include "ImageProcessingDecider.h"
 #include "Utility/ScreenshotUtility.h"
 
 
-class ImageProcessingDeciderCollection
+class ImageProcessingDeciderCollection : public DeciderCollectionBase
 {
 private:
     std::vector<std::shared_ptr<ImageProcessingDecider>> deciders;
@@ -21,7 +22,7 @@ private:
 
 public:
     ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<ScreenshotUtility> & screenshotUtility);
-    ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<ScreenshotUtility> & screenshotUtility);
+    ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree);
     ~ImageProcessingDeciderCollection();
 
     void setDeciders(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders) { this->deciders = deciders; }
@@ -29,7 +30,7 @@ public:
     const std::vector<std::shared_ptr<ImageProcessingDecider>> getDeciders() const { return deciders; }
     const std::shared_ptr<ScreenshotUtility> getScreenshotUtility() { return screenshotUtility; }
 
-    std::map<std::string, std::shared_ptr<Decider>> generateMap() const;
+    std::map<std::string, std::shared_ptr<Decider>> generateMap() const override;
 };
 
 #endif

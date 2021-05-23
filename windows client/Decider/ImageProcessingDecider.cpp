@@ -1,6 +1,6 @@
 #include "ImageProcessingDecider.h"
 
-#define AC_DISPLAY_IMAGE_MATCH 0
+#define AC_DISPLAY_IMAGE_MATCH 1
 
 ImageProcessingDecider::ImageProcessingDecider(const std::string & name, cv::Mat & templatePic,
     const cv::Mat & maskPic,

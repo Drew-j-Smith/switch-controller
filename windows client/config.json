@@ -250,20 +250,31 @@
             }
         ]
     },
-    "deciders":[
-        {
-            "name": "t",
-            "type": "image processing",
-            "template pic filename": "haanit.png",
-            "mask pic filename": "haanit mask.png",
-            "match method": 3,
-            "match threshold": 0.97,
-            "min x": 0,
-            "min y": 0,
-            "max x": 500,
-            "max y": 500
-        }
-    ],
+    "deciders":{
+        "image deciders":[
+            {
+                "type": "screenshot settings",
+                "width": 1920, 
+                "height": 1080, 
+                "window name": "Game Capture HD"
+            },
+            {
+                "name": "t",
+                "type": "image processing",
+                "template pic filename": "haanit.png",
+                "mask pic filename": "haanit mask.png",
+                "match method": 3,
+                "match threshold": 0.97,
+                "min x": 0,
+                "min y": 0,
+                "max x": 500,
+                "max y": 500
+            }
+        ],
+        "sound deciders":[
+            
+        ]
+    },
     "macros":[
         {
             "name": "1",

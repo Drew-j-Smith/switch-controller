@@ -1,5 +1,7 @@
 #include "ImageProcessingDeciderCollection.h"
 
+#include "Utility/WindowsScreenshotUtility.h"
+
 static void matchImage(std::shared_ptr<ImageProcessingDecider> decider, const cv::Mat & screenshot){
     decider->update(screenshot);
 }
@@ -25,13 +27,31 @@ ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const std::ve
     startImageProcessingThread(); 
 }
 
-ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<ScreenshotUtility> & screenshotUtility) {
-    this->screenshotUtility = screenshotUtility;
-    for (auto decider : tree) {
+ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree) {
+    //this->screenshotUtility = screenshotUtility;
+    auto imageTree = tree.find("image deciders");
+    if (imageTree == tree.not_found()) {
+        std::cerr << "The image tree was not found\n";
+        return;
+    }
+
+    for (auto decider : imageTree->second) {
+        if (decider.second.get("type", "") == "screenshot settings") {
+            screenshotUtility = std::make_shared<WindowsScreenshotUtility>(decider.second.get("width", 1920),
+                decider.second.get("height", 1080),
+                decider.second.get("window name", "Game Capture HD"));
+        }
         if (decider.second.get("type", "") == "image processing") {
             deciders.push_back(std::make_shared<ImageProcessingDecider>(decider.second));
         }
     }
+
+    if (screenshotUtility == nullptr) {
+        std::cerr << "The screenshot utility class was not found\n";
+        deciders.clear();
+        return;
+    }
+
     startImageProcessingThread();
 }
 

@@ -14,7 +14,7 @@
 #include "Macro/MacroCollection.h"
 #include "InputEvent/InputManager.h"
 #include "Utility/WindowsScreenshotUtility.h"
-#include "Decider/ImageProcessingDeciderCollection.h"
+#include "Decider/DeciderCollection.h"
 #include "Macro/MacroRecorder.h"
 #include "InputEvent/InputEventToggle.h"
 
@@ -27,8 +27,7 @@ int main(){
 
     InputManager inputManager(tree.find("controls")->second, 15);
 
-    auto screenshotUtil = std::make_shared<WindowsScreenshotUtility>(1920, 1080, "Game Capture HD");
-    auto deciders = std::make_shared<ImageProcessingDeciderCollection>(tree.find("deciders")->second, screenshotUtil);
+    auto deciders = std::make_shared<DeciderCollection>(tree.find("deciders")->second);
     MacroCollection macroCollection(tree.find("macros")->second, deciders);
 
     MacroRecorder recorder(tree.find("controls")->second);
