@@ -28,3 +28,6 @@ The drivers for dfu mode can be found in the flip program folder under \Atmel\Fl
 
 [Boost](https://www.boost.org/)
 
+[FFTW](http://www.fftw.org/)
+
+[AudioFile](https://github.com/adamstark/AudioFile)
