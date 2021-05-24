@@ -272,14 +272,20 @@
             }
         ],
         "sound deciders":[
-            
+            {
+                "type": "sound processing",
+                "name": "g",
+                "filename": "test3.wav",
+                "match threshold": 0.5
+            }
         ]
     },
     "macros":[
         {
             "name": "1",
-            "filename": "test5.txt",
+            "filename": "test6.txt",
             "stored as hex": true,
+            "decider": "g",
             "input merge mode": "input priority",
             "input":
             [
@@ -289,8 +295,19 @@
                 }
             ],
             "next macro list": [
-                ["1"]
+                ["1"],
+                ["2"]
+            ]
+        },
+        {
+            "name": "2",
+            "filename": "test5.txt",
+            "stored as hex": true,
+            "input merge mode": "input priority",
+            "next macro list": [
+                
             ]
         }
+
     ]
 }
