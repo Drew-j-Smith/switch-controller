@@ -21,5 +21,6 @@
 #include <atomic>
 #include <memory>
 #include <future>
+#include <mutex>
 
 #endif

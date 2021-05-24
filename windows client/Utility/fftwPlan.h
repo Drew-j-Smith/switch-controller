@@ -1,8 +1,7 @@
 #ifndef FFTW_PLAN_H
 #define FFTW_PLAN_H
 
-#include <iostream>
-#include <vector>
+#include "pch.h"
 
 #include <fftw3.h>
 

@@ -2,9 +2,6 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
 
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -13,7 +10,6 @@
 #include "Utility/SerialInterface.h"
 #include "Macro/MacroCollection.h"
 #include "InputEvent/InputManager.h"
-#include "Utility/WindowsScreenshotUtility.h"
 #include "Decider/DeciderCollection.h"
 #include "Macro/MacroRecorder.h"
 #include "InputEvent/InputEventToggle.h"

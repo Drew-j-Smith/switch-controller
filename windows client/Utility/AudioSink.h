@@ -1,15 +1,12 @@
 #ifndef AUDIO_SINK_H
 #define AUDIO_SINK_H
 
-#include <iostream>
-#include <vector>
-#include <mutex>
-#include <atomic>
+#include "pch.h"
 
-#include "Windows.h"
-#include "mmdeviceapi.h"
-#include "mmreg.h"
-#include "Audioclient.h"
+#include <Windows.h>
+#include <mmdeviceapi.h>
+#include <mmreg.h>
+#include <Audioclient.h>
 
 #define SAFE_RELEASE(punk)  \
             if ((punk) != NULL)  \
