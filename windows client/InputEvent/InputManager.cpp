@@ -6,12 +6,13 @@
 #include "InputEventTurbo.h"
 
 InputManager::InputManager(const boost::property_tree::ptree & tree, const int turboButtonLoopTime) {
+    // set all inputs to be a default input
     std::shared_ptr<InputEvent> defaultInput = std::make_shared<DefaultInputEvent>();
-
     for (int i = 0; i < 27; i++) {
         inputs[i] = defaultInput;
     }
 
+    // go througth the entire list and try to load inputs
     for (auto & it : tree) {
         loadInputEvent(it);
     }
@@ -68,6 +69,10 @@ static const std::map<std::string, int> analogInputMap = {
 };
 
 void InputManager::loadInputEvent(const std::pair<const std::string, boost::property_tree::ptree> & it) {
+    // trys to match the name to a button
+    // once a match is found, the button is loaded and the function returns
+    
+    // buttons that are used other places but not in this class
     if (unusedButtons.find(it.first) != unusedButtons.end())
         return;
 
@@ -88,6 +93,7 @@ void InputManager::loadInputEvent(const std::pair<const std::string, boost::prop
         return;
     }
 
+    // if a button could not be matched
     std::cerr << "Unknown button type \"" << it.first << "\"\n";
 }
 
@@ -117,6 +123,7 @@ void InputManager::getData(unsigned char* data) const {
     data[7] = getDpadData();
 }
 
+// TODO make readable
 unsigned char InputManager::getControlStickData(int stick) const {
     const std::shared_ptr<InputEvent>* controlSticks = &inputs[14];
     if (controlSticks[stick * 2]->isDigital()) {
