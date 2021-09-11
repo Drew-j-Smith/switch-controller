@@ -24,7 +24,7 @@ public:
     void getData(unsigned char* data) const;
 private:
     void loadInputEvent(const std::pair<const std::string, boost::property_tree::ptree> & it);
-    bool testInMap(const std::map<std::string, int> & map, const std::string & key, std::shared_ptr<InputEvent>* & event);
+    int testInMap(const std::map<std::string, int> & map, const std::string & key);
 
     unsigned char getControlStickData(int stick) const;
     unsigned char getDpadData() const;

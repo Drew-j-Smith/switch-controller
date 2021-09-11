@@ -68,18 +68,18 @@ static const std::map<std::string, int> analogInputMap = {
 };
 
 void InputManager::loadInputEvent(const std::pair<const std::string, boost::property_tree::ptree> & it) {
-    std::shared_ptr<InputEvent>* event;
-
     if (unusedButtons.find(it.first) != unusedButtons.end())
         return;
 
-    if (testInMap(digitalInputMap, it.first, event)) {
-        *event = std::make_shared<InputEventCollection>(it.second);
+    int index = testInMap(digitalInputMap, it.first);
+    if (index >= 0) {
+        inputs[index] = std::make_shared<InputEventCollection>(it.second);
         return;
     }
 
-    if (testInMap(analogInputMap, it.first, event)) {
-        *event = std::make_shared<SfJoystickAnalogInputEvent>(it.second);
+    index = testInMap(analogInputMap, it.first);
+    if (index >= 0) {
+        inputs[index] = std::make_shared<SfJoystickAnalogInputEvent>(it.second);
         return;
     }
 
@@ -92,12 +92,11 @@ void InputManager::loadInputEvent(const std::pair<const std::string, boost::prop
 }
 
 
-bool InputManager::testInMap(const std::map<std::string, int> & map, const std::string & key, std::shared_ptr<InputEvent>* & event) {
+int InputManager::testInMap(const std::map<std::string, int> & map, const std::string & key) {
     if (map.find(key) != map.end()) {
-        event = &inputs[map.at(key)];
-        return true;
+        return map.at(key);
     }
-    return false;
+    return -1;
 }
 
 void InputManager::getData(unsigned char* data) const {
@@ -134,12 +133,12 @@ unsigned char InputManager::getControlStickData(int stick) const {
     
 
 unsigned char InputManager::getDpadData() const {
-    const std::shared_ptr<InputEvent>* dpad = &inputs[22];
-    if (dpad[0]->isDigital()) {
-        return getDpadData(dpad[0]->getInputValue(), dpad[1]->getInputValue(), dpad[2]->getInputValue(), dpad[3]->getInputValue());
+    const int offset = 22;
+    if (inputs[offset]->isDigital()) {
+        return getDpadData(inputs[offset]->getInputValue(), inputs[offset + 1]->getInputValue(), inputs[offset + 2]->getInputValue(), inputs[offset + 3]->getInputValue());
     } else {
-        return getDpadData(dpad[0]->getInputValue() > 128 + JOYSTICK_DEADZONE, dpad[1]->getInputValue() > 128 + JOYSTICK_DEADZONE,
-            dpad[0]->getInputValue() < 128 - JOYSTICK_DEADZONE, dpad[1]->getInputValue() < 128 - JOYSTICK_DEADZONE);
+        return getDpadData(inputs[offset]->getInputValue() > 128 + JOYSTICK_DEADZONE, inputs[offset + 1]->getInputValue() > 128 + JOYSTICK_DEADZONE,
+            inputs[offset]->getInputValue() < 128 - JOYSTICK_DEADZONE, inputs[offset + 1]->getInputValue() < 128 - JOYSTICK_DEADZONE);
     }
 }
 
