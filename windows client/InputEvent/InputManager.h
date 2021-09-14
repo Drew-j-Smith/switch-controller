@@ -18,6 +18,7 @@
 /**
  * @brief This class takes inputs and converts them into a character array which can be sent to the arduino
  * 
+ * @invariant The elements in inputs will not be null
  */
 class InputManager
 {
@@ -44,7 +45,7 @@ public:
     /**
      * @brief Construct a new Input Manager object
      * 
-     * @param tree A dictionary of an input name to an InputEvent (see InputEvent for a detailed desciption)
+     * @param tree A dictionary of an input name to an InputEvent (see InputEvent instances for a detailed desciption)
      * 
      * @param turboButtonLoopTime determines how quickly turbo buttons alternate
      */
@@ -74,6 +75,14 @@ private:
      * @return int The found index or -1
      */
     int testInMap(const std::map<std::string, int> & map, const std::string & key);
+
+    /**
+     * @brief Reports if a stick is in the deadzone
+     * 
+     * @param stick The stick whose value is returned
+     * @return 128 - JOYSTICK_DEADZONE < stickData < 128 + JOYSTICK_DEADZONE
+     */
+    bool isInDeadzone(int stick) const;
 
     /**
      * @brief Get the Control Stick Data at the given stick number

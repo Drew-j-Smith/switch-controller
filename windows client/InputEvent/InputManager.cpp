@@ -123,24 +123,32 @@ void InputManager::getData(unsigned char* data) const {
     data[7] = getDpadData();
 }
 
+bool InputManager::isInDeadzone(int stick) const {
+    const int offset = 14; // control sticks start at inputs[14]
+    const int actualStick = stick * 2; // there are 2 inputs per control stick
+    int stickData = inputs[offset + actualStick]->getInputValue();
+    return stickData > 128 - JOYSTICK_DEADZONE && stickData < 128 + JOYSTICK_DEADZONE;
+}
+
 // TODO make readable
 unsigned char InputManager::getControlStickData(int stick) const {
-    const std::shared_ptr<InputEvent>* controlSticks = &inputs[14];
-    if (controlSticks[stick * 2]->isDigital()) {
-        return controlSticks[stick * 2]->getInputValue() * 127
-            - !(controlSticks[stick * 2 + 1]->getInputValue()) * 128;
+    const int offset = 14; // control sticks start at inputs[14]
+    const int actualStick = stick * 2; // there are 2 inputs per control stick
+
+    if (inputs[offset + actualStick]->isDigital()) {
+        return 128 + inputs[offset + actualStick]->getInputValue() * 127
+            - inputs[offset + actualStick + 1]->getInputValue() * 128;
     } else {
-        if (controlSticks[0 + (stick >= 2) * 4]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[0 + (stick >= 2) * 4]->getInputValue() < 128 + JOYSTICK_DEADZONE &&
-            controlSticks[2 + (stick >= 2) * 4]->getInputValue() > 128 - JOYSTICK_DEADZONE && controlSticks[2 + (stick >= 2) * 4]->getInputValue() < 128 + JOYSTICK_DEADZONE)
+        if (isInDeadzone((stick >= 2) * 2) && isInDeadzone((stick >= 2) * 2 + 1)) {
             return 128;
-        else 
-            return controlSticks[stick * 2]->getInputValue();
+        } else 
+            return inputs[offset + actualStick]->getInputValue();
     }
 }
     
 
 unsigned char InputManager::getDpadData() const {
-    const int offset = 22;
+    const int offset = 22; // Dpad data starts at inputs[22]
     if (inputs[offset]->isDigital()) {
         return getDpadData(inputs[offset]->getInputValue(), inputs[offset + 1]->getInputValue(), inputs[offset + 2]->getInputValue(), inputs[offset + 3]->getInputValue());
     } else {
