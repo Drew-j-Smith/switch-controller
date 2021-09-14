@@ -54,8 +54,6 @@ public:
     /**
      * @brief Gets the user's inputs in the form of a character array
      * 
-     * @todo Add specification of data
-     * 
      * @param data the array to store the user's inputs
      */
     void getData(unsigned char* data) const;
