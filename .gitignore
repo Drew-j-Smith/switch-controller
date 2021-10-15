@@ -23,4 +23,6 @@ CMakeCache.txt
 
 test
 todo*
-AudioFile.h
+
+html
+latex
