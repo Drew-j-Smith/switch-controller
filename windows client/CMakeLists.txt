@@ -21,6 +21,6 @@ add_executable(ArduinoController ArduinoController.cpp Macro/Macro.cpp Macro/Mac
 Decider/ImageProcessingDecider.cpp Decider/ImageProcessingDeciderCollection.cpp Decider/DeciderCollection.cpp 
 Decider/SoundDecider.cpp Decider/SoundDeciderCollection.cpp Utility/AudioSink.cpp
 InputEvent/InputManager.cpp InputEvent/InputEventCollection.cpp InputEvent/InputEventToggle.cpp Utility/TimeString.cpp)
-target_link_libraries(ArduinoController ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES} FFTW3::fftw3 FFTW3::fftw3f FFTW3::fftw3l)
+target_link_libraries(ArduinoController ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES} FFTW3::fftw3f)
 
 target_precompile_headers(ArduinoController PUBLIC pch.h)
