@@ -18,6 +18,8 @@ void StartController(std::string& configFilename) {
     std::cout << "Initializing...\n";
     std::cout << "Loading config files.\n";
 
+    sf::Joystick::update();
+
     boost::property_tree::ptree tree;
     boost::property_tree::read_json(configFilename, tree);
 

@@ -20,10 +20,16 @@ public:
     SfJoystickAnalogInputEvent(unsigned int joystickIndex, sf::Joystick::Axis axis) { 
         this->joystickIndex = joystickIndex; 
         this->axis = axis;
+        assertConnected();
     }
     SfJoystickAnalogInputEvent(const boost::property_tree::ptree & tree) { 
         joystickIndex = tree.get("joystick index", 0);
         axis = (sf::Joystick::Axis) tree.get("axis", 0);
+        assertConnected();
+    }
+    void assertConnected() {
+        if (!sf::Joystick::isConnected(joystickIndex))
+            std::cerr << "Joystick " << joystickIndex << " was requested but is not connected.\n";
     }
 
     int getInputValue() const override { 

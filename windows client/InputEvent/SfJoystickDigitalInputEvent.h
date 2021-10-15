@@ -19,10 +19,16 @@ public:
     SfJoystickDigitalInputEvent(unsigned int joystickIndex, unsigned int button) { 
         this->joystickIndex = joystickIndex; 
         this->button = button;
+        assertConnected();
     }
     SfJoystickDigitalInputEvent(boost::property_tree::ptree tree) { 
         joystickIndex = tree.get("joystick index", 0);
         button = tree.get("button", 0);
+        assertConnected();
+    }
+    void assertConnected() {
+        if (!sf::Joystick::isConnected(joystickIndex))
+            std::cerr << "Joystick " << joystickIndex << " was requested but is not connected.\n";
     }
 
     int getInputValue() const override {
