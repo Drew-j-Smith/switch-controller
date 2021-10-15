@@ -4,9 +4,9 @@
 #include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
+#include <AudioFile.h>
 
 #include "Decider.h"
-#include "Utility/AudioFile.h"
 #include "Utility/fftwPlan.h"
 
 class SoundDecider : public Decider {

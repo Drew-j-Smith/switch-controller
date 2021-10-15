@@ -16,8 +16,7 @@ is not easily put into code documentation.
 
 - [FFTW](http://www.fftw.org/) : used for audio processing (optional w/code tweeks)
 
-- [AudioFile](https://github.com/adamstark/AudioFile) : used for audio loading (optional w/code tweeks) 
-(This library needs to be extracted into the Utility folder)
+- [AudioFile](https://github.com/adamstark/AudioFile) : used for audio loading (optional w/code tweeks)
 
 ## Data packets
 

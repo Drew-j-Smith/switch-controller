@@ -11,9 +11,10 @@ find_package(OpenCV REQUIRED)
 find_package(SFML 2 COMPONENTS window REQUIRED)
 find_package(Boost COMPONENTS system thread REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
+find_path(AUDIOFILE_INCLUDE_DIRS "AudioFile.h")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${FFTW3_INCLUDE_DIRS})
+include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${FFTW3_INCLUDE_DIRS} ${AUDIOFILE_INCLUDE_DIRS})
 
 add_executable(ArduinoController ArduinoController.cpp Macro/Macro.cpp Macro/MacroCollection.cpp
 Decider/ImageProcessingDecider.cpp Decider/ImageProcessingDeciderCollection.cpp Decider/DeciderCollection.cpp 

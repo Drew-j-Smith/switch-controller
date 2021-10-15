@@ -71,7 +71,8 @@ static std::vector<float> findFrequencies(std::shared_ptr<fftwPlan> plan, const 
 SoundDecider::SoundDecider(const boost::property_tree::ptree & tree) {
     try {
         name = tree.get<std::string>("name");
-        matchAudio = AudioFile<float>(tree.get<std::string>("filename"));
+        matchAudio = AudioFile<float>();
+        matchAudio.load(tree.get<std::string>("filename"));
         matchThreshold = tree.get<double>("match threshold");
     }
     catch (boost::property_tree::ptree_error & e) {
