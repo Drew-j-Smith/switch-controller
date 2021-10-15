@@ -94,7 +94,8 @@ void InputManager::loadInputEvent(const std::pair<const std::string, boost::prop
     }
 
     // if a button could not be matched
-    std::cerr << "Unknown button type \"" << it.first << "\"\n";
+    std::cerr << "Unknown button type \"" << it.first << "\" loaded into input manager.\n";
+    std::cerr << "Consult InputManager.cpp for a list of valid buttons.\n";
 }
 
 

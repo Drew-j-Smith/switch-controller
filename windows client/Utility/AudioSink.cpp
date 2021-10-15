@@ -13,7 +13,7 @@ HRESULT AudioSink::SetFormat(WAVEFORMATEX* pwfx) {
         || !SetIfZeroElseReturnEqual(audioInfo.numSamplesPerSec, pwfx->nSamplesPerSec)
         || !SetIfZeroElseReturnEqual(audioInfo.bitsPerSample, pwfx->wBitsPerSample)
         || audioInfo.bitsPerSample != 32) {
-        std::cerr << "Unsupported Sound Format\n";
+        std::cerr << "Unsupported Sound Format used in AudioSink.h\n";
         return -1;
     }
     

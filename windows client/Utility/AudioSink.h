@@ -68,7 +68,6 @@ private:
         SAFE_RELEASE(pAudioClient)
         SAFE_RELEASE(pCaptureClient)
         CoUninitialize();
-        std::cerr << "cleanup\n";
     }
 };
 

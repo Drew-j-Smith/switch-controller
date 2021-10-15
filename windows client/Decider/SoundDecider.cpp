@@ -75,8 +75,9 @@ SoundDecider::SoundDecider(const boost::property_tree::ptree & tree) {
         matchThreshold = tree.get<double>("match threshold");
     }
     catch (boost::property_tree::ptree_error & e) {
-        std::cerr << e.what() << "\n";
-        std::cerr << "Error loading SoundDecider";
+        std::cerr << "Error loading SoundDecider.\n";
+        std::cerr << "\tError: \"" << e.what() << "\"\n";
+        std::cerr << "\tAre fields [\"name\", \"filename\", \"match threshold\"] missing?\n";
     }
 
     plan = std::make_shared<fftwPlan>(matchAudio.getNumSamplesPerChannel());

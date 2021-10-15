@@ -31,7 +31,7 @@ ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::
     //this->screenshotUtility = screenshotUtility;
     auto imageTree = tree.find("image deciders");
     if (imageTree == tree.not_found()) {
-        std::cerr << "The image tree was not found\n";
+        std::cerr << "The image tree was loaded but not found in the config.\n";
         return;
     }
 
@@ -47,7 +47,7 @@ ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::
     }
 
     if (screenshotUtility == nullptr) {
-        std::cerr << "The screenshot utility class was not found\n";
+        std::cerr << "The image tree was loaded but screenshot utility settings were not found.\n";
         deciders.clear();
         return;
     }

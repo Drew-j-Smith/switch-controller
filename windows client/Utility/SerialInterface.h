@@ -23,8 +23,9 @@ public:
             port->set_option(boost::asio::serial_port_base::baud_rate(baud));
         }
         catch(const std::exception& e){
-            std::cerr << e.what() << '\n';
-            std::cerr << "Fatal error opening serial port" << std::endl;
+            std::cerr << "Fatal error opening serial port.\n";
+            std::cerr << "\tError: \"" << e.what() << "\"\n";
+            std::cerr << "\tDoes the port exist?" << std::endl;
             exit(-1);
         }
         this->writeFrameSize = writeFrameSize;

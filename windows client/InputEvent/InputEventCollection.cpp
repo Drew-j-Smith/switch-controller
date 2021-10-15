@@ -27,7 +27,7 @@ bool InputEventCollection::loadEventType(const boost::property_tree::ptree::cons
         return true;
     }
 
-    std::cerr << "Unkown type in macro collection \"" << it->second.get("type", "") << "\"\n";
+    std::cerr << "Unkown type in macro collection \"" << it->second.get("type", "") << "\".\n";
     return false;
 }
 

@@ -34,7 +34,7 @@ Macro::InputMergeMode Macro::strToInputMergeMode(const std::string & str) {
     if (str == "macro priority")
         return macroPriority;
     
-    std::cerr << "unrecognized input merge mode \"" << str << "\"\n";
+    std::cerr << "Unrecognized input merge mode \"" << str << "\" in macro \"" << name << "\"\n";
     return inputPriority;
 }
 

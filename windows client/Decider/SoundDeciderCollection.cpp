@@ -9,7 +9,7 @@ SoundDeciderCollection::SoundDeciderCollection(const boost::property_tree::ptree
 
     auto soundTree = tree.find("sound deciders");
     if (soundTree == tree.not_found()) {
-        std::cerr << "The sound tree was not found\n";
+        std::cerr << "The sound tree was load but not found in config.\n";
         return;
     }
 

@@ -27,8 +27,9 @@ public:
             key = (sf::Keyboard::Key) stoi(keycode);
         }
         catch(const std::exception& e){
-            std::cerr << e.what() << '\n';
-            std::cerr << "Error loading key \"" << keycode << "\"\n";
+            
+            std::cerr << "Error loading SfKeyboardInputEvent key \"" << keycode << "\".\n";
+            std::cerr << "Error: \"" << e.what() << "\"\n";
             sf::Keyboard::Key key = sf::Keyboard::Unknown;
         }
     }
