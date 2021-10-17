@@ -21,7 +21,6 @@ Win32
 *.filters
 CMakeCache.txt
 
-test
 todo*
 
 html
