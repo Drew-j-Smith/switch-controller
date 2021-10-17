@@ -12,6 +12,8 @@
 
 #include "pch.h"
 
+#include <boost/property_tree/ptree.hpp>
+
 /**
  * @brief The InputEvent class is used to abstract various digital
  * and analogue input methods.
@@ -37,10 +39,17 @@ public:
      */
     virtual bool isDigital() const = 0;
 
-    // static std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree) {
-    //     throw "Unsuported Operation: Cannot intialize abstact class InputEvent";
-    //     return nullptr;
-    // }
+    using ptree = boost::property_tree::ptree;
+    virtual std::shared_ptr<InputEvent> makeShared(const ptree & tree,
+        const std::map<std::string, std::shared_ptr<InputEvent> (*)(const ptree & tree)> & map) const = 0;
+    virtual std::string getTypeName() const = 0;
+
+    virtual void update() = 0;
+
+    virtual std::string toString() const = 0;
+    virtual boost::property_tree::ptree toPtree() const = 0;
+    virtual bool operator==(const InputEvent& other) const = 0;
+    // return getTypeName().strcmp(other.getTypeName()) == 0;
 };
 
 
