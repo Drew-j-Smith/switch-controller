@@ -1,5 +1,6 @@
 #include "InputEventCollection.h"
 
+#include "DefaultInputEvent.h"
 #include "SfKeyboardInputEvent.h"
 #include "SFJoystickDigitalInputEvent.h"
 #include "InputEventInverter.h"

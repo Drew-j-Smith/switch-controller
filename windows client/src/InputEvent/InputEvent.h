@@ -36,32 +36,12 @@ public:
      * @return false getInputValue will return [0, 255]
      */
     virtual bool isDigital() const = 0;
+
+    // static std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree) {
+    //     throw "Unsuported Operation: Cannot intialize abstact class InputEvent";
+    //     return nullptr;
+    // }
 };
 
-/**
- * @brief The DefaultInputEvent is a basic implementation of InputEvent
- * which is a digital input that always returns 0.
- * 
- */
-class DefaultInputEvent : public InputEvent
-{
-public:
-    DefaultInputEvent() {};
-    int getInputValue() const override { return 0; };
-    bool isDigital() const override { return true; }
-};
-
-/**
- * @brief The ActiveInputEvent is a basic implementation of InputEvent
- * which is a digital input that always returns 1.
- * 
- */
-class ActiveInputEvent : public InputEvent
-{
-public:
-    ActiveInputEvent() {};
-    int getInputValue() const override { return 1; };
-    bool isDigital() const override { return true; }
-};
 
 #endif

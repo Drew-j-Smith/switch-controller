@@ -1,5 +1,6 @@
 #include "InputManager.h"
 
+#include "DefaultInputEvent.h"
 #include "InputEventCollection.h"
 #include "SfJoystickAnalogInputEvent.h"
 #include "InputEventSwitch.h"

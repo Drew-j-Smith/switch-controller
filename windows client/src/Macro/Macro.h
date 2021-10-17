@@ -7,6 +7,7 @@
 
 #include "NByteVector.h"
 #include "Decider/Decider.h"
+#include "InputEvent/DefaultInputEvent.h"
 #include "InputEvent/InputEventCollection.h"
 
 class Macro {
