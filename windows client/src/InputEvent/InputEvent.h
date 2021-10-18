@@ -39,9 +39,7 @@ public:
      */
     virtual bool isDigital() const = 0;
 
-    using ptree = boost::property_tree::ptree;
-    virtual std::shared_ptr<InputEvent> makeShared(const ptree & tree,
-        const std::map<std::string, std::shared_ptr<InputEvent> (*)(const ptree & tree)> & map) const = 0;
+    virtual std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const = 0;
     virtual std::string getTypeName() const = 0;
 
     virtual void update() = 0;

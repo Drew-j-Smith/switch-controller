@@ -23,12 +23,10 @@ class DefaultInputEvent : public InputEvent
 {
 public:
     DefaultInputEvent() {};
-    int getInputValue() const override { return 0; };
+    int getInputValue() const override { return 0; }
     bool isDigital() const override { return true; }
 
-    using ptree = boost::property_tree::ptree;
-    virtual std::shared_ptr<InputEvent> makeShared(const ptree & tree,
-        const std::map<std::string, std::shared_ptr<InputEvent> (*)(const ptree & tree)> & map) const override { return nullptr; }
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
     std::string getTypeName() const override { return ""; }
 
     void update() override {}
@@ -47,12 +45,10 @@ class ActiveInputEvent : public InputEvent
 {
 public:
     ActiveInputEvent() {};
-    int getInputValue() const override { return 1; };
+    int getInputValue() const override { return 1; }
     bool isDigital() const override { return true; }
 
-    using ptree = boost::property_tree::ptree;
-    virtual std::shared_ptr<InputEvent> makeShared(const ptree & tree,
-        const std::map<std::string, std::shared_ptr<InputEvent> (*)(const ptree & tree)> & map) const override { return nullptr; } 
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
     std::string getTypeName() const override { return ""; }
 
     void update() override {}
