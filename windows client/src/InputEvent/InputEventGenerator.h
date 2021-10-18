@@ -17,7 +17,7 @@ public:
 
     template<class T>
     void registerInputEvent() {
-        std::shared_ptr<InputEvent> event = std::make_shared<T>()
+        std::shared_ptr<InputEvent> event = std::make_shared<T>();
         eventMap.insert({event->getTypeName(), event});
     }
 
@@ -27,6 +27,20 @@ public:
             return (eventMap.at(type))->makeShared(tree, eventMap);
         std::cerr << "Input event type: \"" << type << "\" was not found in InputEventGenerator.\n";
         return nullptr;
+    }
+
+    bool operator==(const InputEventGenerator& other) {
+        if (eventMap.size() != other.eventMap.size()) {
+            return false;
+        }
+        
+        for (auto it = eventMap.begin(); it != eventMap.end(); ++it) {
+            if (other.eventMap.find(it->first) == other.eventMap.end()) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 };
 
