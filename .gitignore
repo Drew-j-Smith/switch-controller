@@ -20,6 +20,7 @@ Win32
 *.vcxproj
 *.filters
 CMakeCache.txt
+Testing
 
 todo*
 
