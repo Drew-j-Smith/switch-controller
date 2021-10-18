@@ -32,7 +32,7 @@ R"(Select one of the following options:
 int main(int argc, const char** argv)
 {
     int option = 0;
-    std::string configFilename = "config.json";
+    std::string configFilename = "data/config.json";
 
     while (option != 6) {
         std::cout << options;

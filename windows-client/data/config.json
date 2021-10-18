@@ -261,8 +261,8 @@
             {
                 "name": "t",
                 "type": "image processing",
-                "template pic filename": "haanit.png",
-                "mask pic filename": "haanit mask.png",
+                "template pic filename": "data/haanit.png",
+                "mask pic filename": "data/haanit mask.png",
                 "match method": 3,
                 "match threshold": 0.97,
                 "min x": 0,
@@ -275,7 +275,7 @@
             {
                 "type": "sound processing",
                 "name": "g",
-                "filename": "test3.wav",
+                "filename": "data/test3.wav",
                 "match threshold": 0.5
             }
         ]
@@ -283,7 +283,7 @@
     "macros":[
         {
             "name": "1",
-            "filename": "test6.txt",
+            "filename": "data/test6.txt",
             "stored as hex": true,
             "decider": "g",
             "input merge mode": "input priority",
@@ -301,7 +301,7 @@
         },
         {
             "name": "2",
-            "filename": "test5.txt",
+            "filename": "data/test5.txt",
             "stored as hex": true,
             "input merge mode": "input priority",
             "next macro list": [
