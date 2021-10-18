@@ -17,10 +17,29 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${FFTW3_INCLUDE_DIRS} ${AUDIOFILE_INCLUDE_DIRS})
 
-file(GLOB_RECURSE CMAKE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../src/*.cpp)
-file(GLOB_RECURSE CMAKE_TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-list(FILTER CMAKE_SRC_FILES EXCLUDE REGEX "ArduinoController.cpp")
-list(FILTER CMAKE_TEST_FILES EXCLUDE REGEX "CMakeCXXCompilerId.cpp")
+set(CMAKE_SRC_FILES
+../src/CreateConfig.cpp
+../src/EditConfig.cpp
+../src/StartController.cpp
+../src/Decider/DeciderCollection.cpp
+../src/Decider/ImageProcessingDecider.cpp
+../src/Decider/ImageProcessingDeciderCollection.cpp
+../src/Decider/SoundDecider.cpp
+../src/Decider/SoundDeciderCollection.cpp
+../src/InputEvent/InputEventCollection.cpp
+../src/InputEvent/InputEventToggle.cpp
+../src/InputEvent/InputManager.cpp
+../src/Macro/Macro.cpp
+../src/Macro/MacroCollection.cpp
+../src/Utility/AudioSink.cpp
+../src/Utility/TimeString.cpp
+)
+
+set(CMAKE_TEST_FILES 
+ArduinoControllerTest.cpp
+InputEvent/InputEventGeneratorTest.cpp
+)
+
 add_executable(ArduinoControllerTest ${CMAKE_SRC_FILES} ${CMAKE_TEST_FILES})
 target_link_libraries(ArduinoControllerTest ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES} FFTW3::fftw3f)
 
