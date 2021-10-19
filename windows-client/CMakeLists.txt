@@ -45,6 +45,7 @@ src/Utility/TimeString.cpp
 
 set(CMAKE_TEST_FILES 
 test/ArduinoControllerTest.cpp
+test/InputEvent/DefaultInputEventTest.cpp
 test/InputEvent/InputEventGeneratorTest.cpp
 )
 

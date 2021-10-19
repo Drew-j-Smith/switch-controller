@@ -26,14 +26,19 @@ public:
     int getInputValue() const override { return 0; }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
-    std::string getTypeName() const override { return ""; }
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { 
+        return std::make_shared<DefaultInputEvent>(); 
+    }
+    std::string getTypeName() const override { return "DefaultInputEvent"; }
 
     void update() override {}
 
-    std::string toString() const override { return ""; }
-    boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
-    bool operator==(const InputEvent& other) const override { return false; }
+    std::string toString() const override { return "DefaultInputEvent"; }
+    boost::property_tree::ptree toPtree() const override {
+        boost::property_tree::ptree result;
+        result.add_child("type", boost::property_tree::ptree("DefaultInputEvent"));
+        return result;
+    }
 };
 
 /**
@@ -48,14 +53,19 @@ public:
     int getInputValue() const override { return 1; }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
-    std::string getTypeName() const override { return ""; }
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { 
+        return std::make_shared<ActiveInputEvent>(); 
+    }
+    std::string getTypeName() const override { return "ActiveInputEvent"; }
 
     void update() override {}
 
-    std::string toString() const override { return ""; }
-    boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
-    bool operator==(const InputEvent& other) const override { return false; }
+    std::string toString() const override { return "ActiveInputEvent"; }
+    boost::property_tree::ptree toPtree() const override {
+        boost::property_tree::ptree result;
+        result.add_child("type", boost::property_tree::ptree("ActiveInputEvent"));
+        return result;
+    }
 };
 
 

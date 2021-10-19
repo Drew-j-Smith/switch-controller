@@ -46,8 +46,8 @@ public:
 
     virtual std::string toString() const = 0;
     virtual boost::property_tree::ptree toPtree() const = 0;
-    virtual bool operator==(const InputEvent& other) const = 0;
-    // return getTypeName().strcmp(other.getTypeName()) == 0;
+    virtual bool operator==(const InputEvent& other) const { return getTypeName() == other.getTypeName(); }
+    virtual bool operator!=(const InputEvent& other) const { return !operator==(other); }
 };
 
 
