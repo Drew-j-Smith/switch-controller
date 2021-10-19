@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.18)
+
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    CACHE STRING "")
+endif()
+
 project(ArduinoController)
+
+option(BUILD_TESTS "Build test programs" OFF)
 
 # needed for boost json parser to not give a warning
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
@@ -17,7 +25,6 @@ set(CMAKE_LIBS ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES} FFTW3::fftw3f)
 
 include_directories(
 ${CMAKE_CURRENT_SOURCE_DIR}/src
-${CMAKE_CURRENT_SOURCE_DIR}/test
 ${OpenCV_INCLUDE_DIRS}
 ${SFML_INCLUDE_DIRS}
 ${Boost_INCLUDE_DIRS}
@@ -25,42 +32,8 @@ ${FFTW3_INCLUDE_DIRS}
 ${AUDIOFILE_INCLUDE_DIRS}
 )
 
-set(CMAKE_SRC_FILES
-src/CreateConfig.cpp
-src/EditConfig.cpp
-src/StartController.cpp
-src/Decider/DeciderCollection.cpp
-src/Decider/ImageProcessingDecider.cpp
-src/Decider/ImageProcessingDeciderCollection.cpp
-src/Decider/SoundDecider.cpp
-src/Decider/SoundDeciderCollection.cpp
-src/InputEvent/InputEventCollection.cpp
-src/InputEvent/InputEventToggle.cpp
-src/InputEvent/InputManager.cpp
-src/Macro/Macro.cpp
-src/Macro/MacroCollection.cpp
-src/Utility/AudioSink.cpp
-src/Utility/TimeString.cpp
-)
 
-set(CMAKE_TEST_FILES 
-test/ArduinoControllerTest.cpp
-test/InputEvent/DefaultInputEventTest.cpp
-test/InputEvent/InputEventGeneratorTest.cpp
-)
-
-add_library(SRC_LIB OBJECT ${CMAKE_SRC_FILES})
-target_precompile_headers(SRC_LIB PUBLIC src/pch.h)
-list(APPEND CMAKE_LIBS SRC_LIB)
-
-add_executable(ArduinoController src/ArduinoController.cpp)
-target_link_libraries(ArduinoController ${CMAKE_LIBS})
-
-add_executable(ArduinoControllerTest ${CMAKE_TEST_FILES})
-target_link_libraries(ArduinoControllerTest ${CMAKE_LIBS})
-
-enable_testing()
-add_test(NAME TestInputEventGenerator COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventGeneratorTest)
-add_test(NAME TestDefaultInputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=DefaultInputEventTest)
-add_test(NAME TestActiveInputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=ActiveInputEventTest)
-# ctest -C Debug --output-on-failure
+add_subdirectory(src)
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif(BUILD_TESTS)
