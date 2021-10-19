@@ -15,9 +15,15 @@ find_path(AUDIOFILE_INCLUDE_DIRS "AudioFile.h")
 
 set(CMAKE_LIBS ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES} FFTW3::fftw3f)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test)
-include_directories(${OpenCV_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${FFTW3_INCLUDE_DIRS} ${AUDIOFILE_INCLUDE_DIRS})
+include_directories(
+${CMAKE_CURRENT_SOURCE_DIR}/src
+${CMAKE_CURRENT_SOURCE_DIR}/test
+${OpenCV_INCLUDE_DIRS}
+${SFML_INCLUDE_DIRS}
+${Boost_INCLUDE_DIRS}
+${FFTW3_INCLUDE_DIRS}
+${AUDIOFILE_INCLUDE_DIRS}
+)
 
 set(CMAKE_SRC_FILES
 src/CreateConfig.cpp
@@ -42,15 +48,15 @@ test/ArduinoControllerTest.cpp
 test/InputEvent/InputEventGeneratorTest.cpp
 )
 
-add_library(src_file_lib OBJECT ${CMAKE_SRC_FILES})
+add_library(SRC_LIB OBJECT ${CMAKE_SRC_FILES})
+target_precompile_headers(SRC_LIB PUBLIC src/pch.h)
+list(APPEND CMAKE_LIBS SRC_LIB)
 
 add_executable(ArduinoController src/ArduinoController.cpp)
-target_link_libraries(ArduinoController src_file_lib ${CMAKE_LIBS})
-target_precompile_headers(ArduinoController PUBLIC src/pch.h)
+target_link_libraries(ArduinoController ${CMAKE_LIBS})
 
 add_executable(ArduinoControllerTest ${CMAKE_TEST_FILES})
-target_link_libraries(ArduinoControllerTest src_file_lib ${CMAKE_LIBS})
-target_precompile_headers(ArduinoControllerTest PUBLIC src/pch.h)
+target_link_libraries(ArduinoControllerTest ${CMAKE_LIBS})
 
 enable_testing()
 add_test(NAME ArduinoControllerTest COMMAND ArduinoControllerTest --detect_memory_leaks=0)
