@@ -53,5 +53,5 @@ target_link_libraries(ArduinoControllerTest src_file_lib ${CMAKE_LIBS})
 target_precompile_headers(ArduinoControllerTest PUBLIC src/pch.h)
 
 enable_testing()
-add_test(NAME ArduinoControllerTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 -l)
+add_test(NAME ArduinoControllerTest COMMAND ArduinoControllerTest --detect_memory_leaks=0)
 # ctest -C Debug --output-on-failure
