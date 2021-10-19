@@ -60,5 +60,7 @@ add_executable(ArduinoControllerTest ${CMAKE_TEST_FILES})
 target_link_libraries(ArduinoControllerTest ${CMAKE_LIBS})
 
 enable_testing()
-add_test(NAME ArduinoControllerTest COMMAND ArduinoControllerTest --detect_memory_leaks=0)
+add_test(NAME TestInputEventGenerator COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventGeneratorTest)
+add_test(NAME TestDefaultInputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=DefaultInputEventTest)
+add_test(NAME TestActiveInputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=ActiveInputEventTest)
 # ctest -C Debug --output-on-failure
