@@ -4,6 +4,7 @@
 #include "pch.h"
 
 #include "InputEvent.h"
+#include "DefaultInputEvent.h"
 
 class InputEventSwitch : public InputEvent 
 {
@@ -12,6 +13,11 @@ private:
     std::shared_ptr<InputEvent> event2;
     std::shared_ptr<InputEvent> deciderEvent;
 public:
+    InputEventSwitch() {
+        this->event1 = std::make_shared<DefaultInputEvent>();
+        this->event2 = event1;
+        this->deciderEvent = event1;
+    }
     InputEventSwitch(std::shared_ptr<InputEvent> event1, std::shared_ptr<InputEvent> event2, std::shared_ptr<InputEvent> deciderEvent) {
         this->event1 = event1;
         this->event2 = event2;

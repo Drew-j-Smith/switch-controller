@@ -4,6 +4,7 @@
 #include "pch.h"
 
 #include "InputEvent.h"
+#include "DefaultInputEvent.h"
 
 class InputEventToggle : public InputEvent
 {
@@ -15,6 +16,11 @@ private:
 
     static std::set<InputEventToggle*> toggles;
 public:
+    InputEventToggle() {
+        this->cooldown = 0;
+        this->event = std::make_shared<DefaultInputEvent>();
+        toggles.insert(this);
+    }
     InputEventToggle(const int cooldown, const std::shared_ptr<InputEvent> event) {
         this->cooldown = cooldown;
         this->event = event;

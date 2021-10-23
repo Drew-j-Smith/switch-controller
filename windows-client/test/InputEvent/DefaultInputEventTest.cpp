@@ -77,11 +77,6 @@ BOOST_AUTO_TEST_SUITE(DefaultInputEventTest);
 BOOST_AUTO_TEST_SUITE_END();
 
 BOOST_AUTO_TEST_SUITE(ActiveInputEventTest);
-    BOOST_AUTO_TEST_CASE(TestConstructor)
-    {
-        ActiveInputEvent i, j;
-        BOOST_TEST((i == j));
-    }
     BOOST_AUTO_TEST_CASE(TestGetInputValue)
     {
         ActiveInputEvent i;
@@ -121,29 +116,4 @@ BOOST_AUTO_TEST_SUITE(ActiveInputEventTest);
         BOOST_TEST(j.get<std::string>("type") == "ActiveInputEvent");
         BOOST_TEST(j.size() == 1);
     }
-    BOOST_AUTO_TEST_SUITE(TestEquals);
-        BOOST_AUTO_TEST_CASE(TestEqualsActiveInputEvent)
-        {
-            ActiveInputEvent i, j;
-            BOOST_TEST((i == j));
-        }
-        BOOST_AUTO_TEST_CASE(TestNotEqualsActiveInputEvent)
-        {
-            ActiveInputEvent i, j;
-            BOOST_TEST(!(i != j));
-        }
-
-        BOOST_AUTO_TEST_CASE(TestEqualsDefaultInputEvent)
-        {
-            ActiveInputEvent i;
-            DefaultInputEvent j;
-            BOOST_TEST(!(i == j));
-        }
-        BOOST_AUTO_TEST_CASE(TestNotEqualsDefaultInputEvent)
-        {
-            ActiveInputEvent i;
-            DefaultInputEvent j;
-            BOOST_TEST((i != j));
-        }
-    BOOST_AUTO_TEST_SUITE_END();
 BOOST_AUTO_TEST_SUITE_END();

@@ -12,6 +12,7 @@
 #include "pch.h"
 
 #include "InputEvent.h"
+#include "DefaultInputEvent.h"
 
 /**
  * @brief The InputInverter class inverts any input recieved from a InputEvent class.
@@ -23,6 +24,7 @@ class InputEventInverter : public InputEvent
 private:
     std::shared_ptr<InputEvent> event;
 public:
+    InputEventInverter() : event(std::make_shared<DefaultInputEvent>()) {};
     /**
      * @brief Construct a new InputEventInverter object.
      * 
