@@ -41,14 +41,31 @@ public:
     };
     bool isDigital() const override { return event->isDigital(); }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
-    std::string getTypeName() const override { return ""; }
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { 
+        boost::property_tree::ptree childTree = tree.get_child("event");
+        std::shared_ptr<InputEvent> childEvent = eventMap.at(childTree.get<std::string>("type"))->makeShared(childTree, eventMap);
+        return std::make_shared<InputEventInverter>(childEvent); 
+    }
+    std::string getTypeName() const override { return "InputEventInverter"; }
 
-    void update() override {}
+    void update() override { event->update(); }
 
-    std::string toString() const override { return ""; }
-    boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
-    bool operator==(const InputEvent& other) const override { return false; }
+    std::string toString() const override { return "InputEventInverter: (" + event->toString() + ")"; }
+    boost::property_tree::ptree toPtree() const override { 
+        boost::property_tree::ptree result;
+        result.add_child("type", boost::property_tree::ptree("InputEventInverter"));
+        result.add_child("event", event->toPtree());
+        return result;
+    }
+    bool operator==(const InputEvent& other) const override { 
+        if (!InputEvent::operator==(other))
+            return false;
+        const InputEventInverter* otherPtr = reinterpret_cast<const InputEventInverter*>(&other);
+        return *event == *otherPtr->event;
+    }
+    bool operator!=(const InputEvent& other) const override { 
+        return !operator==(other);
+    }
 };
 
 
