@@ -59,4 +59,20 @@ BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
         BOOST_TEST(j.get_child("event") == DefaultInputEvent().toPtree());
         BOOST_TEST(j.size() == 2);
     }
+    BOOST_AUTO_TEST_CASE(TestEqualsTrue) {
+        InputEventInverter i, j;
+        BOOST_TEST((i == j));
+    }
+    BOOST_AUTO_TEST_CASE(TestEqualsFalse) {
+        InputEventInverter i, j(std::make_shared<ActiveInputEvent>());
+        BOOST_TEST(!(i == j));
+    }
+    BOOST_AUTO_TEST_CASE(TestNotEqualsTrue) {
+        InputEventInverter i, j(std::make_shared<ActiveInputEvent>());
+        BOOST_TEST((i != j));
+    }
+    BOOST_AUTO_TEST_CASE(TestNotEqualsFalse) {
+        InputEventInverter i, j;
+        BOOST_TEST(!(i != j));
+    }
 BOOST_AUTO_TEST_SUITE_END();
