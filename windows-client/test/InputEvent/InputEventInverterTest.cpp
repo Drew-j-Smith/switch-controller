@@ -4,6 +4,7 @@
 
 #include "InputEvent/InputEventInverter.h"
 #include "InputEvent/DefaultInputEvent.h"
+#include "InputEvent/SFJoystickAnalogInputEvent.h"
 
 BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
     BOOST_AUTO_TEST_CASE(TestGetInputValueDefault)
@@ -74,5 +75,16 @@ BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
     BOOST_AUTO_TEST_CASE(TestNotEqualsFalse) {
         InputEventInverter i, j;
         BOOST_TEST(!(i != j));
+    }
+    BOOST_AUTO_TEST_CASE(TestInvalidInputEvent) {
+        try {
+            InputEventInverter i(std::make_shared<SfJoystickAnalogInputEvent>());
+            BOOST_TEST(false, "Error was not thrown");
+        }
+        catch (std::invalid_argument& e) {
+            BOOST_TEST(true, "Error was thrown");
+            return;
+        }
+        
     }
 BOOST_AUTO_TEST_SUITE_END();
