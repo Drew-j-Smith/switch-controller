@@ -1,23 +1,10 @@
 #include "pch.h"
 
-#include "Utility/SerialInterface.h"
+#include "Utility/SerialPort.h"
 
 void CreateConfig(std::string& configFilename);
 void EditConfig(std::string& configFilename);
 void StartController(std::string& configFilename);
-
-void TestSerialCom() {
-    std::cout << "Intializing serial communication.\n";
-    SerialInterface s("COM4", 57600, 8, 1);
-    std::cout << "Serial communication intialized, testing connection... (hangs if connection cannot be established)\n";
-
-    // sending a nuetral signal
-    unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
-    unsigned char recieve[1];
-
-    s.sendData(send, recieve);
-    std::cout << "Serial communication established.\n";
-}
 
 const std::string options =
 R"(Select one of the following options:
@@ -54,7 +41,19 @@ int main(int argc, const char** argv)
                 StartController(configFilename);
                 break;
             case 5:
-                TestSerialCom();
+                {
+                    try {
+                        auto port = initializeSerialPort("COM4", 57600);
+                        // sending a nuetral signal
+                        unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
+                        unsigned char recieve[1];
+
+                        testSerialPort(port, 8, send, 1, recieve);
+                    }
+                    catch (std::exception& e) {
+                        std::cerr << "Failure connecting via serial port.\n";
+                    }
+                }
             case 6:
                 break;
             default:

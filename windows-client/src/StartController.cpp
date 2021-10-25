@@ -7,7 +7,9 @@
 
 #include "pch.h"
 
-#include "Utility/SerialInterface.h"
+#include "Utility/SerialPort.h"
+#include "boost/asio/read.hpp"
+#include "boost/asio/write.hpp"
 #include "Macro/MacroCollection.h"
 #include "InputEvent/InputManager.h"
 #include "Decider/DeciderCollection.h"
@@ -35,16 +37,21 @@ void StartController(std::string& configFilename) {
 
     std::cout << "Config files loaded.\n";
 
-    SerialInterface s("COM4", 57600, 8, 1);
-    std::cout << "Serial communication intialized, testing connection... (hangs if connection cannot be established)\n";
+    std::unique_ptr<boost::asio::serial_port> port;
 
     // sending a nuetral signal
     unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
     unsigned char recieve[1];
 
-    s.sendData(send, recieve);
-    std::cout << "Serial communication established.\n";
-    std::cout << "Intialization complete.\n";
+    try {
+        port = initializeSerialPort("COM4", 57600);
+
+        testSerialPort(port, 8, send, 1, recieve);
+    }
+    catch (std::exception& e) {
+        std::cerr << "Failure connecting via serial port.\n";
+        return;
+    }
 
 
 
@@ -66,7 +73,10 @@ void StartController(std::string& configFilename) {
             macroCollection.getData(send);
         }
 
-        s.sendData(send, recieve);
+        boost::asio::write(*port, boost::asio::buffer(send, 8));
+        if (!boost::asio::read(*port, boost::asio::buffer(recieve, 1))) {
+            std::cerr << "Error reading from serial port";
+        }
         // if ((int)(recieve[0]) != 85)
         //     std::cout << (int)(recieve[0]) << std::endl;
         
