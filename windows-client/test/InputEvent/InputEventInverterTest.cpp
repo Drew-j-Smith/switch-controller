@@ -4,7 +4,7 @@
 
 #include "InputEvent/InputEventInverter.h"
 #include "InputEvent/DefaultInputEvent.h"
-#include "InputEvent/SFJoystickAnalogInputEvent.h"
+#include "InputEvent/SfJoystickAnalogInputEvent.h"
 
 BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
     BOOST_AUTO_TEST_CASE(TestGetInputValueDefault)

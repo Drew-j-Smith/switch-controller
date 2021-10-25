@@ -8,7 +8,7 @@
 #include "InputEvent/InputEventInverter.h"
 #include "InputEvent/InputEventToggle.h"
 #include "InputEvent/InputEventSwitch.h"
-#include "InputEvent/SFJoystickAnalogInputEvent.h"
+#include "InputEvent/SfJoystickAnalogInputEvent.h"
 #include "InputEvent/SfJoystickDigitalInputEvent.h"
 #include "InputEvent/SfKeyboardInputEvent.h"
 
