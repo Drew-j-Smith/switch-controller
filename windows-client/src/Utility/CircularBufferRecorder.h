@@ -41,8 +41,8 @@ public:
         std::copy(samples.begin() + currSample, samples.end(), vec.begin());
         std::copy(samples.begin(), samples.begin() + currSample, vec.begin() + samples.size() - currSample);
     };
-    void setBufferSize(double size) { bufferSize = size; };
-    double getBufferSize() { return bufferSize; };
+    void setBufferSize(long long size) { bufferSize = size; };
+    long long getBufferSize() { return bufferSize; };
 
 };
 
