@@ -16,12 +16,12 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 add_definitions(-D_WIN32_WINNT=0x0A00)
 
 find_package(OpenCV REQUIRED)
-find_package(SFML 2 COMPONENTS window REQUIRED)
+find_package(SFML 2 COMPONENTS window audio REQUIRED)
 find_package(Boost COMPONENTS system thread unit_test_framework REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
 find_path(AUDIOFILE_INCLUDE_DIRS "AudioFile.h")
 
-set(CMAKE_LIBS ${OpenCV_LIBS} sfml-window ${Boost_LIBRARIES} FFTW3::fftw3f)
+set(CMAKE_LIBS ${OpenCV_LIBS} sfml-window sfml-audio ${Boost_LIBRARIES} FFTW3::fftw3f)
 
 include_directories(
 ${CMAKE_CURRENT_SOURCE_DIR}/src
