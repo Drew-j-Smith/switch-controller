@@ -42,11 +42,6 @@ BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
         std::shared_ptr<InputEvent> j = i.makeShared(tree, map);
         BOOST_TEST((i == *j));
     }
-    BOOST_AUTO_TEST_CASE(TestGetTypeName)
-    {
-        InputEventInverter i;
-        BOOST_TEST(i.getTypeName() == "InputEventInverter");
-    }
     BOOST_AUTO_TEST_CASE(TestToString)
     {
         InputEventInverter i;

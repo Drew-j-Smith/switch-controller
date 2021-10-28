@@ -40,13 +40,12 @@ public:
     virtual bool isDigital() const = 0;
 
     virtual std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const = 0;
-    virtual std::string getTypeName() const = 0;
 
     virtual void update() = 0;
 
     virtual std::string toString() const = 0;
     virtual boost::property_tree::ptree toPtree() const = 0;
-    virtual bool operator==(const InputEvent& other) const { return getTypeName() == other.getTypeName(); }
+    virtual bool operator==(const InputEvent& other) const { return typeid(*this) == typeid(other); }
     virtual bool operator!=(const InputEvent& other) const { return !operator==(other); }
 };
 

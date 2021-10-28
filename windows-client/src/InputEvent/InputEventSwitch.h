@@ -21,7 +21,7 @@ public:
     InputEventSwitch(std::shared_ptr<InputEvent> event1, std::shared_ptr<InputEvent> event2, std::shared_ptr<InputEvent> deciderEvent) {
         if (event1->isDigital() != event2->isDigital() || !deciderEvent->isDigital()) {
             throw std::invalid_argument("Invalid input types for InputEventSwitch: " +
-            event1->getTypeName() + " " + event2->getTypeName() + " " + deciderEvent->getTypeName());
+            std::string(typeid(event1).name()) + " " + std::string(typeid(event2).name()) + " " + std::string(typeid(deciderEvent).name()));
         }
         this->event1 = event1;
         this->event2 = event2;
@@ -38,7 +38,6 @@ public:
     bool isDigital() const override { return event1->isDigital(); }
 
     std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
-    std::string getTypeName() const override { return ""; }
 
     void update() override {}
 

@@ -38,7 +38,6 @@ public:
     bool isDigital() const override { return true; }
 
     std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
-    std::string getTypeName() const override { return ""; }
 
     void update() override {}
 

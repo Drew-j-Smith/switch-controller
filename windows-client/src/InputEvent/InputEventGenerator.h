@@ -18,7 +18,7 @@ public:
     template<class T>
     void registerInputEvent() {
         std::shared_ptr<InputEvent> event = std::make_shared<T>();
-        eventMap.insert({event->getTypeName(), event});
+        eventMap.insert({std::string(typeid(*event).name()), event});
     }
 
     std::shared_ptr<InputEvent> generateInputEvent(const boost::property_tree::ptree & tree) {
