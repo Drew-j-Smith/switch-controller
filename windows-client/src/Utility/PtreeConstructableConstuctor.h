@@ -15,7 +15,7 @@ public:
     template<class classToRegister>
     void registerClass() {
         std::shared_ptr<T> obj = std::make_shared<classToRegister>();
-        map.insert({std::string(typeid(*obj).name()), obj});
+        map.insert({obj->getTypeName(), obj});
     }
 
     virtual std::shared_ptr<T> generateObject(const boost::property_tree::ptree & tree) = 0;
