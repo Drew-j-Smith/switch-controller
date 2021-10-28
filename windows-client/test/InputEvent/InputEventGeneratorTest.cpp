@@ -15,24 +15,24 @@ BOOST_AUTO_TEST_SUITE(InputEventGeneratorTest);
         BOOST_AUTO_TEST_CASE(RegisterDefaultInputEvent)
         {
             InputEventGenerator i, j;
-            i.registerInputEvent<DefaultInputEvent>();
-            j.registerInputEvent<DefaultInputEvent>();
+            i.registerClass<DefaultInputEvent>();
+            j.registerClass<DefaultInputEvent>();
             BOOST_TEST((i == j));
         }
         BOOST_AUTO_TEST_CASE(RegisterActiveInputEvent)
         {
             InputEventGenerator i, j;
-            i.registerInputEvent<ActiveInputEvent>();
-            j.registerInputEvent<ActiveInputEvent>();
+            i.registerClass<ActiveInputEvent>();
+            j.registerClass<ActiveInputEvent>();
             BOOST_TEST((i == j));
         }
         BOOST_AUTO_TEST_CASE(RegisterActiveAndDefaultInputEvent)
         {
             InputEventGenerator i, j;
-            i.registerInputEvent<ActiveInputEvent>();
-            j.registerInputEvent<ActiveInputEvent>();
-            i.registerInputEvent<DefaultInputEvent>();
-            j.registerInputEvent<DefaultInputEvent>();
+            i.registerClass<ActiveInputEvent>();
+            j.registerClass<ActiveInputEvent>();
+            i.registerClass<DefaultInputEvent>();
+            j.registerClass<DefaultInputEvent>();
             BOOST_TEST((i == j));
         }
     BOOST_AUTO_TEST_SUITE_END();
@@ -41,14 +41,14 @@ BOOST_AUTO_TEST_SUITE(InputEventGeneratorTest);
         BOOST_AUTO_TEST_CASE(NotEqualEmptyDefault)
         {
             InputEventGenerator i, j;
-            j.registerInputEvent<DefaultInputEvent>();
+            j.registerClass<DefaultInputEvent>();
             BOOST_TEST((!(i == j)));
         }
         BOOST_AUTO_TEST_CASE(NotEqualDefaultActive)
         {
             InputEventGenerator i, j;
-            i.registerInputEvent<ActiveInputEvent>();
-            j.registerInputEvent<DefaultInputEvent>();
+            i.registerClass<ActiveInputEvent>();
+            j.registerClass<DefaultInputEvent>();
             BOOST_TEST((!(i == j)));
         }
     BOOST_AUTO_TEST_SUITE_END();
