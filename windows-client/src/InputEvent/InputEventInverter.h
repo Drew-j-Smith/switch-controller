@@ -32,8 +32,8 @@ public:
      */
     InputEventInverter(std::shared_ptr<InputEvent> event) {
         if (!event->isDigital()) {
-            std::cerr << "Invalid type for InputEventInverter: " << typeid(event).name() << std::endl;
-            throw std::invalid_argument("Invalid type for InputEventInverter: " + std::string(typeid(event).name()));
+            std::cerr << "Invalid type for InputEventInverter: " << event->getTypeName() << std::endl;
+            throw std::invalid_argument("Invalid type for InputEventInverter: " + event->getTypeName());
         }
         this->event = event;
     };
@@ -52,6 +52,7 @@ public:
         std::shared_ptr<InputEvent> childEvent = eventMap.at(childTree.get<std::string>("type"))->makeShared(childTree, eventMap);
         return std::make_shared<InputEventInverter>(childEvent); 
     }
+    std::string getTypeName() const override { return "InputEventInverter"; }
 
     void update() override { event->update(); }
 

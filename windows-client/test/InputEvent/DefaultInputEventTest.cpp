@@ -26,6 +26,11 @@ BOOST_AUTO_TEST_SUITE(DefaultInputEventTest);
         std::shared_ptr<InputEvent> j = i.makeShared(boost::property_tree::ptree(), std::map<std::string, std::shared_ptr<InputEvent>>());
         BOOST_TEST((i == *j));
     }
+    BOOST_AUTO_TEST_CASE(TestGetTypeName)
+    {
+        DefaultInputEvent i;
+        BOOST_TEST(i.getTypeName() == "DefaultInputEvent");
+    }
     BOOST_AUTO_TEST_CASE(TestUpdate)
     {
         DefaultInputEvent i, j;
@@ -35,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(DefaultInputEventTest);
     BOOST_AUTO_TEST_CASE(TestToString)
     {
         DefaultInputEvent i;
-        BOOST_TEST(i.toString() == "DefaultInputEvent");
+        BOOST_TEST(i.getTypeName() == "DefaultInputEvent");
     }
     BOOST_AUTO_TEST_CASE(TestToPtree)
     {
@@ -88,6 +93,11 @@ BOOST_AUTO_TEST_SUITE(ActiveInputEventTest);
         std::shared_ptr<InputEvent> j = i.makeShared(boost::property_tree::ptree(), std::map<std::string, std::shared_ptr<InputEvent>>());
         BOOST_TEST((i == *j));
     }
+    BOOST_AUTO_TEST_CASE(TestGetTypeName)
+    {
+        ActiveInputEvent i;
+        BOOST_TEST(i.getTypeName() == "ActiveInputEvent");
+    }
     BOOST_AUTO_TEST_CASE(TestUpdate)
     {
         ActiveInputEvent i, j;
@@ -97,7 +107,7 @@ BOOST_AUTO_TEST_SUITE(ActiveInputEventTest);
     BOOST_AUTO_TEST_CASE(TestToString)
     {
         ActiveInputEvent i;
-        BOOST_TEST(i.toString() == "ActiveInputEvent");
+        BOOST_TEST(i.getTypeName() == "ActiveInputEvent");
     }
     BOOST_AUTO_TEST_CASE(TestToPtree)
     {
