@@ -41,7 +41,6 @@
     #include <libavutil/timestamp.h>
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
-    #include <libavutil/opt.h>
     #include <libswscale/swscale.h>
     #include <libavdevice/avdevice.h>
  }
