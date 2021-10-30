@@ -43,6 +43,7 @@
     #include <libavformat/avformat.h>
     #include <libavutil/opt.h>
     #include <libswscale/swscale.h>
+    #include <libavdevice/avdevice.h>
  }
  
 static AVFormatContext *fmt_ctx = NULL;
@@ -260,6 +261,14 @@ static int get_format_from_sample_fmt(const char **fmt,
  
 int main (int argc, char **argv)
 {
+	avdevice_register_all(); // for device 
+	avcodec_register_all();
+	av_register_all();
+	char *dev_name = "video=USB Video Device:audio=Microphone (USB Audio Device)"; // here mine is video0 , it may vary.
+	AVInputFormat *inputFormat =av_find_input_format("dshow");
+	AVDictionary *options = NULL;
+	av_dict_set(&options, "framerate", "30", 0);
+	
     int ret = 0;
  
     if (argc != 4) {
@@ -276,7 +285,7 @@ int main (int argc, char **argv)
     audio_dst_filename = argv[3];
  
     /* open input file, and allocate format context */
-    if (avformat_open_input(&fmt_ctx, src_filename, NULL, NULL) < 0) {
+    if (avformat_open_input(&fmt_ctx, dev_name, inputFormat, &options) < 0) {
         fprintf(stderr, "Could not open source file %s\n", src_filename);
         exit(1);
     }
