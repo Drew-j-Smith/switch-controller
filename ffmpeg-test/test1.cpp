@@ -187,7 +187,7 @@ int main (int argc, char **argv)
     avdevice_register_all(); // for device 
     avcodec_register_all();
     av_register_all();
-    char *dev_name = "video=USB Video Device:audio=Microphone (USB Audio Device)";
+    char *dev_name = "video=Game Capture HD60 S";
     AVInputFormat *inputFormat =av_find_input_format("dshow");
     AVDictionary *options = NULL;
     // av_dict_set(&options, "framerate", "30", 0);
