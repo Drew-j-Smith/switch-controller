@@ -161,21 +161,21 @@ unsigned char InputManager::getDpadData() const {
 
 unsigned char InputManager::getDpadData(bool up, bool right, bool down, bool left) const {
     unsigned char result = 8;
-	if (up && !down){
-		result = 0; //up
-	}
-	if (down && !up){
-		result = 4; //down
-	}
-	if (right && !left){
-		if(result == 0) result = 1; //up right
-		if(result == 8) result = 2; //right
-		if(result == 4) result = 3; //down right
-	}
-	if (left && !right){
-		if(result == 4) result = 5; //down left
-		if(result == 8) result = 6; //left
-		if(result == 0) result = 7; //up left
-	}
+    if (up && !down){
+        result = 0; //up
+    }
+    if (down && !up){
+        result = 4; //down
+    }
+    if (right && !left){
+        if(result == 0) result = 1; //up right
+        if(result == 8) result = 2; //right
+        if(result == 4) result = 3; //down right
+    }
+    if (left && !right){
+        if(result == 4) result = 5; //down left
+        if(result == 8) result = 6; //left
+        if(result == 0) result = 7; //up left
+    }
     return result;
 }
