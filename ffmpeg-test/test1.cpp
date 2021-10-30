@@ -68,7 +68,7 @@ static int audio_frame_count = 0;
 
 static struct SwsContext* sws_ctx = NULL;
 static uint8_t* data = NULL;
-static int linesize[4];
+static int linesize[1];
 
  
 static int output_video_frame(AVFrame *frame)
@@ -102,9 +102,7 @@ static int output_video_frame(AVFrame *frame)
 
     if (data == NULL) {
         data = new uint8_t[frame->width * frame->height * 8];
-        for (int i = 0; i < 4; i++) {
-            linesize[i] = av_image_get_linesize(AV_PIX_FMT_BGR24, frame->width, i);
-        }
+        linesize[0] = 3 * frame->width;
     }
     sws_ctx = sws_getCachedContext(sws_ctx, frame->width, frame->height,
                                   (AVPixelFormat)frame->format, frame->width, frame->height,
