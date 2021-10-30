@@ -41,6 +41,8 @@
     #include <libavutil/timestamp.h>
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
+    #include <libavutil/opt.h>
+    #include <libswscale/swscale.h>
  }
  
 static AVFormatContext *fmt_ctx = NULL;
@@ -63,6 +65,11 @@ static AVFrame *frame = NULL;
 static AVPacket *pkt = NULL;
 static int video_frame_count = 0;
 static int audio_frame_count = 0;
+
+static struct SwsContext* sws_ctx = NULL;
+static uint8_t* data = NULL;
+static int linesize[4];
+
  
 static int output_video_frame(AVFrame *frame)
 {
@@ -77,7 +84,7 @@ static int output_video_frame(AVFrame *frame)
                 "new: width = %d, height = %d, format = %s\n",
                 width, height, av_get_pix_fmt_name(pix_fmt),
                 frame->width, frame->height,
-                av_get_pix_fmt_name(*(AVPixelFormat*)&frame->format));
+                av_get_pix_fmt_name((AVPixelFormat)frame->format));
         return -1;
     }
  
@@ -92,12 +99,27 @@ static int output_video_frame(AVFrame *frame)
  
     /* write to rawvideo file */
     fwrite(video_dst_data[0], 1, video_dst_bufsize, video_dst_file);
+
+    if (data == NULL) {
+        data = new uint8_t[frame->width * frame->height * 8];
+        for (int i = 0; i < 4; i++) {
+            linesize[i] = av_image_get_linesize(AV_PIX_FMT_BGR24, frame->width, i);
+        }
+    }
+    sws_ctx = sws_getCachedContext(sws_ctx, frame->width, frame->height,
+                                  (AVPixelFormat)frame->format, frame->width, frame->height,
+                                  AV_PIX_FMT_BGR24, 0, 0, 0, 0);
+    sws_scale(sws_ctx, frame->data, frame->linesize, 0, frame->height, &data, linesize);
+
+    cv::Mat mat = cv::Mat(frame->height, frame->width, CV_8UC3, data);
+    cv::imshow("test", mat);
+    cv::waitKey(1);
     return 0;
 }
  
 static int output_audio_frame(AVFrame *frame)
 {
-    size_t unpadded_linesize = frame->nb_samples * av_get_bytes_per_sample(*(AVSampleFormat*)&frame->format);
+    size_t unpadded_linesize = frame->nb_samples * av_get_bytes_per_sample((AVSampleFormat)frame->format);
     char timestr[AV_TS_MAX_STRING_SIZE];
     printf("audio_frame n:%d nb_samples:%d pts:%s\n",
            audio_frame_count++, frame->nb_samples,
@@ -387,6 +409,8 @@ end:
         fclose(audio_dst_file);
     av_packet_free(&pkt);
     av_frame_free(&frame);
+    delete[] data;
+    sws_freeContext(sws_ctx);
     av_free(video_dst_data[0]);
  
     return ret < 0;
