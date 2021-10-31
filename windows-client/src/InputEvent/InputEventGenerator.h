@@ -7,12 +7,31 @@
 #include "InputEvent.h"
 #include "Utility/PtreeConstructableConstuctor.h"
 
+#include "DefaultInputEvent.h"
+#include "InputEventCollection.h"
+#include "InputEventInverter.h"
+#include "InputEventToggle.h"
+#include "InputEventSwitch.h"
+#include "SfJoystickAnalogInputEvent.h"
+#include "SfJoystickDigitalInputEvent.h"
+#include "SfKeyboardInputEvent.h"
+
 #include <boost/property_tree/ptree.hpp>
 
 class InputEventGenerator : public PtreeConstructableConstructor<InputEvent>
 {
 public:
-    InputEventGenerator() {}
+    InputEventGenerator() {
+        registerClass<DefaultInputEvent>();
+        registerClass<ActiveInputEvent>();
+        registerClass<InputEventCollection>();
+        registerClass<InputEventInverter>();
+        registerClass<InputEventToggle>();
+        registerClass<InputEventSwitch>();
+        registerClass<SfJoystickAnalogInputEvent>();
+        registerClass<SfJoystickDigitalInputEvent>();
+        registerClass<SfKeyboardInputEvent>();
+    }
 
     std::shared_ptr<InputEvent> generateObject(const boost::property_tree::ptree & tree) {
         std::string type = tree.get<std::string>("type");
