@@ -134,8 +134,7 @@ static int open_codec_context(int *stream_idx,
  
     ret = av_find_best_stream(fmt_ctx, type, -1, -1, NULL, 0);
     if (ret < 0) {
-        fprintf(stderr, "Could not find %s stream for input\n",
-                av_get_media_type_string(type));
+        fprintf(stderr, "Could not find %s stream\n", av_get_media_type_string(type));
         return ret;
     } else {
         stream_index = ret;
@@ -186,6 +185,10 @@ int main (int argc, char **argv)
     AVDictionary *options = NULL;
     // av_dict_set(&options, "framerate", "30", 0);
     // av_dict_set(&options, "video_size", "1280x960", 0);
+    // av_dict_set(&options, "rtbufsize", "1000M", 0);
+
+    av_log_set_level(AV_LOG_QUIET);
+    
 
     int ret = 0;
  
