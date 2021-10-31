@@ -54,8 +54,6 @@ static enum AVPixelFormat pix_fmt;
 static AVStream *video_stream = NULL, *audio_stream = NULL;
  
 static int video_stream_idx = -1, audio_stream_idx = -1;
-static AVFrame *frame = NULL;
-static AVPacket *pkt = NULL;
 
 static struct SwsContext* sws_ctx = NULL;
 static uint8_t* video_data = NULL;
@@ -66,7 +64,7 @@ static int output_video_frame(AVFrame *frame)
 {
     if (frame->width != width || frame->height != height ||
         frame->format != pix_fmt) {
-        std::cout << "error";
+        std::cout << "error changing input format";
         return -1;
     }
 
@@ -91,7 +89,7 @@ static int output_audio_frame(AVFrame *frame)
     return 0;
 }
  
-static int decode_packet(AVCodecContext *dec, const AVPacket *pkt)
+static int decode_packet(AVCodecContext *dec, const AVPacket *pkt, AVFrame* frame)
 {
     int ret = 0;
  
@@ -232,14 +230,14 @@ int main (int argc, char **argv)
         goto end;
     }
  
-    frame = av_frame_alloc();
+    AVFrame* frame = av_frame_alloc();
     if (!frame) {
         fprintf(stderr, "Could not allocate frame\n");
         ret = AVERROR(ENOMEM);
         goto end;
     }
  
-    pkt = av_packet_alloc();
+    AVPacket* pkt = av_packet_alloc();
     if (!pkt) {
         fprintf(stderr, "Could not allocate packet\n");
         ret = AVERROR(ENOMEM);
@@ -252,9 +250,9 @@ int main (int argc, char **argv)
         // check if the packet belongs to a stream we are interested in, otherwise
         // skip it
         if (pkt->stream_index == video_stream_idx)
-            ret = decode_packet(video_dec_ctx, pkt);
+            ret = decode_packet(video_dec_ctx, pkt, frame);
         else if (pkt->stream_index == audio_stream_idx)
-            ret = decode_packet(audio_dec_ctx, pkt);
+            ret = decode_packet(audio_dec_ctx, pkt, frame);
         av_packet_unref(pkt);
         if (ret < 0)
             break;
@@ -262,9 +260,9 @@ int main (int argc, char **argv)
  
     /* flush the decoders */
     if (video_dec_ctx)
-        decode_packet(video_dec_ctx, NULL);
+        decode_packet(video_dec_ctx, NULL, frame);
     if (audio_dec_ctx)
-        decode_packet(audio_dec_ctx, NULL);
+        decode_packet(audio_dec_ctx, NULL, frame);
  
 
  
