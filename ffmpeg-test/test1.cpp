@@ -58,8 +58,7 @@ static int video_linesize[1];
  
 static int output_video_frame(AVFrame *frame)
 {
-    if (frame->width != width || frame->height != height ||
-        frame->format != pix_fmt) {
+    if (frame->width != width || frame->height != height || frame->format != pix_fmt) {
         std::cout << "error changing input format";
         return -1;
     }
@@ -125,8 +124,7 @@ static int decode_packet(AVCodecContext *dec, const AVPacket *pkt, AVFrame* fram
     return 0;
 }
  
-static int open_codec_context(int *stream_idx,
-                              AVCodecContext **dec_ctx, AVFormatContext *fmt_ctx, enum AVMediaType type)
+static int open_codec_context(int *stream_idx, AVCodecContext **dec_ctx, AVFormatContext *fmt_ctx, enum AVMediaType type)
 {
     int ret, stream_index;
     AVStream *st;
@@ -136,41 +134,37 @@ static int open_codec_context(int *stream_idx,
     if (ret < 0) {
         fprintf(stderr, "Could not find %s stream\n", av_get_media_type_string(type));
         return ret;
-    } else {
-        stream_index = ret;
-        st = fmt_ctx->streams[stream_index];
- 
-        /* find decoder for the stream */
-        dec = avcodec_find_decoder(st->codecpar->codec_id);
-        if (!dec) {
-            fprintf(stderr, "Failed to find %s codec\n",
-                    av_get_media_type_string(type));
-            return AVERROR(EINVAL);
-        }
- 
-        /* Allocate a codec context for the decoder */
-        *dec_ctx = avcodec_alloc_context3(dec);
-        if (!*dec_ctx) {
-            fprintf(stderr, "Failed to allocate the %s codec context\n",
-                    av_get_media_type_string(type));
-            return AVERROR(ENOMEM);
-        }
- 
-        /* Copy codec parameters from input stream to output codec context */
-        if ((ret = avcodec_parameters_to_context(*dec_ctx, st->codecpar)) < 0) {
-            fprintf(stderr, "Failed to copy %s codec parameters to decoder context\n",
-                    av_get_media_type_string(type));
-            return ret;
-        }
- 
-        /* Init the decoders */
-        if ((ret = avcodec_open2(*dec_ctx, dec, NULL)) < 0) {
-            fprintf(stderr, "Failed to open %s codec\n",
-                    av_get_media_type_string(type));
-            return ret;
-        }
-        *stream_idx = stream_index;
+    } 
+    stream_index = ret;
+    st = fmt_ctx->streams[stream_index];
+
+    /* find decoder for the stream */
+    dec = avcodec_find_decoder(st->codecpar->codec_id);
+    if (!dec) {
+        fprintf(stderr, "Failed to find %s codec\n", av_get_media_type_string(type));
+        return AVERROR(EINVAL);
     }
+
+    /* Allocate a codec context for the decoder */
+    *dec_ctx = avcodec_alloc_context3(dec);
+    if (!*dec_ctx) {
+        fprintf(stderr, "Failed to allocate the %s codec context\n", av_get_media_type_string(type));
+        return AVERROR(ENOMEM);
+    }
+
+    /* Copy codec parameters from input stream to output codec context */
+    if ((ret = avcodec_parameters_to_context(*dec_ctx, st->codecpar)) < 0) {
+        fprintf(stderr, "Failed to copy %s codec parameters to decoder context\n", av_get_media_type_string(type));
+        return ret;
+    }
+
+    /* Init the decoders */
+    if ((ret = avcodec_open2(*dec_ctx, dec, NULL)) < 0) {
+        fprintf(stderr, "Failed to open %s codec\n", av_get_media_type_string(type));
+        return ret;
+    }
+    *stream_idx = stream_index;
+    
  
     return 0;
 }
