@@ -45,15 +45,11 @@
     #include <libavformat/avformat.h>
     #include <libswscale/swscale.h>
     #include <libavdevice/avdevice.h>
- }
+}
  
-static AVFormatContext *fmt_ctx = NULL;
-static AVCodecContext *video_dec_ctx = NULL, *audio_dec_ctx;
+
 static int width, height;
 static enum AVPixelFormat pix_fmt;
-static AVStream *video_stream = NULL, *audio_stream = NULL;
- 
-static int video_stream_idx = -1, audio_stream_idx = -1;
 
 static struct SwsContext* sws_ctx = NULL;
 static uint8_t* video_data = NULL;
@@ -193,7 +189,7 @@ int main (int argc, char **argv)
 
     int ret = 0;
  
- 
+    AVFormatContext *fmt_ctx = NULL;
     /* open input file, and allocate format context */
     if (avformat_open_input(&fmt_ctx, dev_name, inputFormat, &options) < 0) {
         fprintf(stderr, "Could not open stream %s\n", dev_name);
@@ -205,7 +201,10 @@ int main (int argc, char **argv)
         fprintf(stderr, "Could not find stream information\n");
         exit(1);
     }
- 
+    
+    int video_stream_idx = -1, audio_stream_idx = -1;
+    AVCodecContext *video_dec_ctx = NULL, *audio_dec_ctx = NULL;
+    AVStream *video_stream = NULL, *audio_stream = NULL;
     if (open_codec_context(&video_stream_idx, &video_dec_ctx, fmt_ctx, AVMEDIA_TYPE_VIDEO) >= 0) {
         video_stream = fmt_ctx->streams[video_stream_idx];
  
