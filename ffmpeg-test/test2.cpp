@@ -18,5 +18,5 @@ int main() {
     FfmpegRecorder recorder(inputFormat, deviceName, options, sinks);
     recorder.start();
 
-    while (true) {}
+    while (true) { std::this_thread::sleep_for(std::chrono::minutes(1)); }
 }
