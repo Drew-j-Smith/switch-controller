@@ -62,13 +62,10 @@ static int output_video_frame(AVFrame *frame)
         return -1;
     }
 
-    sws_ctx = sws_getCachedContext(sws_ctx, width, height,
-                                  (AVPixelFormat)frame->format, width, height,
-                                  AV_PIX_FMT_BGR24, 0, 0, 0, 0);
     sws_scale(sws_ctx, frame->data, frame->linesize, 0, height, &video_data, video_linesize);
 
     cv::Mat mat = cv::Mat(frame->height, frame->width, CV_8UC3, video_data);
-    cv::imshow("test", mat);
+    // cv::imshow("test", mat);
     cv::waitKey(1);
     return 0;
 }
@@ -178,6 +175,7 @@ int main (int argc, char **argv)
     // av_dict_set(&options, "framerate", "30", 0);
     // av_dict_set(&options, "video_size", "1280x960", 0);
     // av_dict_set(&options, "rtbufsize", "1000M", 0);
+    av_dict_set(&options, "pixel_format", "bgr24", 0);
 
     av_log_set_level(AV_LOG_QUIET);
     
@@ -209,6 +207,9 @@ int main (int argc, char **argv)
         pix_fmt = video_dec_ctx->pix_fmt;
         video_data = new uint8_t[width * height * 8];
         video_linesize[0] = 3 * width;
+		sws_ctx = sws_getCachedContext(sws_ctx, width, height,
+			pix_fmt, width, height,
+			AV_PIX_FMT_BGR24, 0, 0, 0, 0);
     }
  
     if (open_codec_context(&audio_stream_idx, &audio_dec_ctx, fmt_ctx, AVMEDIA_TYPE_AUDIO) >= 0) {
