@@ -78,6 +78,7 @@ void FfmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
     for (auto sink : sinks) {
         openCodecContext(&streamIndex, &decoderContext, formatContext, sink->getType());
         streamIdCtxSinkMap.insert({streamIndex, {sink, decoderContext}});
+        sink->init(decoderContext);
     }
 
     if(streamIdCtxSinkMap.size() == 0)
@@ -171,10 +172,8 @@ void FfmpegRecorder::start() {
 
     recordingThread = std::thread([&](){
         // read until there are no more frames or canceled
-        std::cout << "1\n";
         while (recording.load() && av_read_frame(formatContext, &pkt) >= 0) {
             // check if the pack goes to a frame sink
-            std::cout << "2\n";
             if (streamIdCtxSinkMap.find(pkt.stream_index) != streamIdCtxSinkMap.end()) {
                 auto streamIdCtxSink = streamIdCtxSinkMap.at(pkt.stream_index);
                 decodePacket(streamIdCtxSink.second, &pkt, frame, streamIdCtxSink.first);

@@ -12,6 +12,11 @@ public:
 
     }
 
+
+    void init(AVCodecContext* decoderContext) override {
+
+    }
+
     void outputFrame(AVFrame *frame) override {
 
     }
