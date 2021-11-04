@@ -8,12 +8,15 @@ class VideoFrameSink : public FfmpegFrameSink
 private:
 
 public:
-    VideoFrameSink();
-    int outputFrame(AVFrame *frame) {
+    VideoFrameSink() {
 
     }
 
-    AVMediaType getType() {
+    void outputFrame(AVFrame *frame) override {
+
+    }
+
+    AVMediaType getType() const override {
         return AVMEDIA_TYPE_VIDEO;
     }
 };

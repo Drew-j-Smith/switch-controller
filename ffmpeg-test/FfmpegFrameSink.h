@@ -8,8 +8,8 @@ extern "C" {
 class FfmpegFrameSink
 {
 public:
-    virtual int outputFrame(AVFrame *frame);
-    virtual AVMediaType getType() const;
+    virtual void outputFrame(AVFrame *frame) = 0;
+    virtual AVMediaType getType() const = 0;
 };
 
 

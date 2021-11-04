@@ -36,3 +36,7 @@ endforeach()
 add_executable(decode_encode test1.cpp)
 target_include_directories(decode_encode PRIVATE ${FFMPEG_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} )
 target_link_libraries(decode_encode PRIVATE ${FFMPEG_LIBS} ${OpenCV_LIBS})
+
+add_executable(ffmpeg-test test2.cpp FfmpegRecorder.cpp)
+target_include_directories(ffmpeg-test PRIVATE ${FFMPEG_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} )
+target_link_libraries(ffmpeg-test PRIVATE ${FFMPEG_LIBS} ${OpenCV_LIBS})
