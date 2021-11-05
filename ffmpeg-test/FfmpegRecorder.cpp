@@ -38,11 +38,7 @@ bool FfmpegRecorder::checkOverlap(std::vector<std::shared_ptr<FfmpegFrameSink>> 
 
 void FfmpegRecorder::free() {
     recording.store(false);
-    for (auto streamIdCtxSink : streamIdCtxSinkMap) {
-        auto streamCtx = streamIdCtxSink.second.second;
-        avcodec_free_context(&streamCtx);
-    }
-    streamIdCtxSinkMap.clear();
+    decoders.clear();
     avformat_close_input(&formatContext);
     av_frame_free(&frame);
 }
@@ -77,11 +73,11 @@ void FfmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
     AVCodecContext* decoderContext = NULL;
     for (auto sink : sinks) {
         openCodecContext(&streamIndex, &decoderContext, formatContext, sink->getType());
-        streamIdCtxSinkMap.insert({streamIndex, {sink, decoderContext}});
+        decoders.insert({streamIndex, std::make_shared<FFmpegDecoder>(formatContext, decoderContext, sink)});
         sink->init(decoderContext);
     }
 
-    if(streamIdCtxSinkMap.size() == 0)
+    if(decoders.size() == 0)
         throw std::runtime_error("No frame sinks were loaded");
  
     // print stream info
@@ -124,40 +120,6 @@ void FfmpegRecorder::openCodecContext(int *streamIndex, AVCodecContext **decoder
     }
 }
 
-void FfmpegRecorder::decodePacket(AVCodecContext *decoderContext, const AVPacket *packet, AVFrame* frame, std::shared_ptr<FfmpegFrameSink> sink) {
-    int ret = 0;
- 
-    // submit the packet to the decoder
-    ret = avcodec_send_packet(decoderContext, packet);
-    if (ret < 0) {
-        free();
-        char error[AV_ERROR_MAX_STRING_SIZE];
-        throw std::runtime_error("Error submitting a packet for decoding (" + std::string(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret)) + ")");
-    }
- 
-    // get all the available frames from the decoder
-    while (ret >= 0) {
-        ret = avcodec_receive_frame(decoderContext, frame);
-        if (ret < 0) {
-            // those two return values are special and mean there is no output
-            // frame available, but there were no errors during decoding
-            if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
-                return;
-
-            free();
-            char error[AV_ERROR_MAX_STRING_SIZE];
-            throw std::runtime_error("Error during decoding (" + std::string(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret)) + ")");
-        }
- 
-        // send frame to frame sink
-        auto streamIdCtxSink = streamIdCtxSinkMap.at(decoderContext->codec->type);
-        streamIdCtxSink.first->outputFrame(frame);
- 
-        // dereference frame
-        av_frame_unref(frame);
-    }
-}
-
 
 void FfmpegRecorder::start() {
     openStream(inputFormat, deviceName, options, sinks);
@@ -174,16 +136,16 @@ void FfmpegRecorder::start() {
         // read until there are no more frames or canceled
         while (recording.load() && av_read_frame(formatContext, &pkt) >= 0) {
             // check if the pack goes to a frame sink
-            if (streamIdCtxSinkMap.find(pkt.stream_index) != streamIdCtxSinkMap.end()) {
-                auto streamIdCtxSink = streamIdCtxSinkMap.at(pkt.stream_index);
-                decodePacket(streamIdCtxSink.second, &pkt, frame, streamIdCtxSink.first);
+            if (decoders.find(pkt.stream_index) != decoders.end()) {
+                auto decoder = decoders.at(pkt.stream_index);
+                decoder->decodePacket(&pkt, frame);
             }
             av_packet_unref(&pkt);
         }
 
         // flushing decoders
-        for (auto it : streamIdCtxSinkMap) {
-            decodePacket(it.second.second, NULL, frame, it.second.first);
+        for (auto it : decoders) {
+            it.second->decodePacket(NULL, frame);
         }
 
         free();

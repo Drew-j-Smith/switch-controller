@@ -2,6 +2,7 @@
 #define FFMPEG_RECORDER_H
 
 #include "FfmpegFrameSink.h"
+#include "FfmpegDecoder.h"
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -20,7 +21,7 @@ class FfmpegRecorder
 private:
     AVFormatContext* formatContext = NULL;
     AVFrame* frame = NULL;
-    std::map<int, std::pair<std::shared_ptr<FfmpegFrameSink>, AVCodecContext*>> streamIdCtxSinkMap;
+    std::map<int, std::shared_ptr<FFmpegDecoder>> decoders;
 
     std::vector<std::shared_ptr<FfmpegFrameSink>> sinks;
     std::string inputFormat; std::string deviceName; std::map<std::string, std::string> options;
@@ -28,7 +29,6 @@ private:
     std::atomic<bool> recording;
     std::thread recordingThread;
 
-    void decodePacket(AVCodecContext* decoderContext, const AVPacket* packet, AVFrame* frame, std::shared_ptr<FfmpegFrameSink> sink);
     void openStream(std::string inputFormatStr, std::string deviceName, std::map<std::string, std::string> optionsMap, std::vector<std::shared_ptr<FfmpegFrameSink>> sinks);
     void openCodecContext(int* streamIndex, AVCodecContext** decoderContext, AVFormatContext* formatContex, enum AVMediaType type);
 

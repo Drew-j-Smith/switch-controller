@@ -47,9 +47,9 @@ public:
 
         sws_scale(swsContext, frame->data, frame->linesize, 0, height, &data, linesize);
 
-        // cv::Mat mat = cv::Mat(frame->height, frame->width, CV_8UC3, data);
-        // cv::imshow("test", mat);
-        // cv::waitKey(1);
+        cv::Mat mat = cv::Mat(frame->height, frame->width, CV_8UC3, data);
+        cv::imshow("test", mat);
+        cv::waitKey(1);
     }
 
     AVMediaType getType() const override {
