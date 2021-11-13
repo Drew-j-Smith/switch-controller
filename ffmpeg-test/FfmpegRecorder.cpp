@@ -138,7 +138,14 @@ void FfmpegRecorder::start() {
             // check if the pack goes to a frame sink
             if (decoders.find(pkt.stream_index) != decoders.end()) {
                 auto decoder = decoders.at(pkt.stream_index);
-                decoder->decodePacket(&pkt, frame);
+                try {
+                    decoder->decodePacket(&pkt, frame);
+                }
+                catch (std::runtime_error& e) {
+                    free();
+                    throw;
+                }
+                
             }
             av_packet_unref(&pkt);
         }
