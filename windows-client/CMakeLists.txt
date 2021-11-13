@@ -7,8 +7,6 @@ endif()
 
 project(ArduinoController)
 
-option(BUILD_TESTS "Build test programs" OFF)
-
 # needed for boost json parser to not give a warning
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
@@ -34,6 +32,6 @@ ${AUDIOFILE_INCLUDE_DIRS}
 
 
 add_subdirectory(src)
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif(BUILD_TESTS)
+
+enable_testing()
+add_subdirectory(test)
