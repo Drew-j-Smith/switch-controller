@@ -27,6 +27,8 @@ std::unique_ptr<boost::asio::serial_port> initializeSerialPort(std::string seria
 
 
 void testSerialPort(std::unique_ptr<boost::asio::serial_port>& serialPort, unsigned int writeLen, const unsigned char* writeData, unsigned int readLen, unsigned char* readData) {
+    // TODO there is definitly something wrong with this block of code but the bug is inconsistant
+    
     std::cout << "Testing connection.\n";
     std::atomic<bool> finished;
     finished.store(false);
@@ -39,7 +41,7 @@ void testSerialPort(std::unique_ptr<boost::asio::serial_port>& serialPort, unsig
     auto start = std::chrono::steady_clock::now();
     while (!finished.load()) {
         auto end = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() < 1000) {
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() > 1000) {
             std::cerr << "Unable to establish serial connection.\n";
             throw std::runtime_error("Unable to establish serial connection.");
         }
