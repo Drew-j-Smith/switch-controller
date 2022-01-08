@@ -19,15 +19,47 @@ find_package(Boost COMPONENTS system thread unit_test_framework REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
 find_path(AUDIOFILE_INCLUDE_DIRS "AudioFile.h")
 
-set(CMAKE_LIBS ${OpenCV_LIBS} sfml-window sfml-audio ${Boost_LIBRARIES} FFTW3::fftw3f)
+set(FFMPEG_INCLUDE_NAMES
+libavcodec/avcodec.h
+libavformat/avformat.h
+libavutil/avutil.h
+libavdevice/avdevice.h
+libswscale/swscale.h
+)
 
-include_directories(
+set(FFMPEG_LIB_NAMES
+avcodec
+avformat
+avutil
+avdevice
+swscale
+)
+
+foreach(DIR_NAME LIB_NAME IN ZIP_LISTS FFMPEG_INCLUDE_NAMES FFMPEG_LIB_NAMES)
+    set(LIB "LIB-NOTFOUND")
+    find_path(DIR ${DIR_NAME})
+    find_library(LIB ${LIB_NAME})
+    list(APPEND FFMPEG_INCLUDE_DIRS ${DIR})
+    list(APPEND FFMPEG_LIBS ${LIB})
+endforeach()
+
+set(CMAKE_LIBS 
+${OpenCV_LIBS}
+sfml-window
+sfml-audio
+${Boost_LIBRARIES}
+FFTW3::fftw3f
+${FFMPEG_LIBS}
+)
+
+set(CMAKE_INCLUDE_DIRS
 ${CMAKE_CURRENT_SOURCE_DIR}/src
 ${OpenCV_INCLUDE_DIRS}
 ${SFML_INCLUDE_DIRS}
 ${Boost_INCLUDE_DIRS}
 ${FFTW3_INCLUDE_DIRS}
 ${AUDIOFILE_INCLUDE_DIRS}
+${FFMPEG_INCLUDE_DIRS}
 )
 
 
