@@ -1,5 +1,5 @@
 
-#include "FfmpegDecoder.h"
+#include "FFmpegDecoder.h"
 
 #include <stdexcept>
 
@@ -48,7 +48,7 @@ void FFmpegDecoder::openCodecContext()
     }
 }
 
-FFmpegDecoder::FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FfmpegFrameSink> sink) {
+FFmpegDecoder::FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FFmpegFrameSink> sink) {
     this->formatContext = formatContext;
     this->sink = sink;
     openCodecContext();

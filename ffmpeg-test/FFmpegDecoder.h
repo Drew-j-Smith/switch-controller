@@ -1,7 +1,7 @@
 #ifndef FFMPEG_DECODER_H
 #define FFMPEG_DECODER_H
 
-#include "FfmpegFrameSink.h"
+#include "FFmpegFrameSink.h"
 
 #include <iostream>
 
@@ -14,10 +14,10 @@ class FFmpegDecoder
 private:
     AVFormatContext* formatContext;
     AVCodecContext* decoderContext;
-    std::shared_ptr<FfmpegFrameSink> sink;
+    std::shared_ptr<FFmpegFrameSink> sink;
     int streamIndex;
 public:
-    FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FfmpegFrameSink> sink);
+    FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FFmpegFrameSink> sink);
     ~FFmpegDecoder() { free(); };
 
     void free();

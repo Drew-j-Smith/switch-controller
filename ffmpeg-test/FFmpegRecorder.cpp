@@ -1,4 +1,4 @@
-#include "FfmpegRecorder.h"
+#include "FFmpegRecorder.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -12,7 +12,7 @@
     #include <libavdevice/avdevice.h>
 }
 
-FfmpegRecorder::FfmpegRecorder(std::string inputFormat, std::string deviceName, std::map<std::string, std::string> options, std::vector<std::shared_ptr<FfmpegFrameSink>> sinks) {
+FFmpegRecorder::FFmpegRecorder(std::string inputFormat, std::string deviceName, std::map<std::string, std::string> options, std::vector<std::shared_ptr<FFmpegFrameSink>> sinks) {
     if (checkOverlap(sinks))
         throw std::runtime_error("Only one frame sink of each type may be used");
     if (sinks.size() == 0)
@@ -24,7 +24,7 @@ FfmpegRecorder::FfmpegRecorder(std::string inputFormat, std::string deviceName, 
     this->sinks = sinks;
 }
 
-bool FfmpegRecorder::checkOverlap(std::vector<std::shared_ptr<FfmpegFrameSink>> sinks) {
+bool FFmpegRecorder::checkOverlap(std::vector<std::shared_ptr<FFmpegFrameSink>> sinks) {
     std::set<AVMediaType> types;
     for (auto sink : sinks) {
         if (types.find(sink->getType()) == types.end()) {
@@ -36,14 +36,14 @@ bool FfmpegRecorder::checkOverlap(std::vector<std::shared_ptr<FfmpegFrameSink>> 
     return false;
 }
 
-void FfmpegRecorder::free() {
+void FFmpegRecorder::free() {
     recording.store(false);
     decoders.clear();
     avformat_close_input(&formatContext);
     av_frame_free(&frame);
 }
 
-void FfmpegRecorder::openStream(std::string inputFormatStr, std::string deviceName, std::map<std::string, std::string> optionsMap, std::vector<std::shared_ptr<FfmpegFrameSink>> sinks) {
+void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceName, std::map<std::string, std::string> optionsMap, std::vector<std::shared_ptr<FFmpegFrameSink>> sinks) {
     avdevice_register_all();
 
     // finding input format and setting options dict
@@ -82,7 +82,7 @@ void FfmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
 }
 
 
-void FfmpegRecorder::start() {
+void FFmpegRecorder::start() {
     openStream(inputFormat, deviceName, options, sinks);
 
     AVPacket pkt;

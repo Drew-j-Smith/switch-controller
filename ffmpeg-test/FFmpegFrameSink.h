@@ -5,7 +5,7 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-class FfmpegFrameSink
+class FFmpegFrameSink
 {
 public:
     virtual void init(AVCodecContext* decoderContext) = 0;

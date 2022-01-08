@@ -1,7 +1,7 @@
 #ifndef VIDEO_FRAME_SINK_H
 #define VIDEO_FRAME_SINK_H
 
-#include "FfmpegFrameSink.h"
+#include "FFmpegFrameSink.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -12,7 +12,7 @@ extern "C" {
     #include <libswscale/swscale.h>
 }
 
-class VideoFrameSink : public FfmpegFrameSink
+class VideoFrameSink : public FFmpegFrameSink
 {
 private:
     int width, height;

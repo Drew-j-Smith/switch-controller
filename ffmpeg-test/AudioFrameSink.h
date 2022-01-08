@@ -1,9 +1,9 @@
 #ifndef AUDIO_FRAME_SINK_H
 #define AUDIO_FRAME_SINK_H
 
-#include "FfmpegFrameSink.h"
+#include "FFmpegFrameSink.h"
 
-class AudioFrameSink : public FfmpegFrameSink
+class AudioFrameSink : public FFmpegFrameSink
 {
 private:
 
