@@ -1,4 +1,5 @@
 {
+    "serial port": "COM3",
     "controls": {
         "a": [
             {

@@ -44,7 +44,7 @@ void StartController(std::string& configFilename) {
     unsigned char recieve[1];
 
     try {
-        port = initializeSerialPort("COM4", 57600);
+        port = initializeSerialPort(tree.get<std::string>("serial port"), 57600);
 
         testSerialPort(port, 8, send, 1, recieve);
     }

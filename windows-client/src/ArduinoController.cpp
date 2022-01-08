@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include "Utility/SerialPort.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 void CreateConfig(std::string& configFilename);
 void EditConfig(std::string& configFilename);
@@ -43,7 +45,10 @@ int main(int argc, const char** argv)
             case 5:
                 {
                     try {
-                        auto port = initializeSerialPort("COM4", 57600);
+                        boost::property_tree::ptree tree;
+                        boost::property_tree::read_json(configFilename, tree);
+                        auto port = initializeSerialPort(tree.get<std::string>("serial port"), 57600);
+                        
                         // sending a nuetral signal
                         unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
                         unsigned char recieve[1];
