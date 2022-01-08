@@ -12,10 +12,47 @@ extern "C" {
     #include <libavdevice/avdevice.h>
 }
 
-FFmpegDecoder::FFmpegDecoder(AVFormatContext* formatContext, AVCodecContext* decoderContext, std::shared_ptr<FfmpegFrameSink> sink) {
+void FFmpegDecoder::openCodecContext()
+{
+    this->streamIndex = av_find_best_stream(formatContext, this->sink->getType(), -1, -1, NULL, 0);
+    if (this->streamIndex < 0) {
+        free();
+        throw std::runtime_error("Could not find " + std::string(av_get_media_type_string(this->sink->getType())) + " stream");
+    }
+    AVStream* stream = formatContext->streams[this->streamIndex];
+
+    // find decoder for the stream
+    const AVCodec* decoder = avcodec_find_decoder(stream->codecpar->codec_id);
+    if (!decoder) {
+        free();
+        throw std::runtime_error("Failed to find " + std::string(av_get_media_type_string(this->sink->getType())) + " codec");
+    }
+
+    // Allocate a codec context for the decoder
+    this->decoderContext = avcodec_alloc_context3(decoder);
+    if (!this->decoderContext) {
+        free();
+        throw std::runtime_error("Failed to allocate the " + std::string(av_get_media_type_string(this->sink->getType())) + " codec context");
+    }
+
+    // Copy codec parameters from input stream to output codec context
+    if (avcodec_parameters_to_context(this->decoderContext, stream->codecpar) < 0) {
+        free();
+        throw std::runtime_error("Failed to copy " + std::string(av_get_media_type_string(this->sink->getType())) + " codec parameters to decoder context");
+    }
+
+    // Init the decoders
+    if (avcodec_open2(this->decoderContext, decoder, NULL) < 0) {
+        free();
+        throw std::runtime_error("Failed to open " + std::string(av_get_media_type_string(this->sink->getType())) + " codec");
+    }
+}
+
+FFmpegDecoder::FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FfmpegFrameSink> sink) {
     this->formatContext = formatContext;
-    this->decoderContext = decoderContext;
     this->sink = sink;
+    openCodecContext();
+    sink->init(this->decoderContext);
 }
 
 void FFmpegDecoder::free() {

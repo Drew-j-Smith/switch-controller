@@ -15,13 +15,17 @@ private:
     AVFormatContext* formatContext;
     AVCodecContext* decoderContext;
     std::shared_ptr<FfmpegFrameSink> sink;
+    int streamIndex;
 public:
-    FFmpegDecoder(AVFormatContext* formatContext, AVCodecContext* decoderContext, std::shared_ptr<FfmpegFrameSink> sink);
+    FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FfmpegFrameSink> sink);
     ~FFmpegDecoder() { free(); };
 
     void free();
 
     void decodePacket(const AVPacket* packet, AVFrame* frame);
+    int getStreamIndex() const { return streamIndex; }
+private:
+    void openCodecContext();
 };
 
 

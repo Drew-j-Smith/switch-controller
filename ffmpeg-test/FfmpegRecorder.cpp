@@ -69,12 +69,9 @@ void FfmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
     }
     
     // open stream ctx for each frame sink
-    int streamIndex = -1;
-    AVCodecContext* decoderContext = NULL;
     for (auto sink : sinks) {
-        openCodecContext(&streamIndex, &decoderContext, formatContext, sink->getType());
-        decoders.insert({streamIndex, std::make_shared<FFmpegDecoder>(formatContext, decoderContext, sink)});
-        sink->init(decoderContext);
+        std::shared_ptr<FFmpegDecoder> decoder = std::make_shared<FFmpegDecoder>(formatContext, sink);
+        decoders.insert({decoder->getStreamIndex(), decoder});
     }
 
     if(decoders.size() == 0)
@@ -82,42 +79,6 @@ void FfmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
  
     // print stream info
     // av_dump_format(formatContext, 0, deviceName.c_str(), 0);
-}
-
-void FfmpegRecorder::openCodecContext(int *streamIndex, AVCodecContext **decoderContext, AVFormatContext *formatContext, enum AVMediaType type)
-{
-    *streamIndex = av_find_best_stream(formatContext, type, -1, -1, NULL, 0);
-    if (*streamIndex < 0) {
-        free();
-        throw std::runtime_error("Could not find " + std::string(av_get_media_type_string(type)) + " stream");
-    }
-    AVStream* stream = formatContext->streams[*streamIndex];
-
-    // find decoder for the stream
-    const AVCodec* decoder = avcodec_find_decoder(stream->codecpar->codec_id);
-    if (!decoder) {
-        free();
-        throw std::runtime_error("Failed to find " + std::string(av_get_media_type_string(type)) + " codec");
-    }
-
-    // Allocate a codec context for the decoder
-    *decoderContext = avcodec_alloc_context3(decoder);
-    if (!*decoderContext) {
-        free();
-        throw std::runtime_error("Failed to allocate the " + std::string(av_get_media_type_string(type)) + " codec context");
-    }
-
-    // Copy codec parameters from input stream to output codec context
-    if (avcodec_parameters_to_context(*decoderContext, stream->codecpar) < 0) {
-        free();
-        throw std::runtime_error("Failed to copy " + std::string(av_get_media_type_string(type)) + " codec parameters to decoder context");
-    }
-
-    // Init the decoders
-    if (avcodec_open2(*decoderContext, decoder, NULL) < 0) {
-        free();
-        throw std::runtime_error("Failed to open " + std::string(av_get_media_type_string(type)) + " codec");
-    }
 }
 
 

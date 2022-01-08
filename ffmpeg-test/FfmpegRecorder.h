@@ -39,7 +39,7 @@ public:
     FfmpegRecorder(std::string inputFormat, std::string deviceName, std::map<std::string, std::string> options, std::vector<std::shared_ptr<FfmpegFrameSink>> sinks);
     ~FfmpegRecorder() { free(); };
     void start();
-    void stop() { recording.store(true); } ;
+    void stop() { recording.store(false); } ;
 };
 
 
