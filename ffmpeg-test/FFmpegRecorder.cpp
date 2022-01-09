@@ -84,16 +84,16 @@ void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
 
 void FFmpegRecorder::start() {
     openStream(inputFormat, deviceName, options, sinks);
-
-    AVPacket pkt;
-    frame = av_frame_alloc();
-    if (!frame) {
-        free();
-        throw std::runtime_error("Could not allocate frame");
-    }
+    
     recording.store(true);
 
     recordingThread = std::thread([&](){
+        AVPacket pkt;
+        frame = av_frame_alloc();
+        if (!frame) {
+            free();
+            throw std::runtime_error("Could not allocate frame");
+        }
         // read until there are no more frames or canceled
         while (recording.load() && av_read_frame(formatContext, &pkt) >= 0) {
             // check if the pack goes to a frame sink
