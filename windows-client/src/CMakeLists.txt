@@ -8,6 +8,8 @@ Decider/ImageProcessingDecider.cpp
 Decider/ImageProcessingDeciderCollection.cpp
 Decider/SoundDecider.cpp
 Decider/SoundDeciderCollection.cpp
+FFmpeg/FFmpegDecoder.cpp
+FFmpeg/FFmpegRecorder.cpp
 InputEvent/InputEventCollection.cpp
 InputEvent/InputEventToggle.cpp
 InputEvent/InputManager.cpp

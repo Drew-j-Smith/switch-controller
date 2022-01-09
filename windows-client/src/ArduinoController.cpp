@@ -1,5 +1,8 @@
 #include "pch.h"
 
+#include "FFmpeg/FFmpegRecorder.h"
+#include "FFmpeg/AudioFrameSink.h"
+#include "FFmpeg/VideoFrameSink.h"
 #include "Utility/SerialPort.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -15,7 +18,8 @@ R"(Select one of the following options:
     3. Edit config File
     4. Run
     5. Test serial communication
-    6. Exit
+    6. Test FFmpeg capture
+    7. Exit
 )";
 
 int main(int argc, const char** argv)
@@ -23,7 +27,7 @@ int main(int argc, const char** argv)
     int option = 0;
     std::string configFilename = "data/config.json";
 
-    while (option != 6) {
+    while (option != 7) {
         std::cout << options;
         std::cout << "The current config file is: \"" << configFilename << "\"\n";
         std::cin >> option;
@@ -59,7 +63,25 @@ int main(int argc, const char** argv)
                         std::cerr << "Failure connecting via serial port.\n";
                     }
                 }
+                break;
             case 6:
+                {
+                    std::string inputFormat = "dshow";
+                    std::string deviceName = "video=Game Capture HD60 S";
+                    std::map<std::string, std::string> options = {{"pixel_format", "bgr24"}};
+                    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+                    std::shared_ptr<FFmpegFrameSink> videoSink = std::make_shared<VideoFrameSink>();
+                    sinks.push_back(videoSink);
+
+                    av_log_set_level(AV_LOG_QUIET);
+
+                    FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
+                    recorder.start();
+
+                    while (true) { std::this_thread::sleep_for(std::chrono::minutes(1)); }
+                }
+                break;
+            case 7:
                 break;
             default:
                 std::cout << "Unkown option: " << option << "\n";
