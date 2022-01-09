@@ -83,11 +83,11 @@ void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
 
 
 void FFmpegRecorder::start() {
-    openStream(inputFormat, deviceName, options, sinks);
-    
     recording.store(true);
 
     recordingThread = std::thread([&](){
+        openStream(inputFormat, deviceName, options, sinks);
+
         AVPacket pkt;
         frame = av_frame_alloc();
         if (!frame) {

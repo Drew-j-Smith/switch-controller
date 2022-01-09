@@ -37,9 +37,14 @@ private:
     void free();
 public:
     FFmpegRecorder(std::string inputFormat, std::string deviceName, std::map<std::string, std::string> options, std::vector<std::shared_ptr<FFmpegFrameSink>> sinks);
-    ~FFmpegRecorder() { free(); };
+    ~FFmpegRecorder() { stop(); };
     void start();
-    void stop() { recording.store(false); } ;
+    void stop() {
+        recording.store(false);
+        if (recordingThread.joinable()) {
+            recordingThread.join();
+        }
+    } ;
 };
 
 

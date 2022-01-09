@@ -78,7 +78,10 @@ int main(int argc, const char** argv)
                     FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
                     recorder.start();
 
-                    while (true) { std::this_thread::sleep_for(std::chrono::minutes(1)); }
+                    std::cin.get();
+                    std::cin.get();
+                    
+                    recorder.stop();
                 }
                 break;
             case 7:
