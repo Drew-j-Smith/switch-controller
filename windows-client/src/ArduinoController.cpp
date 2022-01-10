@@ -78,8 +78,7 @@ int main(int argc, const char** argv)
                     FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
                     recorder.start();
 
-                    // TODO use something like condition variable to notify or use a callback
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    videoSink->waitForInit();
                     uint8_t* data = new uint8_t[videoSink->getDataSize()];
                     cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data);
                     while (true) {

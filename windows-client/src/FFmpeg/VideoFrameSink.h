@@ -44,6 +44,7 @@ public:
 		swsContext = sws_getCachedContext(swsContext, width, height,
 			pixelFormat, width, height,
 			AV_PIX_FMT_BGR24, 0, 0, 0, 0);
+        setInitialized(true);
     }
 
     void outputFrame(AVFrame *frame) override {
