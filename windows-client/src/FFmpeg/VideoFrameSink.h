@@ -3,6 +3,8 @@
 
 #include "FFmpegFrameSink.h"
 
+#include "pch.h"
+
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -15,8 +17,11 @@ extern "C" {
 class VideoFrameSink : public FFmpegFrameSink
 {
 private:
-    int width, height;
+    int width = 0;
+    int height = 0;
     AVPixelFormat pixelFormat;
+
+    std::mutex mutex;
 
     struct SwsContext* swsContext = NULL;
     uint8_t* data = NULL;
@@ -33,7 +38,8 @@ public:
         width = decoderContext->width;
         height = decoderContext->height;
         pixelFormat = decoderContext->pix_fmt;
-        data = new uint8_t[width * height * 8];
+        data = new uint8_t[getDataSize()];
+        memset(data, 0, getDataSize());
         linesize[0] = 3 * width;
 		swsContext = sws_getCachedContext(swsContext, width, height,
 			pixelFormat, width, height,
@@ -45,15 +51,23 @@ public:
             throw std::runtime_error("Cannot support changing input format");
         }
 
+        std::lock_guard<std::mutex> lock(mutex);
         sws_scale(swsContext, frame->data, frame->linesize, 0, height, &data, linesize);
-
-        cv::Mat mat = cv::Mat(frame->height, frame->width, CV_8UC3, data);
-        cv::imshow("test", mat);
-        cv::waitKey(1);
     }
 
     AVMediaType getType() const override {
         return AVMEDIA_TYPE_VIDEO;
+    }
+
+    int getWidth() const { return this->width; }
+    int getHeight() const { return this->height; }
+
+    void getData(uint8_t* data) {
+        std::lock_guard<std::mutex> lock(mutex);
+        memcpy(data, this->data, getDataSize());
+    }
+    int getDataSize() const {
+        return width * height * 3;
     }
 };
 

@@ -70,7 +70,7 @@ int main(int argc, const char** argv)
                     std::string deviceName = "video=Game Capture HD60 S";
                     std::map<std::string, std::string> options = {{"pixel_format", "bgr24"}};
                     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-                    std::shared_ptr<FFmpegFrameSink> videoSink = std::make_shared<VideoFrameSink>();
+                    std::shared_ptr<VideoFrameSink> videoSink = std::make_shared<VideoFrameSink>();
                     sinks.push_back(videoSink);
 
                     av_log_set_level(AV_LOG_QUIET);
@@ -78,10 +78,16 @@ int main(int argc, const char** argv)
                     FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
                     recorder.start();
 
-                    std::cin.get();
-                    std::cin.get();
-                    
-                    recorder.stop();
+                    // TODO use something like condition variable to notify or use a callback
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    uint8_t* data = new uint8_t[videoSink->getDataSize()];
+                    cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data);
+                    while (true) {
+                        videoSink->getData(data);
+                        cv::imshow("test", mat);
+                        cv::waitKey(1);
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
                 }
                 break;
             case 7:
