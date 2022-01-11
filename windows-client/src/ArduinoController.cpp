@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include "FFmpeg/FFmpegRecorder.h"
-#include "FFmpeg/AudioFrameSink.h"
+// #include "FFmpeg/AudioFrameSink.h" TODO this file is broken
 #include "FFmpeg/VideoFrameSink.h"
 #include "Utility/SerialPort.h"
 #include <boost/property_tree/ptree.hpp>
@@ -81,11 +81,11 @@ int main(int argc, const char** argv)
                     videoSink->waitForInit();
                     uint8_t* data = new uint8_t[videoSink->getDataSize()];
                     cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data);
+                    long long lastFrame = 0;
                     while (true) {
-                        videoSink->getData(data);
+                        lastFrame = videoSink->getNextData(data, lastFrame);
                         cv::imshow("test", mat);
                         cv::waitKey(1);
-                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     }
                 }
                 break;

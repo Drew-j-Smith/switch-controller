@@ -9,26 +9,59 @@ extern "C" {
 
 class FFmpegFrameSink
 {
-protected:
+private:
     std::mutex initMutex;
     std::condition_variable initCV;
     bool initialized = false;
+
+    std::mutex dataMutex;
+    std::condition_variable dataCV;
+    long long lastFrame = 0;
+
+protected:
+    virtual void virtualInit(AVCodecContext* decoderContext) = 0;
+    virtual void virtualOutputFrame(AVFrame* frame) = 0;
+    virtual void getDataWithoutLock(uint8_t* data) = 0;
+
 public:
+    void init(AVCodecContext* decoderContext) {
+        virtualInit(decoderContext);
+        std::lock_guard<std::mutex> lock(initMutex);
+        this->initialized = true;
+        initCV.notify_all();
+    }
+
     void waitForInit() {
         std::unique_lock<std::mutex> lock(initMutex);
         while (!initialized) {
             initCV.wait(lock);
         }
-        lock.unlock();
-    }
-    void setInitialized(bool initialized) {
-        std::lock_guard<std::mutex> lk(initMutex);
-        this->initialized = initialized;
-        initCV.notify_all();
     }
 
-    virtual void init(AVCodecContext* decoderContext) = 0;
-    virtual void outputFrame(AVFrame* frame) = 0;
+    void outputFrame(AVFrame* frame) {
+        std::lock_guard<std::mutex> lock(dataMutex);
+        virtualOutputFrame(frame);
+        lastFrame++;
+        dataCV.notify_all();
+    }
+
+    long long getData(uint8_t* data) {
+        std::lock_guard<std::mutex> lock(dataMutex);
+        getDataWithoutLock(data);
+        return lastFrame;
+    }
+
+    long long getNextData(uint8_t* data, long long lastFrame) {
+        std::unique_lock<std::mutex> lock(dataMutex);
+        while (this->lastFrame == lastFrame) {
+            dataCV.wait(lock);
+        }
+        getDataWithoutLock(data);
+        return this->lastFrame;
+    }
+
+    virtual long long getDataSize() const = 0;
+
     virtual AVMediaType getType() const = 0;
 };
 

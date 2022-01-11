@@ -26,15 +26,8 @@ private:
     struct SwsContext* swsContext = NULL;
     uint8_t* data = NULL;
     int linesize[1];
-public:
-    VideoFrameSink() {}
 
-    ~VideoFrameSink() {
-        if (data)
-            delete[] data;
-    }
-
-    void init(AVCodecContext* decoderContext) override {
+    void virtualInit(AVCodecContext* decoderContext) override {
         width = decoderContext->width;
         height = decoderContext->height;
         pixelFormat = decoderContext->pix_fmt;
@@ -44,32 +37,38 @@ public:
 		swsContext = sws_getCachedContext(swsContext, width, height,
 			pixelFormat, width, height,
 			AV_PIX_FMT_BGR24, 0, 0, 0, 0);
-        setInitialized(true);
     }
 
-    void outputFrame(AVFrame *frame) override {
+    void virtualOutputFrame(AVFrame* frame) override {
         if (frame->width != width || frame->height != height || frame->format != pixelFormat) {
             throw std::runtime_error("Cannot support changing input format");
         }
 
-        std::lock_guard<std::mutex> lock(mutex);
         sws_scale(swsContext, frame->data, frame->linesize, 0, height, &data, linesize);
+    }
+
+    void getDataWithoutLock(uint8_t* data) override {
+        memcpy(data, this->data, getDataSize());
+    }
+
+public:
+    VideoFrameSink() {}
+
+    ~VideoFrameSink() {
+        if (data)
+            delete[] data;
     }
 
     AVMediaType getType() const override {
         return AVMEDIA_TYPE_VIDEO;
     }
 
-    int getWidth() const { return this->width; }
-    int getHeight() const { return this->height; }
-
-    void getData(uint8_t* data) {
-        std::lock_guard<std::mutex> lock(mutex);
-        memcpy(data, this->data, getDataSize());
-    }
-    int getDataSize() const {
+    long long getDataSize() const override {
         return width * height * 3;
     }
+
+    int getWidth() const { return this->width; }
+    int getHeight() const { return this->height; }
 };
 
 
