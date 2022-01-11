@@ -1,7 +1,5 @@
 #include "ImageProcessingDeciderCollection.h"
 
-#include "Utility/WindowsScreenshotUtility.h"
-
 static void matchImage(std::shared_ptr<ImageProcessingDecider> decider, const cv::Mat & screenshot){
     decider->update(screenshot);
 }
@@ -10,46 +8,55 @@ void ImageProcessingDeciderCollection::startImageProcessingThread() {
     imageProcessing.store(true);
     imageProcessingThread = std::thread([&](){
         std::vector<std::future<void>> futures;
-        cv::Mat screenshot;
+        this->videoFrameSink->waitForInit();
+        uint8_t* data = new uint8_t[this->videoFrameSink->getDataSize()];
+        cv::Mat screenshot = cv::Mat(this->videoFrameSink->getHeight(), this->videoFrameSink->getWidth(), CV_8UC3, data);
+        long long lastFrame = 0;
+        
         while (imageProcessing.load()) {
-            screenshotUtility->screenshot(screenshot);
+            lastFrame = this->videoFrameSink->getNextData(data, lastFrame);
             for (auto & decider : deciders) {
                 futures.push_back(std::async(std::launch::async, matchImage, decider, screenshot));
             }
             futures.clear();
         }
+
+        delete[] data;
     });
 }
 
-ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<ScreenshotUtility> & screenshotUtility) {
+ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<VideoFrameSink> & videoFrameSink) {
     this->deciders = deciders;
-    this->screenshotUtility = screenshotUtility;
+    this->videoFrameSink = videoFrameSink;
     startImageProcessingThread(); 
 }
 
 ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree) {
-    //this->screenshotUtility = screenshotUtility;
     auto imageTree = tree.find("image deciders");
     if (imageTree == tree.not_found()) {
         std::cerr << "The image tree was loaded but not found in the config.\n";
         return;
     }
 
+    std::string inputFormat = "dshow";
+    std::string deviceName = "video=Game Capture HD60 S";
+    std::map<std::string, std::string> options = {{"pixel_format", "bgr24"}};
+    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+    this->videoFrameSink = std::make_shared<VideoFrameSink>();
+    sinks.push_back(this->videoFrameSink);
+
+    av_log_set_level(AV_LOG_QUIET);
+
+    this->ffmpegRecorder = std::make_shared<FFmpegRecorder>(inputFormat, deviceName, options, sinks);
+    this->ffmpegRecorder->start();
+
     for (auto decider : imageTree->second) {
         if (decider.second.get("type", "") == "screenshot settings") {
-            screenshotUtility = std::make_shared<WindowsScreenshotUtility>(decider.second.get("width", 1920),
-                decider.second.get("height", 1080),
-                decider.second.get("window name", "Game Capture HD"));
+            // TODO
         }
         if (decider.second.get("type", "") == "image processing") {
             deciders.push_back(std::make_shared<ImageProcessingDecider>(decider.second));
         }
-    }
-
-    if (screenshotUtility == nullptr) {
-        std::cerr << "The image tree was loaded but screenshot utility settings were not found.\n";
-        deciders.clear();
-        return;
     }
 
     startImageProcessingThread();

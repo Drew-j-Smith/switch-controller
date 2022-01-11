@@ -7,28 +7,30 @@
 
 #include "DeciderCollectionBase.h"
 #include "ImageProcessingDecider.h"
-#include "Utility/ScreenshotUtility.h"
+#include "FFmpeg/VideoFrameSink.h"
+#include "FFmpeg/FFmpegRecorder.h"
 
 
 class ImageProcessingDeciderCollection : public DeciderCollectionBase
 {
 private:
     std::vector<std::shared_ptr<ImageProcessingDecider>> deciders;
-    std::shared_ptr<ScreenshotUtility> screenshotUtility;
+    std::shared_ptr<FFmpegRecorder> ffmpegRecorder;
+    std::shared_ptr<VideoFrameSink> videoFrameSink;
     std::thread imageProcessingThread;
     std::atomic<bool> imageProcessing;
 
     void startImageProcessingThread();
 
 public:
-    ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<ScreenshotUtility> & screenshotUtility);
+    ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<VideoFrameSink> & videoFrameSink);
     ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree);
     ~ImageProcessingDeciderCollection();
 
     void setDeciders(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders) { this->deciders = deciders; }
-    void setScreenshotUtility(const std::shared_ptr<ScreenshotUtility> & screenshotUtility) { this->screenshotUtility = screenshotUtility; }
+    void setVideoFrameSink(const std::shared_ptr<VideoFrameSink> & videoFrameSink) { this->videoFrameSink = videoFrameSink; }
     const std::vector<std::shared_ptr<ImageProcessingDecider>> getDeciders() const { return deciders; }
-    const std::shared_ptr<ScreenshotUtility> getScreenshotUtility() { return screenshotUtility; }
+    const std::shared_ptr<VideoFrameSink> getVideoFrameSink() { return videoFrameSink; }
 
     std::map<std::string, std::shared_ptr<Decider>> generateMap() const override;
 };
