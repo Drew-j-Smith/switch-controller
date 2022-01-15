@@ -1,8 +1,9 @@
 #include "pch.h"
 
 #include "FFmpeg/FFmpegRecorder.h"
-// #include "FFmpeg/AudioFrameSink.h" TODO this file is broken
+#include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/VideoFrameSink.h"
+#include <AudioFile.h>
 #include "Utility/SerialPort.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -18,8 +19,9 @@ R"(Select one of the following options:
     3. Edit config File
     4. Run
     5. Test serial communication
-    6. Test FFmpeg capture
-    7. Exit
+    6. Test FFmpeg video capture
+    7. Test FFmpeg audio capture
+    8. Exit
 )";
 
 int main(int argc, const char** argv)
@@ -27,7 +29,7 @@ int main(int argc, const char** argv)
     int option = 0;
     std::string configFilename = "data/config.json";
 
-    while (option != 7) {
+    while (option != 8) {
         std::cout << options;
         std::cout << "The current config file is: \"" << configFilename << "\"\n";
         std::cin >> option;
@@ -90,6 +92,44 @@ int main(int argc, const char** argv)
                 }
                 break;
             case 7:
+                {
+                    std::string inputFormat = "dshow";
+                    std::string deviceName = "audio=Game Capture HD60 S Audio";
+                    std::map<std::string, std::string> options = {};
+                    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>();
+                    sinks.push_back(audioSink);
+
+                    av_log_set_level(AV_LOG_QUIET);
+
+                    FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
+                    recorder.start();
+
+                    audioSink->waitForInit();
+                    std::this_thread::sleep_for(std::chrono::seconds(5));
+                    
+                    recorder.stop();
+					int size = audioSink->getDataSize() / sizeof(float);
+                    uint8_t* data = new uint8_t[audioSink->getDataSize()];
+                    audioSink->getData(data);
+
+                    std::cout << "test\n";
+                    float* floatData = (float*)data;
+                    std::vector<std::vector<float>> audioData;
+                    audioData.push_back({});
+                    audioData[0].resize(size);
+                    
+                    for (int i = 0; i < size; i++) {
+                        audioData[0][i] = floatData[i];
+                    }
+
+                    AudioFile<float> audiofile = AudioFile<float>();
+                    audiofile.setAudioBuffer(audioData);
+                    audiofile.setSampleRate(48000);
+                    audiofile.save("test.wav");
+                }
+                break;
+            case 8:
                 break;
             default:
                 std::cout << "Unkown option: " << option << "\n";

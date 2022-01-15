@@ -10,11 +10,11 @@ extern "C" {
 class FFmpegFrameSink
 {
 private:
-    std::mutex initMutex;
+    mutable std::mutex initMutex;
     std::condition_variable initCV;
     bool initialized = false;
 
-    std::mutex dataMutex;
+    mutable std::mutex dataMutex;
     std::condition_variable dataCV;
     long long lastFrame = 0;
 
@@ -22,6 +22,10 @@ protected:
     virtual void virtualInit(AVCodecContext* decoderContext) = 0;
     virtual void virtualOutputFrame(AVFrame* frame) = 0;
     virtual void getDataWithoutLock(uint8_t* data) = 0;
+
+    std::unique_ptr<std::unique_lock<std::mutex>> getDataMutexLock() const {
+        return std::make_unique<std::unique_lock<std::mutex>>(dataMutex);
+    }
 
 public:
     void init(AVCodecContext* decoderContext) {

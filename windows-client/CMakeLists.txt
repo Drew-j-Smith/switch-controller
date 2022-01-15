@@ -25,6 +25,7 @@ libavformat/avformat.h
 libavutil/avutil.h
 libavdevice/avdevice.h
 libswscale/swscale.h
+libswresample/swresample.h
 )
 
 set(FFMPEG_LIB_NAMES
@@ -33,6 +34,7 @@ avformat
 avutil
 avdevice
 swscale
+swresample
 )
 
 foreach(DIR_NAME LIB_NAME IN ZIP_LISTS FFMPEG_INCLUDE_NAMES FFMPEG_LIB_NAMES)
