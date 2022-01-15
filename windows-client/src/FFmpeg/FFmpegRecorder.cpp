@@ -71,7 +71,7 @@ void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
     }
  
     // retrieve stream information
-    if (avformat_find_stream_info(formatContext, NULL) < 0) {
+    if (avformat_find_stream_info(formatContext, nullptr) < 0) {
         free();
         std::string errStr = "Could not find stream information for " + deviceName + " in FFmpeg Recorder";
         std::cerr << errStr << '\n';

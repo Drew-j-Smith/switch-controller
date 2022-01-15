@@ -14,7 +14,7 @@ extern "C" {
 
 void FFmpegDecoder::openCodecContext()
 {
-    this->streamIndex = av_find_best_stream(formatContext, this->sink->getType(), -1, -1, NULL, 0);
+    this->streamIndex = av_find_best_stream(formatContext, this->sink->getType(), -1, -1, nullptr, 0);
     if (this->streamIndex < 0) {
         free();
         std::string errStr = "Could not find " + std::string(av_get_media_type_string(this->sink->getType())) + " stream in FFmpeg Decoder";
@@ -50,7 +50,7 @@ void FFmpegDecoder::openCodecContext()
     }
 
     // Init the decoders
-    if (avcodec_open2(this->decoderContext, decoder, NULL) < 0) {
+    if (avcodec_open2(this->decoderContext, decoder, nullptr) < 0) {
         free();
         std::string errStr = "Failed to open " + std::string(av_get_media_type_string(this->sink->getType())) + " codec in FFmpeg Decoder";
         std::cerr << errStr << '\n';

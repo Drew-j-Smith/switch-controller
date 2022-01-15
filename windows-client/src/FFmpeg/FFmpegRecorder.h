@@ -19,8 +19,8 @@ extern "C" {
 class FFmpegRecorder
 {
 private:
-    AVFormatContext* formatContext = NULL;
-    AVFrame* frame = NULL;
+    AVFormatContext* formatContext = nullptr;
+    AVFrame* frame;
     std::map<int, std::shared_ptr<FFmpegDecoder>> decoders;
 
     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
