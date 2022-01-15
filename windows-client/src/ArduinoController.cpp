@@ -126,6 +126,8 @@ int main(int argc, const char** argv)
                     audiofile.setAudioBuffer(audioData);
                     audiofile.setSampleRate(48000);
                     audiofile.save("test.wav");
+
+                    delete[] data;
                 }
                 break;
             case 8:
