@@ -15,6 +15,7 @@ class AudioFrameSink : public FFmpegFrameSink
 private:
     std::vector<uint8_t> data = {};
     SwrContext* swr = nullptr;
+    int bytesPerSample;
 public:
     AudioFrameSink() {
 
@@ -28,11 +29,22 @@ public:
 
     void virtualInit(AVCodecContext* decoderContext) override {
         data = std::vector<uint8_t>();
+
+        // getting the channel rate or setting it to default
+        int channel_layout = decoderContext->channel_layout;
+        if (channel_layout == 0) {
+            channel_layout = av_get_default_channel_layout(decoderContext->channels);
+        }
+
+        // This doesn't work as intended
+        // because of this I may switch to a PCM format with constant width 
+        bytesPerSample = av_get_bytes_per_sample(decoderContext->sample_fmt);
+
         swr = swr_alloc_set_opts(NULL,      // we're allocating a new context
             AV_CH_LAYOUT_MONO,              // out_ch_layout
             AV_SAMPLE_FMT_FLT,              // out_sample_fmt
             48000,                          // out_sample_rate
-            AV_CH_LAYOUT_STEREO,            // in_ch_layout TODO
+            channel_layout,                 // in_ch_layout
             decoderContext->sample_fmt,     // in_sample_fmt
             decoderContext->sample_rate,    // in_sample_rate
             0,                              // log_offset
