@@ -15,11 +15,17 @@ class AudioFrameSink : public FFmpegFrameSink
 private:
     std::vector<uint8_t> data = {};
     SwrContext* swr = nullptr;
-    int bytesPerSample;
-public:
-    AudioFrameSink() {
 
-    }
+    int64_t outChannelLayout = AV_CH_LAYOUT_MONO;
+    AVSampleFormat outputSampleFormat = AV_SAMPLE_FMT_FLT;
+    int outSampleRate = 48000;
+public:
+    AudioFrameSink() {}
+
+    AudioFrameSink(int64_t outChannelLayout, AVSampleFormat outputSampleFormat, int outSampleRate) :
+        outChannelLayout(outChannelLayout),
+        outputSampleFormat(outputSampleFormat),
+        outSampleRate(outSampleRate) {}
 
     ~AudioFrameSink() {
         if (swr != nullptr) {
@@ -28,22 +34,16 @@ public:
     }
 
     void virtualInit(AVCodecContext* decoderContext) override {
-        data = std::vector<uint8_t>();
-
-        // getting the channel rate or setting it to default
+        // getting the channel layout or setting it to default
         int channel_layout = decoderContext->channel_layout;
         if (channel_layout == 0) {
             channel_layout = av_get_default_channel_layout(decoderContext->channels);
         }
 
-        // This doesn't work as intended
-        // because of this I may switch to a PCM format with constant width 
-        bytesPerSample = av_get_bytes_per_sample(decoderContext->sample_fmt);
-
         swr = swr_alloc_set_opts(NULL,      // we're allocating a new context
-            AV_CH_LAYOUT_MONO,              // out_ch_layout
-            AV_SAMPLE_FMT_FLT,              // out_sample_fmt
-            48000,                          // out_sample_rate
+            outChannelLayout,               // out_ch_layout
+            outputSampleFormat,             // out_sample_fmt
+            outSampleRate,                  // out_sample_rate
             channel_layout,                 // in_ch_layout
             decoderContext->sample_fmt,     // in_sample_fmt
             decoderContext->sample_rate,    // in_sample_rate
@@ -60,8 +60,8 @@ public:
 
     void virtualOutputFrame(AVFrame* frame) override {
         int out_samples = av_rescale_rnd(swr_get_delay(swr, frame->sample_rate) + frame->nb_samples, 48000, frame->sample_rate, AV_ROUND_UP);
-        data.resize(data.size() + out_samples * sizeof(float));
-        uint8_t* output = data.data() + data.size() - out_samples * sizeof(float);
+        data.resize(data.size() + out_samples * av_get_bytes_per_sample(outputSampleFormat));
+        uint8_t* output = data.data() + data.size() - out_samples * av_get_bytes_per_sample(outputSampleFormat);
         int res = swr_convert(swr, &output, out_samples, (const uint8_t**)frame->extended_data, frame->nb_samples);
         if (out_samples < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
