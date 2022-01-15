@@ -13,7 +13,7 @@ extern "C" {
 class AudioFrameSink : public FFmpegFrameSink
 {
 private:
-    std::vector<uint8_t> data = {};
+    std::vector<uint8_t> data;
     SwrContext* swr = nullptr;
 
     int64_t outChannelLayout = AV_CH_LAYOUT_MONO;
@@ -28,9 +28,7 @@ public:
         outSampleRate(outSampleRate) {}
 
     ~AudioFrameSink() {
-        if (swr != nullptr) {
-            swr_free(&swr);
-        }
+        swr_free(&swr);
     }
 
     void virtualInit(AVCodecContext* decoderContext) override {
