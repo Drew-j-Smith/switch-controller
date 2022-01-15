@@ -20,7 +20,8 @@ R"(Select one of the following options:
     5. Test serial communication
     6. Test FFmpeg video capture
     7. Test FFmpeg audio capture
-    8. Exit
+    8. Test FFmpeg file loading
+    9. Exit
 )";
 
 int main(int argc, const char** argv)
@@ -28,7 +29,7 @@ int main(int argc, const char** argv)
     int option = 0;
     std::string configFilename = "data/config.json";
 
-    while (option != 8) {
+    while (option != 9) {
         std::cout << options;
         std::cout << "The current config file is: \"" << configFilename << "\"\n";
         std::cin >> option;
@@ -120,12 +121,45 @@ int main(int argc, const char** argv)
                     std::getline(std::cin, audioFilename);
 
                     std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
-                    outfile.write(data, size);
+                    outfile.write((const char*)data, size);
 
                     delete[] data;
                 }
                 break;
             case 8:
+                {
+                    std::cout << "Enter the input filename:";
+                    std::string audioFilename;
+                    std::getline(std::cin, audioFilename);
+                    std::getline(std::cin, audioFilename);
+
+                    std::string inputFormat = "";
+                    std::string deviceName = audioFilename;
+                    std::map<std::string, std::string> options = {};
+                    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000);
+                    sinks.push_back(audioSink);
+
+                    // av_log_set_level(AV_LOG_QUIET);
+
+                    FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
+                    recorder.start();
+                    recorder.join();
+                    recorder.stop();
+                    int size = audioSink->getDataSize();
+                    uint8_t* data = new uint8_t[size];
+                    audioSink->getData(data);
+
+                    std::cout << "Enter the output filename:";
+                    std::getline(std::cin, audioFilename);
+
+                    std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
+                    outfile.write((const char*)data, size);
+
+                    delete[] data;
+                }
+                break;
+            case 9:
                 break;
             default:
                 std::cout << "Unkown option: " << option << "\n";

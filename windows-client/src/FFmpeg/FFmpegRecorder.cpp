@@ -65,7 +65,7 @@ void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
     // open input file, and allocate format context
     if (avformat_open_input(&formatContext, deviceName.c_str(), inputFormat, &options) < 0) {
         free();
-        std::string errStr = "Could not open stream + " + deviceName + " in FFmpeg Recorder";
+        std::string errStr = "Could not open stream " + deviceName + " in FFmpeg Recorder";
         std::cerr << errStr << '\n';
         throw std::runtime_error(errStr);
     }

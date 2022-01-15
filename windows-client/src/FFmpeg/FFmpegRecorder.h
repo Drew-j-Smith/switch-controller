@@ -20,7 +20,7 @@ class FFmpegRecorder
 {
 private:
     AVFormatContext* formatContext = nullptr;
-    AVFrame* frame;
+    AVFrame* frame = nullptr;
     std::map<int, std::shared_ptr<FFmpegDecoder>> decoders;
 
     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
@@ -41,11 +41,14 @@ public:
     void start();
     void stop() {
         recording.store(false);
+        join();
+        free();
+    };
+    void join() {
         if (recordingThread.joinable()) {
             recordingThread.join();
         }
-        free();
-    } ;
+    }
 };
 
 
