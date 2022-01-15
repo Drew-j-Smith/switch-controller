@@ -100,7 +100,7 @@ int main(int argc, const char** argv)
                     std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>();
                     sinks.push_back(audioSink);
 
-                    av_log_set_level(AV_LOG_QUIET);
+                    // av_log_set_level(AV_LOG_QUIET);
 
                     FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
                     recorder.start();
@@ -109,11 +109,10 @@ int main(int argc, const char** argv)
                     std::this_thread::sleep_for(std::chrono::seconds(5));
                     
                     recorder.stop();
-					int size = audioSink->getDataSize() / sizeof(float);
+                    int size = audioSink->getDataSize() / sizeof(float);
                     uint8_t* data = new uint8_t[audioSink->getDataSize()];
                     audioSink->getData(data);
 
-                    std::cout << "test\n";
                     float* floatData = (float*)data;
                     std::vector<std::vector<float>> audioData;
                     audioData.push_back({});

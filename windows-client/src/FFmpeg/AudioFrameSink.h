@@ -28,12 +28,11 @@ public:
 
     void virtualInit(AVCodecContext* decoderContext) override {
         data = std::vector<uint8_t>();
-		std::cout << decoderContext->channel_layout << '\n' << decoderContext->sample_fmt << '\n' << decoderContext->sample_rate << '\n';
         swr = swr_alloc_set_opts(NULL,      // we're allocating a new context
             AV_CH_LAYOUT_MONO,              // out_ch_layout
             AV_SAMPLE_FMT_FLT,              // out_sample_fmt
             48000,                          // out_sample_rate
-			AV_CH_LAYOUT_STEREO,            // in_ch_layout TODO
+            AV_CH_LAYOUT_STEREO,            // in_ch_layout TODO
             decoderContext->sample_fmt,     // in_sample_fmt
             decoderContext->sample_rate,    // in_sample_rate
             0,                              // log_offset

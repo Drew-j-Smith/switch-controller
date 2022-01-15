@@ -34,9 +34,9 @@ private:
         data = new uint8_t[getDataSize()];
         memset(data, 0, getDataSize());
         linesize[0] = 3 * width;
-		swsContext = sws_getCachedContext(swsContext, width, height,
-			pixelFormat, width, height,
-			AV_PIX_FMT_BGR24, 0, 0, 0, 0);
+        swsContext = sws_getCachedContext(swsContext, width, height,
+            pixelFormat, width, height,
+            AV_PIX_FMT_BGR24, 0, 0, 0, 0);
     }
 
     void virtualOutputFrame(AVFrame* frame) override {
