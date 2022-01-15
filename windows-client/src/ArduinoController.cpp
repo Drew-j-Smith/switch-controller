@@ -3,7 +3,6 @@
 #include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/VideoFrameSink.h"
-#include <AudioFile.h>
 #include "Utility/SerialPort.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -99,7 +98,7 @@ int main(int argc, const char** argv)
                     std::string deviceName = "audio=Game Capture HD60 S Audio";
                     std::map<std::string, std::string> options = {};
                     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>();
+                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000);
                     sinks.push_back(audioSink);
 
                     // av_log_set_level(AV_LOG_QUIET);
@@ -111,27 +110,17 @@ int main(int argc, const char** argv)
                     std::this_thread::sleep_for(std::chrono::seconds(5));
                     
                     recorder.stop();
-                    int size = audioSink->getDataSize() / sizeof(float);
-                    uint8_t* data = new uint8_t[audioSink->getDataSize()];
+                    int size = audioSink->getDataSize();
+                    uint8_t* data = new uint8_t[size];
                     audioSink->getData(data);
 
-                    float* floatData = (float*)data;
-                    std::vector<std::vector<float>> audioData;
-                    audioData.push_back({});
-                    audioData[0].resize(size);
-                    
-                    for (int i = 0; i < size; i++) {
-                        audioData[0][i] = floatData[i];
-                    }
-
-                    AudioFile<float> audiofile = AudioFile<float>();
-                    audiofile.setAudioBuffer(audioData);
-                    audiofile.setSampleRate(48000);
                     std::cout << "Enter the filename:";
                     std::string audioFilename;
                     std::getline(std::cin, audioFilename);
                     std::getline(std::cin, audioFilename);
-                    audiofile.save(audioFilename);
+
+                    std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
+                    outfile.write(data, size);
 
                     delete[] data;
                 }
