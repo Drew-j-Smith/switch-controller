@@ -61,7 +61,7 @@ public:
         data.resize(data.size() + out_samples * av_get_bytes_per_sample(outputSampleFormat));
         uint8_t* output = data.data() + data.size() - out_samples * av_get_bytes_per_sample(outputSampleFormat);
         int res = swr_convert(swr, &output, out_samples, (const uint8_t**)frame->extended_data, frame->nb_samples);
-        if (out_samples < 0) {
+        if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
             std::cerr << "Error converting audio in AudioFrameSink" << error << '\n';
