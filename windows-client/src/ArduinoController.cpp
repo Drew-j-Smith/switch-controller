@@ -93,6 +93,8 @@ int main(int argc, const char** argv)
                 break;
             case 7:
                 {
+                    std::cout << "Recording audio for 5 seconds...\n";
+
                     std::string inputFormat = "dshow";
                     std::string deviceName = "audio=Game Capture HD60 S Audio";
                     std::map<std::string, std::string> options = {};
@@ -125,7 +127,11 @@ int main(int argc, const char** argv)
                     AudioFile<float> audiofile = AudioFile<float>();
                     audiofile.setAudioBuffer(audioData);
                     audiofile.setSampleRate(48000);
-                    audiofile.save("test.wav");
+                    std::cout << "Enter the filename:";
+                    std::string audioFilename;
+                    std::getline(std::cin, audioFilename);
+                    std::getline(std::cin, audioFilename);
+                    audiofile.save(audioFilename);
 
                     delete[] data;
                 }
