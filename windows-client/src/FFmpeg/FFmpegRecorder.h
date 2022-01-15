@@ -44,6 +44,7 @@ public:
         if (recordingThread.joinable()) {
             recordingThread.join();
         }
+        free();
     } ;
 };
 

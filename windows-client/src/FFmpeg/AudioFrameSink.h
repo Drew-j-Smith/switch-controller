@@ -40,7 +40,7 @@ public:
             channel_layout = av_get_default_channel_layout(decoderContext->channels);
         }
 
-        swr = swr_alloc_set_opts(NULL,      // we're allocating a new context
+        swr = swr_alloc_set_opts(nullptr,      // we're allocating a new context
             outChannelLayout,               // out_ch_layout
             outputSampleFormat,             // out_sample_fmt
             outSampleRate,                  // out_sample_rate
@@ -48,13 +48,13 @@ public:
             decoderContext->sample_fmt,     // in_sample_fmt
             decoderContext->sample_rate,    // in_sample_rate
             0,                              // log_offset
-            NULL);                          // log_ctx
+            nullptr);                          // log_ctx
         int res = swr_init(swr);
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            std::cout << error << '\n';
-            throw std::exception("Error converting audio");
+            std::cerr << "Error Initializing AudioFrameSink\n" << error << '\n';
+            throw std::exception("Error Initializing AudioFrameSink");
         }
     }
 
@@ -66,7 +66,7 @@ public:
         if (out_samples < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            std::cout << error << '\n';
+            std::cerr << "Error converting audio in AudioFrameSink" << error << '\n';
             throw std::exception("Error converting audio");
         }
     }

@@ -23,8 +23,8 @@ private:
 
     std::mutex mutex;
 
-    struct SwsContext* swsContext = NULL;
-    uint8_t* data = NULL;
+    struct SwsContext* swsContext;
+    uint8_t* data;
     int linesize[1];
 
     void virtualInit(AVCodecContext* decoderContext) override {
@@ -33,10 +33,18 @@ private:
         pixelFormat = decoderContext->pix_fmt;
         data = new uint8_t[getDataSize()];
         memset(data, 0, getDataSize());
-        linesize[0] = 3 * width;
-        swsContext = sws_getCachedContext(swsContext, width, height,
-            pixelFormat, width, height,
-            AV_PIX_FMT_BGR24, 0, 0, 0, 0);
+        linesize[0] = 3 * width; // TODO get with ffmpeg
+        swsContext = sws_getCachedContext(nullptr,
+            width,
+            height,
+            pixelFormat,
+            width,
+            height,
+            AV_PIX_FMT_BGR24, // TODO pick output format
+            0,
+            0,
+            0,
+            0);
     }
 
     void virtualOutputFrame(AVFrame* frame) override {
@@ -44,7 +52,13 @@ private:
             throw std::runtime_error("Cannot support changing input format");
         }
 
-        sws_scale(swsContext, frame->data, frame->linesize, 0, height, &data, linesize);
+        int res = sws_scale(swsContext, frame->data, frame->linesize, 0, height, &data, linesize);
+        if (res < 0) {
+            char error[AV_ERROR_MAX_STRING_SIZE];
+            av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
+            std::cerr << "Error converting audio in VideoFrameSink" << error << '\n';
+            throw std::runtime_error("Error converting image in VideoFrameSink");
+        }
     }
 
     void getDataWithoutLock(uint8_t* data) override {

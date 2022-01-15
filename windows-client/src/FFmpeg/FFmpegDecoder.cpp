@@ -17,7 +17,9 @@ void FFmpegDecoder::openCodecContext()
     this->streamIndex = av_find_best_stream(formatContext, this->sink->getType(), -1, -1, NULL, 0);
     if (this->streamIndex < 0) {
         free();
-        throw std::runtime_error("Could not find " + std::string(av_get_media_type_string(this->sink->getType())) + " stream");
+        std::string errStr = "Could not find " + std::string(av_get_media_type_string(this->sink->getType())) + " stream in FFmpeg Decoder";
+        std::cerr << errStr << '\n';
+        throw std::runtime_error(errStr);
     }
     AVStream* stream = formatContext->streams[this->streamIndex];
 
@@ -25,26 +27,34 @@ void FFmpegDecoder::openCodecContext()
     const AVCodec* decoder = avcodec_find_decoder(stream->codecpar->codec_id);
     if (!decoder) {
         free();
-        throw std::runtime_error("Failed to find " + std::string(av_get_media_type_string(this->sink->getType())) + " codec");
+        std::string errStr = "Failed to find " + std::string(av_get_media_type_string(this->sink->getType())) + " codec in FFmpeg Decoder";
+        std::cerr << errStr << '\n';
+        throw std::runtime_error(errStr);
     }
 
     // Allocate a codec context for the decoder
     this->decoderContext = avcodec_alloc_context3(decoder);
     if (!this->decoderContext) {
         free();
-        throw std::runtime_error("Failed to allocate the " + std::string(av_get_media_type_string(this->sink->getType())) + " codec context");
+        std::string errStr = "Failed to allocate the " + std::string(av_get_media_type_string(this->sink->getType())) + " codec context in FFmpeg Decoder";
+        std::cerr << errStr << '\n';
+        throw std::runtime_error(errStr);
     }
 
     // Copy codec parameters from input stream to output codec context
     if (avcodec_parameters_to_context(this->decoderContext, stream->codecpar) < 0) {
         free();
-        throw std::runtime_error("Failed to copy " + std::string(av_get_media_type_string(this->sink->getType())) + " codec parameters to decoder context");
+        std::string errStr = "Failed to copy " + std::string(av_get_media_type_string(this->sink->getType())) + " codec parameters to decoder context in FFmpeg Decoder";
+        std::cerr << errStr << '\n';
+        throw std::runtime_error(errStr);
     }
 
     // Init the decoders
     if (avcodec_open2(this->decoderContext, decoder, NULL) < 0) {
         free();
-        throw std::runtime_error("Failed to open " + std::string(av_get_media_type_string(this->sink->getType())) + " codec");
+        std::string errStr = "Failed to open " + std::string(av_get_media_type_string(this->sink->getType())) + " codec in FFmpeg Decoder";
+        std::cerr << errStr << '\n';
+        throw std::runtime_error(errStr);
     }
 }
 
@@ -67,7 +77,9 @@ void FFmpegDecoder::decodePacket(const AVPacket* packet, AVFrame* frame) {
     if (ret < 0) {
         free();
         char error[AV_ERROR_MAX_STRING_SIZE];
-        throw std::runtime_error("Error submitting a packet for decoding (" + std::string(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret)) + ")");
+        std::string errStr(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret));
+        std::cerr << "Error submitting a packet for decoding (" << errStr << ")\n";
+        throw std::runtime_error("Error submitting a packet for decoding (" + errStr + ")");
     }
  
     // get all the available frames from the decoder
@@ -81,7 +93,9 @@ void FFmpegDecoder::decodePacket(const AVPacket* packet, AVFrame* frame) {
 
             free();
             char error[AV_ERROR_MAX_STRING_SIZE];
-            throw std::runtime_error("Error during decoding (" + std::string(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret)) + ")");
+            std::string errStr(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret));
+            std::cerr << "Error during decoding (" << errStr << ")  in FFmpeg Decoder\n";
+            throw std::runtime_error("Error during decoding (" + errStr + ")  in FFmpeg Decoder");
         }
  
         // send frame to frame sink
