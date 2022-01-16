@@ -14,35 +14,10 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 add_definitions(-D_WIN32_WINNT=0x0A00)
 
 find_package(OpenCV REQUIRED)
-find_package(SFML 2 COMPONENTS window audio REQUIRED)
+find_package(SFML 2 COMPONENTS window REQUIRED)
 find_package(Boost COMPONENTS system thread unit_test_framework REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
-
-set(FFMPEG_INCLUDE_NAMES
-libavcodec/avcodec.h
-libavformat/avformat.h
-libavutil/avutil.h
-libavdevice/avdevice.h
-libswscale/swscale.h
-libswresample/swresample.h
-)
-
-set(FFMPEG_LIB_NAMES
-avcodec
-avformat
-avutil
-avdevice
-swscale
-swresample
-)
-
-foreach(DIR_NAME LIB_NAME IN ZIP_LISTS FFMPEG_INCLUDE_NAMES FFMPEG_LIB_NAMES)
-    set(LIB "LIB-NOTFOUND")
-    find_path(DIR ${DIR_NAME})
-    find_library(LIB ${LIB_NAME})
-    list(APPEND FFMPEG_INCLUDE_DIRS ${DIR})
-    list(APPEND FFMPEG_LIBS ${LIB})
-endforeach()
+find_package(FFMPEG REQUIRED)
 
 set(CMAKE_LIBS 
 ${OpenCV_LIBS}
@@ -50,7 +25,7 @@ sfml-window
 sfml-audio
 ${Boost_LIBRARIES}
 FFTW3::fftw3f
-${FFMPEG_LIBS}
+${FFMPEG_LIBRARIES}
 )
 
 set(CMAKE_INCLUDE_DIRS
@@ -61,6 +36,7 @@ ${Boost_INCLUDE_DIRS}
 ${FFTW3_INCLUDE_DIRS}
 ${AUDIOFILE_INCLUDE_DIRS}
 ${FFMPEG_INCLUDE_DIRS}
+${FFMPEG_LIBRARY_DIRS}
 )
 
 
