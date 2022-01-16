@@ -12,6 +12,7 @@
 
 extern "C" {
     #include <libswscale/swscale.h>
+    #include <libavutil/imgutils.h>
 }
 
 class VideoFrameSink : public FFmpegFrameSink
@@ -25,29 +26,50 @@ private:
 
     struct SwsContext* swsContext;
     std::vector<uint8_t> data;
-    int linesize[1];
+    int linesize[4];
+
+    AVPixelFormat outputPixelFormat = AV_PIX_FMT_BGR24;
+    int outputWidth = 1920;
+    int outputHeight = 1080;
 
     void virtualInit(AVCodecContext* decoderContext) override {
         width = decoderContext->width;
         height = decoderContext->height;
         pixelFormat = decoderContext->pix_fmt;
-        data.resize(width * height * 3);
-        linesize[0] = 3 * width; // TODO get with ffmpeg
+
+        int res = av_image_fill_linesizes(linesize, outputPixelFormat, outputWidth);
+        if (res < 0) {
+            char error[AV_ERROR_MAX_STRING_SIZE];
+            av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
+            std::cerr << "Error getting linesize in VideoFrameSink " << error << '\n';
+            throw std::runtime_error("Error getting linesize in VideoFrameSink");
+        }
+
+        res = av_image_get_buffer_size(outputPixelFormat, outputWidth, outputHeight, 1);
+        if (res < 0) {
+            char error[AV_ERROR_MAX_STRING_SIZE];
+            av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
+            std::cerr << "Error getting plane size in VideoFrameSink " << error << '\n';
+            throw std::runtime_error("Error getting plane size in VideoFrameSink");
+        }
+        data.resize(res);
+
         swsContext = sws_getCachedContext(nullptr,
             width,
             height,
             pixelFormat,
-            width,
-            height,
-            AV_PIX_FMT_BGR24, // TODO pick output format
+            outputWidth,
+            outputHeight,
+            outputPixelFormat,
             0,
-            0,
-            0,
-            0);
+            nullptr,
+            nullptr,
+            nullptr);
     }
 
     void virtualOutputFrame(AVFrame* frame) override {
         if (frame->width != width || frame->height != height || frame->format != pixelFormat) {
+            std::cerr << "Cannot support changing input format in VideoFrameSink\n";
             throw std::runtime_error("Cannot support changing input format");
         }
 
@@ -77,8 +99,8 @@ public:
         return AVMEDIA_TYPE_VIDEO;
     }
 
-    int getWidth() const { return this->width; }
-    int getHeight() const { return this->height; }
+    int getWidth() const { return outputWidth; }
+    int getHeight() const { return outputHeight; }
 };
 
 
