@@ -7,15 +7,16 @@
 
 #include "DeciderCollectionBase.h"
 #include "SoundDecider.h"
-#include "Utility/AudioSink.h"
+#include "FFmpeg/AudioFrameSink.h"
+#include "FFmpeg/FFmpegRecorder.h"
 
 class SoundDeciderCollection : public DeciderCollectionBase {
 private:
     std::vector<std::shared_ptr<SoundDecider>> deciders;
-    std::thread soundThread;
     std::thread updateThread;
     std::atomic<bool> continueUpdating;
-    std::shared_ptr<AudioSink> audioSink;
+    std::shared_ptr<FFmpegRecorder> ffmpegRecorder;
+    std::shared_ptr<AudioFrameSink> audioSink;
 
 public:
     SoundDeciderCollection(const boost::property_tree::ptree & tree);

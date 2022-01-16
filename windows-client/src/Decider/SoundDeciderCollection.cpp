@@ -21,21 +21,27 @@ SoundDeciderCollection::SoundDeciderCollection(const boost::property_tree::ptree
         }
     }
 
-    double bufferTime = 1.0;
-    AudioSink::AudioInfo audioInfo = {0, 0, 0};
-    audioSink = std::make_shared<AudioSink>(bufferTime, audioInfo);
+    std::string inputFormat = "dshow";
+    std::string deviceName = "audio=Game Capture HD60 S Audio";
+    std::map<std::string, std::string> options = {};
+    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+    this->audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, true, 48000);
+    sinks.push_back(this->audioSink);
 
-    soundThread = std::thread([&](){
-        audioSink->RecordAudioStreamLoopback();
-    });
+    av_log_set_level(AV_LOG_QUIET);
+
+    this->ffmpegRecorder = std::make_shared<FFmpegRecorder>(inputFormat, deviceName, options, sinks);
+    this->ffmpegRecorder->start();
+
+    audioSink->waitForInit();
 
     updateThread = std::thread([&](){
-        std::this_thread::sleep_for(std::chrono::milliseconds((long long)(1000 * bufferTime + 500)));
-        std::vector<float> soundData;
+        std::vector<uint8_t> data;
         std::vector<std::future<void>> futures;
+        long long lastFrame = audioSink->getData(data);
+        std::vector<float> soundData((float*)data.data(), (float*)(data.data() + data.size()));
         while (continueUpdating.load()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            soundData = audioSink->getData()[0];
+            lastFrame = audioSink->getNextData(data, lastFrame);
             for (auto decider : deciders) {
                 futures.push_back(std::async(std::launch::async, matchSound, decider, soundData));
             }
@@ -45,9 +51,7 @@ SoundDeciderCollection::SoundDeciderCollection(const boost::property_tree::ptree
 }
 
 SoundDeciderCollection::~SoundDeciderCollection() {
-    audioSink->setFinished(true);
     continueUpdating.store(false);
-    if (soundThread.joinable()) soundThread.join();
     if (updateThread.joinable()) updateThread.join();
 }
 
