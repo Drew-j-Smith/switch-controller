@@ -23,7 +23,13 @@ void StartController(std::string& configFilename) {
     sf::Joystick::update();
 
     boost::property_tree::ptree tree;
-    boost::property_tree::read_json(configFilename, tree);
+    try {
+        boost::property_tree::read_json(configFilename, tree);
+    }
+    catch (boost::property_tree::json_parser::json_parser_error& e) {
+        std::cerr << "Error parsing config file\n";
+        return;
+    }
 
     InputManager inputManager(tree.find("controls")->second, 15);
 
