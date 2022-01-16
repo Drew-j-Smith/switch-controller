@@ -1,5 +1,8 @@
 #include "SoundDecider.h"
 
+#include "FFmpeg/FFmpegRecorder.h"
+#include "FFmpeg/AudioFrameSink.h"
+
 static double dotProduct(const std::vector<float> & v) {
     double total = 0.0f;
     for (int i = 0; i < v.size(); i++) {
@@ -69,22 +72,37 @@ static std::vector<float> findFrequencies(std::shared_ptr<fftwPlan> plan, const 
 }
 
 SoundDecider::SoundDecider(const boost::property_tree::ptree & tree) {
+    std::string filename;
     try {
         name = tree.get<std::string>("name");
-        matchAudio = AudioFile<float>();
-        matchAudio.load(tree.get<std::string>("filename"));
+        filename = tree.get<std::string>("filename");
         matchThreshold = tree.get<double>("match threshold");
     }
     catch (boost::property_tree::ptree_error & e) {
         std::cerr << "Error loading SoundDecider.\n";
         std::cerr << "\tError: \"" << e.what() << "\"\n";
         std::cerr << "\tAre fields [\"name\", \"filename\", \"match threshold\"] missing?\n";
+        throw;
     }
 
-    plan = std::make_shared<fftwPlan>(matchAudio.getNumSamplesPerChannel());
+    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000);
+    sinks.push_back(audioSink);
 
-    matchFrequencies = findFrequencies(plan, matchAudio.samples[0]);
+    av_log_set_level(AV_LOG_QUIET);
 
+    FFmpegRecorder ffmpegRecorder("", filename, {}, sinks);
+    ffmpegRecorder.start();
+    audioSink->waitForInit();
+    ffmpegRecorder.join();
+    ffmpegRecorder.stop();
+
+    std::vector<uint8_t> rawData;
+    audioSink->getData(rawData);
+    matchAudio = std::vector<float>((float*)rawData.data(), (float*)(rawData.data() + rawData.size()));
+
+    plan = std::make_shared<fftwPlan>(matchAudio.size());
+    matchFrequencies = findFrequencies(plan, matchAudio);
     matchValue.store(0);
 }
 

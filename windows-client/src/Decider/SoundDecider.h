@@ -4,14 +4,13 @@
 #include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
-#include <AudioFile.h>
 
 #include "Decider.h"
 #include "Utility/fftwPlan.h"
 
 class SoundDecider : public Decider {
 private:
-    AudioFile<float> matchAudio;
+    std::vector<float> matchAudio;
     std::shared_ptr<fftwPlan> plan;
     std::vector<float> matchFrequencies;
     double matchThreshold;
@@ -21,7 +20,7 @@ public:
 
     void update(std::vector<float> soundData);
 
-    const AudioFile<float>* getMatchAudio() const { return &matchAudio; }
+    const std::vector<float>* getMatchAudio() const { return &matchAudio; }
 
     int nextListIndex() const override;
 };
