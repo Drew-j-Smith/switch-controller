@@ -1,0 +1,12 @@
+{
+    "name": "switch-controller",
+    "version-string": "3.0.0",
+    "dependencies": [
+      "opencv",
+      "sfml",
+      "boost",
+      "fftw3",
+      "ffmpeg",
+      "audiofile"
+    ]
+  }
