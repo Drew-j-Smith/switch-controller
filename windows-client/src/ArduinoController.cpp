@@ -80,9 +80,9 @@ int main(int argc, const char** argv)
                     recorder.start();
 
                     videoSink->waitForInit();
-                    uint8_t* data = new uint8_t[videoSink->getDataSize()];
-                    cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data);
-                    long long lastFrame = 0;
+                    std::vector<uint8_t> data;
+                    long long lastFrame = videoSink->getData(data);
+                    cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data.data());
                     while (true) {
                         lastFrame = videoSink->getNextData(data, lastFrame);
                         cv::imshow("test", mat);
@@ -98,7 +98,7 @@ int main(int argc, const char** argv)
                     std::string deviceName;
                     std::string recordTimeStr;
                     char loopRecord;
-                    int64_t bufferSize;
+                    int64_t bufferSize = 0;
 
                     // dshow
                     // audio=Game Capture HD60 S Audio
@@ -138,8 +138,7 @@ int main(int argc, const char** argv)
                     }
                     
                     recorder.stop();
-                    int size = audioSink->getDataSize();
-                    uint8_t* data = new uint8_t[size];
+                    std::vector<uint8_t> data;
                     audioSink->getData(data);
 
                     std::cout << "Enter the output filename:\n";
@@ -148,9 +147,7 @@ int main(int argc, const char** argv)
                     std::getline(std::cin, audioFilename);
 
                     std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
-                    outfile.write((const char*)data, size);
-
-                    delete[] data;
+                    outfile.write((const char*)data.data(), data.size());
                 }
                 break;
             case 8:

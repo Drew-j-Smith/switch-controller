@@ -21,7 +21,7 @@ private:
 protected:
     virtual void virtualInit(AVCodecContext* decoderContext) = 0;
     virtual void virtualOutputFrame(AVFrame* frame) = 0;
-    virtual void getDataWithoutLock(uint8_t* data) = 0;
+    virtual void getDataWithoutLock(std::vector<uint8_t>& data) = 0;
 
     std::unique_ptr<std::unique_lock<std::mutex>> getDataMutexLock() const {
         return std::make_unique<std::unique_lock<std::mutex>>(dataMutex);
@@ -49,13 +49,13 @@ public:
         dataCV.notify_all();
     }
 
-    long long getData(uint8_t* data) {
+    long long getData(std::vector<uint8_t>& data) {
         std::lock_guard<std::mutex> lock(dataMutex);
         getDataWithoutLock(data);
         return lastFrame;
     }
 
-    long long getNextData(uint8_t* data, long long lastFrame) {
+    long long getNextData(std::vector<uint8_t>& data, long long lastFrame) {
         std::unique_lock<std::mutex> lock(dataMutex);
         while (this->lastFrame == lastFrame) {
             dataCV.wait(lock);
@@ -63,8 +63,6 @@ public:
         getDataWithoutLock(data);
         return this->lastFrame;
     }
-
-    virtual long long getDataSize() const = 0;
 
     virtual AVMediaType getType() const = 0;
 };

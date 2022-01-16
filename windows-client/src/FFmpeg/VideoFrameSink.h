@@ -24,15 +24,14 @@ private:
     std::mutex mutex;
 
     struct SwsContext* swsContext;
-    uint8_t* data;
+    std::vector<uint8_t> data;
     int linesize[1];
 
     void virtualInit(AVCodecContext* decoderContext) override {
         width = decoderContext->width;
         height = decoderContext->height;
         pixelFormat = decoderContext->pix_fmt;
-        data = new uint8_t[getDataSize()];
-        memset(data, 0, getDataSize());
+        data.resize(width * height * 3);
         linesize[0] = 3 * width; // TODO get with ffmpeg
         swsContext = sws_getCachedContext(nullptr,
             width,
@@ -52,7 +51,8 @@ private:
             throw std::runtime_error("Cannot support changing input format");
         }
 
-        int res = sws_scale(swsContext, frame->data, frame->linesize, 0, height, &data, linesize);
+        uint8_t* dataPointer = data.data();
+        int res = sws_scale(swsContext, frame->data, frame->linesize, 0, height, &dataPointer, linesize);
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
@@ -61,24 +61,20 @@ private:
         }
     }
 
-    void getDataWithoutLock(uint8_t* data) override {
-        memcpy(data, this->data, getDataSize());
+    void getDataWithoutLock(std::vector<uint8_t>& data) override {
+		data.resize(this->data.size());
+        std::copy(this->data.begin(), this->data.end(), data.begin());
     }
 
 public:
     VideoFrameSink() {}
 
     ~VideoFrameSink() {
-        if (data)
-            delete[] data;
+        sws_freeContext(swsContext);
     }
 
     AVMediaType getType() const override {
         return AVMEDIA_TYPE_VIDEO;
-    }
-
-    long long getDataSize() const override {
-        return width * height * 3;
     }
 
     int getWidth() const { return this->width; }

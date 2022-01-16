@@ -106,19 +106,15 @@ public:
         }
     }
 
-    void getDataWithoutLock(uint8_t* data) override {
+    void getDataWithoutLock(std::vector<uint8_t>& data) override {
+        data.resize(this->data.size());
         if (loopRecording) {
-            memcpy(data, this->data.data() + loopBufferPosition, this->data.size() - loopBufferPosition);
-            memcpy(data + this->data.size() - loopBufferPosition, this->data.data(), loopBufferPosition);
+            std::copy(this->data.begin() + loopBufferPosition, this->data.end(), data.begin());
+            std::copy(this->data.begin(), this->data.begin() + loopBufferPosition, data.begin() + (this->data.size() - loopBufferPosition));
         } else {
-            memcpy(data, this->data.data(), this->data.size());
+            std::copy(this->data.begin(), this->data.end(), data.begin());
         }
     }
-
-    long long getDataSize() const override {
-        auto lock = getDataMutexLock();
-        return data.size();
-    };
 
     AVMediaType getType() const override {
         return AVMEDIA_TYPE_AUDIO;

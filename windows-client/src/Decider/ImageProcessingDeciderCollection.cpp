@@ -9,9 +9,9 @@ void ImageProcessingDeciderCollection::startImageProcessingThread() {
     imageProcessingThread = std::thread([&](){
         std::vector<std::future<void>> futures;
         this->videoFrameSink->waitForInit();
-        uint8_t* data = new uint8_t[this->videoFrameSink->getDataSize()];
-        cv::Mat screenshot = cv::Mat(this->videoFrameSink->getHeight(), this->videoFrameSink->getWidth(), CV_8UC3, data);
-        long long lastFrame = 0;
+        std::vector<uint8_t> data;
+        long long lastFrame = this->videoFrameSink->getData(data);
+        cv::Mat screenshot = cv::Mat(this->videoFrameSink->getHeight(), this->videoFrameSink->getWidth(), CV_8UC3, data.data());
         
         while (imageProcessing.load()) {
             lastFrame = this->videoFrameSink->getNextData(data, lastFrame);
@@ -20,8 +20,6 @@ void ImageProcessingDeciderCollection::startImageProcessingThread() {
             }
             futures.clear();
         }
-
-        delete[] data;
     });
 }
 
