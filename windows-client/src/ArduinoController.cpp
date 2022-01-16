@@ -20,8 +20,7 @@ R"(Select one of the following options:
     5. Test serial communication
     6. Test FFmpeg video capture
     7. Test FFmpeg audio capture
-    8. Test FFmpeg file loading
-    9. Exit
+    8. Exit
 )";
 
 int main(int argc, const char** argv)
@@ -29,7 +28,7 @@ int main(int argc, const char** argv)
     int option = 0;
     std::string configFilename = "data/config.json";
 
-    while (option != 9) {
+    while (option != 8) {
         std::cout << options;
         std::cout << "The current config file is: \"" << configFilename << "\"\n";
         std::cin >> option;
@@ -93,29 +92,51 @@ int main(int argc, const char** argv)
                 break;
             case 7:
                 {
-                    std::cout << "Recording audio for 5 seconds...\n";
+                    std::getline(std::cin, std::string());
 
-                    std::string inputFormat = "dshow";
-                    std::string deviceName = "audio=Game Capture HD60 S Audio";
+                    std::string inputFormat;
+                    std::string deviceName;
+                    std::string recordTimeStr;
+                    char loopRecord;
+
+                    // dshow
+                    // audio=Game Capture HD60 S Audio
+                    // ffplay -f s16le -ar 48k -ac 1 test.pcm
+
+                    std::cout << "Enter the input format (empty to load a file):\n";
+                    std::getline(std::cin, inputFormat);
+
+                    std::cout << "Enter the device/filename:\n";
+                    std::getline(std::cin, deviceName);
+
+                    std::cout << "Enter the recording time in seconds (empty to read an entire file)\n";
+                    std::getline(std::cin, recordTimeStr);
+
+                    // TODO not yet implemented
+                    std::cout << "Use loop recording (y/n):\n";
+                    std::cin >> loopRecord;
+
                     std::map<std::string, std::string> options = {};
                     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
                     std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000);
                     sinks.push_back(audioSink);
 
-                    // av_log_set_level(AV_LOG_QUIET);
-
                     FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
                     recorder.start();
 
                     audioSink->waitForInit();
-                    std::this_thread::sleep_for(std::chrono::seconds(5));
+                    if (recordTimeStr.length() > 0) {
+                        std::this_thread::sleep_for(std::chrono::seconds(std::stoi(recordTimeStr)));
+                    } else {
+                        recorder.join();
+                    }
                     
                     recorder.stop();
                     int size = audioSink->getDataSize();
                     uint8_t* data = new uint8_t[size];
                     audioSink->getData(data);
 
-                    std::cout << "Enter the filename:";
+                    std::cout << "Enter the output filename:\n";
                     std::string audioFilename;
                     std::getline(std::cin, audioFilename);
                     std::getline(std::cin, audioFilename);
@@ -127,39 +148,6 @@ int main(int argc, const char** argv)
                 }
                 break;
             case 8:
-                {
-                    std::cout << "Enter the input filename:";
-                    std::string audioFilename;
-                    std::getline(std::cin, audioFilename);
-                    std::getline(std::cin, audioFilename);
-
-                    std::string inputFormat = "";
-                    std::string deviceName = audioFilename;
-                    std::map<std::string, std::string> options = {};
-                    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000);
-                    sinks.push_back(audioSink);
-
-                    // av_log_set_level(AV_LOG_QUIET);
-
-                    FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
-                    recorder.start();
-                    recorder.join();
-                    recorder.stop();
-                    int size = audioSink->getDataSize();
-                    uint8_t* data = new uint8_t[size];
-                    audioSink->getData(data);
-
-                    std::cout << "Enter the output filename:";
-                    std::getline(std::cin, audioFilename);
-
-                    std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
-                    outfile.write((const char*)data, size);
-
-                    delete[] data;
-                }
-                break;
-            case 9:
                 break;
             default:
                 std::cout << "Unkown option: " << option << "\n";
