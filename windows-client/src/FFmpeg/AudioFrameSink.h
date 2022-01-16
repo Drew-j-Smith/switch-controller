@@ -19,13 +19,25 @@ private:
     int64_t outChannelLayout = AV_CH_LAYOUT_MONO;
     AVSampleFormat outputSampleFormat = AV_SAMPLE_FMT_FLT;
     int outSampleRate = 48000;
+
+    bool loopRecording = false;
+    std::vector<uint8_t> dataBuffer;
+    int64_t loopBufferPosition = 0;
 public:
     AudioFrameSink() {}
 
-    AudioFrameSink(int64_t outChannelLayout, AVSampleFormat outputSampleFormat, int outSampleRate) :
+    AudioFrameSink(int64_t outChannelLayout, AVSampleFormat outputSampleFormat, int outSampleRate, bool loopRecording = false, int64_t loopBufferSize = 0) :
         outChannelLayout(outChannelLayout),
         outputSampleFormat(outputSampleFormat),
-        outSampleRate(outSampleRate) {}
+        outSampleRate(outSampleRate),
+        loopRecording(loopRecording) {
+        if (loopRecording) {
+            // I don't know the best way to do this but I am just going 
+            // to set the buffer to be 1 sec. of audio data
+            dataBuffer.resize(outSampleRate * av_get_bytes_per_sample(outputSampleFormat));
+            data.resize(loopBufferSize * av_get_bytes_per_sample(outputSampleFormat));
+        }
+    }
 
     ~AudioFrameSink() {
         swr_free(&swr);
@@ -58,19 +70,49 @@ public:
 
     void virtualOutputFrame(AVFrame* frame) override {
         int out_samples = av_rescale_rnd(swr_get_delay(swr, frame->sample_rate) + frame->nb_samples, 48000, frame->sample_rate, AV_ROUND_UP);
-        data.resize(data.size() + out_samples * av_get_bytes_per_sample(outputSampleFormat));
-        uint8_t* output = data.data() + data.size() - out_samples * av_get_bytes_per_sample(outputSampleFormat);
-        int res = swr_convert(swr, &output, out_samples, (const uint8_t**)frame->extended_data, frame->nb_samples);
+        uint8_t* output;
+        int res;
+
+        if (loopRecording) {
+            output = dataBuffer.data();
+        } else {
+            data.resize(data.size() + out_samples * av_get_bytes_per_sample(outputSampleFormat));
+            output = data.data() + data.size() - out_samples * av_get_bytes_per_sample(outputSampleFormat);
+        }
+
+        res = swr_convert(swr, &output, out_samples, (const uint8_t**)frame->extended_data, frame->nb_samples);
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
             std::cerr << "Error converting audio in AudioFrameSink" << error << '\n';
             throw std::exception("Error converting audio");
         }
+
+        if (loopRecording) {
+            if (loopBufferPosition + out_samples * av_get_bytes_per_sample(outputSampleFormat) >= data.size()) {
+                std::copy(dataBuffer.begin(),
+                          dataBuffer.begin() + (data.size() - loopBufferPosition),
+                          data.begin() + loopBufferPosition);
+                std::copy(dataBuffer.begin() + (data.size() - loopBufferPosition),
+                          dataBuffer.begin() + out_samples * av_get_bytes_per_sample(outputSampleFormat),
+                          data.begin());
+                loopBufferPosition -= data.size();
+            } else {
+                std::copy(dataBuffer.begin(),
+                          dataBuffer.begin() + out_samples * av_get_bytes_per_sample(outputSampleFormat),
+                          data.begin() + loopBufferPosition);
+            }
+            loopBufferPosition += out_samples * av_get_bytes_per_sample(outputSampleFormat);
+        }
     }
 
     void getDataWithoutLock(uint8_t* data) override {
-        memcpy(data, this->data.data(), this->data.size());
+        if (loopRecording) {
+            memcpy(data, this->data.data() + loopBufferPosition, this->data.size() - loopBufferPosition);
+            memcpy(data + this->data.size() - loopBufferPosition, this->data.data(), loopBufferPosition);
+        } else {
+            memcpy(data, this->data.data(), this->data.size());
+        }
     }
 
     long long getDataSize() const override {

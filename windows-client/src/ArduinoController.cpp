@@ -98,6 +98,7 @@ int main(int argc, const char** argv)
                     std::string deviceName;
                     std::string recordTimeStr;
                     char loopRecord;
+                    int64_t bufferSize;
 
                     // dshow
                     // audio=Game Capture HD60 S Audio
@@ -112,13 +113,18 @@ int main(int argc, const char** argv)
                     std::cout << "Enter the recording time in seconds (empty to read an entire file)\n";
                     std::getline(std::cin, recordTimeStr);
 
-                    // TODO not yet implemented
                     std::cout << "Use loop recording (y/n):\n";
                     std::cin >> loopRecord;
 
+                    if (loopRecord == 'y') {
+                        std::cout << "Enter the buffer size in seconds:\n";
+                        std::cin >> bufferSize;
+                    }
+
                     std::map<std::string, std::string> options = {};
                     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000);
+                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000,
+                        loopRecord == 'y', 48000 * bufferSize);
                     sinks.push_back(audioSink);
 
                     FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
