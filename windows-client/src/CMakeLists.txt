@@ -15,7 +15,6 @@ InputEvent/InputEventToggle.cpp
 InputEvent/InputManager.cpp
 Macro/Macro.cpp
 Macro/MacroCollection.cpp
-Utility/AudioSink.cpp
 Utility/SerialPort.cpp
 Utility/TimeString.cpp
 )

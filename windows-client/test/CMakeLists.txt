@@ -22,8 +22,3 @@ add_test(NAME InputEventGeneratorTest COMMAND ArduinoControllerTest --detect_mem
 add_test(NAME InputEventInverterTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventInverterTest)
 add_test(NAME InputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventTest)
 # ctest -C Debug --output-on-failure
-
-
-
-add_executable(CircularBufferTest Utility/CircularBufferRecorderTest.cpp)
-target_link_libraries(CircularBufferTest ${CMAKE_LIBS})
