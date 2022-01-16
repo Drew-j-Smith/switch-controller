@@ -4,9 +4,10 @@
     "dependencies": [
       "opencv",
       "sfml",
-      "boost",
+      "boost-property-tree",
+      "boost-asio",
+      "boost-test",
       "fftw3",
-      "ffmpeg",
-      "audiofile"
+      "ffmpeg"
     ]
   }
