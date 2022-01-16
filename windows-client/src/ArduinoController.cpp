@@ -83,11 +83,22 @@ int main(int argc, const char** argv)
                     std::vector<uint8_t> data;
                     long long lastFrame = videoSink->getData(data);
                     cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data.data());
-                    while (true) {
-                        lastFrame = videoSink->getNextData(data, lastFrame);
-                        cv::imshow("test", mat);
-                        cv::waitKey(1);
-                    }
+
+                    std::atomic<bool> running = true;
+
+                    std::thread t([&]() {
+                        while (running.load()) {
+                            lastFrame = videoSink->getNextData(data, lastFrame);
+                            cv::imshow("test", mat);
+                            cv::waitKey(1);
+                        }
+                    });
+
+                    std::cout << "Press enter to stop\n";
+                    std::cin.get();
+                    std::cin.get();
+                    running.store(false);
+                    t.join();
                 }
                 break;
             case 7:
