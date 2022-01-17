@@ -71,7 +71,7 @@ int NByteVector<frameSize>::hexToInt(char t) const{
 }
 
 template<size_t frameSize>
-void NByteVector<frameSize>::load(const std::string & filename, const bool isHex = true){
+void NByteVector<frameSize>::load(const std::string & filename, const bool isHex){
     clear();
     reserve(10000);
     std::ifstream infile(filename, std::ios::in | std::ios::binary);
@@ -116,7 +116,7 @@ void NByteVector<frameSize>::load(const std::string & filename, const bool isHex
 }
 
 template<size_t frameSize>
-void NByteVector<frameSize>::save(const std::string & filename, const bool asHex = true) const{
+void NByteVector<frameSize>::save(const std::string & filename, const bool asHex) const{
     std::ofstream outfile(filename, std::ios::out | std::ios::binary);
 
     if (outfile)
@@ -128,7 +128,7 @@ void NByteVector<frameSize>::save(const std::string & filename, const bool asHex
 }
 
 template<size_t frameSize>
-void NByteVector<frameSize>::print(std::ostream & out, const bool asHex = true) const{
+void NByteVector<frameSize>::print(std::ostream & out, const bool asHex) const{
     if (asHex){
         out << std::hex << std::setfill('0');
         for (int i = 0; i < size(); i++) {
