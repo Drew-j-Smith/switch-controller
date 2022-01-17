@@ -20,7 +20,7 @@ public:
     Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Decider>> & deciderList);
     
     void setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroMap);
-    void setNextMacroLists(const std::vector<std::vector<std::weak_ptr<Macro>>> & nextMacroLists) { this->nextMacroLists = nextMacroLists; }
+    void setNextMacroLists(const std::vector<std::vector<std::weak_ptr<Macro>>> & newNextMacroLists) { this->nextMacroLists = newNextMacroLists; }
 private:
     std::string name = "";
     NByteVector<sizeof(unsigned long long) + 7> data = {};
@@ -33,17 +33,17 @@ private:
     std::shared_ptr<Macro> cycleVector(int macroIndex);
 public:
     const std::string & getName() const { return name; }
-    void setName(const std::string & name) { this->name = name; }
+    void setName(const std::string & newName) { this->name = newName; }
     const std::shared_ptr<InputEvent> getInputEvent() const { return inputEvent; }
-    void setInputEvent(const std::shared_ptr<InputEvent> inputEvent) { this->inputEvent = inputEvent; }
+    void setInputEvent(const std::shared_ptr<InputEvent> newInputEvent) { this->inputEvent = newInputEvent; }
     const std::shared_ptr<Decider> getMacroDecider() const { return decider; }
-    void setMacroDecider(const std::shared_ptr<Decider> & decider) { this->decider = decider; }
+    void setMacroDecider(const std::shared_ptr<Decider> & newDecider) { this->decider = newDecider; }
     std::shared_ptr<Macro> getNextMacro();
     InputMergeMode getMode() { return mode; }
-    void setMode(const InputMergeMode mode) { this->mode = mode; }
+    void setMode(const InputMergeMode newMode) { this->mode = newMode; }
 
     const NByteVector<sizeof(unsigned long long) + 7> getData() const { return data; }
-    void setData(const NByteVector<sizeof(unsigned long long) + 7> data) { this->data = data; }
+    void setData(const NByteVector<sizeof(unsigned long long) + 7> newData) { this->data = newData; }
     void appendData(const unsigned long long, const unsigned char[8]);
     void getDataframe(const unsigned long long, unsigned char[8]) const;
     unsigned long long getTime(int index) const { return data.size() > 0 ? *(unsigned long long*)data[index].data() : 0; }
