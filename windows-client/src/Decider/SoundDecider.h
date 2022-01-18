@@ -6,17 +6,35 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "Decider.h"
-#include "Utility/fftwPlan.h"
+
+extern "C" {
+    #include <fftw3.h>
+}
 
 class SoundDecider : public Decider {
 private:
     std::vector<float> matchAudio;
-    std::shared_ptr<fftwPlan> plan;
+    
+    // fftw
+    float* fftwIn;
+    fftwf_complex* fftwOut;
+    fftwf_plan p;
+    int size;
+
     std::vector<float> matchFrequencies;
     double matchThreshold;
     std::atomic<double> matchValue;
+
+    std::vector<float> SoundDecider::findFrequencies(const std::vector<float> & samples);
+
 public:
     SoundDecider(const boost::property_tree::ptree & tree); // dont forget to set name
+
+    ~SoundDecider() {
+        fftwf_destroy_plan(p);
+        fftwf_free(fftwIn);
+        fftwf_free(fftwOut);
+    }
 
     void update(std::vector<float> soundData);
 
