@@ -9,7 +9,6 @@ InputEvent/DefaultInputEventTest.cpp
 InputEvent/InputEventGeneratorTest.cpp
 InputEvent/InputEventInverterTest.cpp
 InputEvent/InputEventTest.cpp
-Utility/TimeStringTest.cpp
 )
 
 
@@ -22,5 +21,4 @@ add_test(NAME ActiveInputEventTest COMMAND ArduinoControllerTest --detect_memory
 add_test(NAME InputEventGeneratorTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventGeneratorTest)
 add_test(NAME InputEventInverterTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventInverterTest)
 add_test(NAME InputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventTest)
-add_test(NAME TimeStringTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=TimeStringTest)
 # ctest -C Debug --output-on-failure

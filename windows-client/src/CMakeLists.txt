@@ -16,7 +16,6 @@ InputEvent/InputManager.cpp
 Macro/Macro.cpp
 Macro/MacroCollection.cpp
 Utility/SerialPort.cpp
-Utility/TimeString.cpp
 )
 
 add_library(SRC_LIB OBJECT ${CMAKE_SRC_FILES})

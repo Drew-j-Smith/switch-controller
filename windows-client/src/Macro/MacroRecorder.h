@@ -7,7 +7,7 @@
 
 #include "Macro.h"
 #include "InputEvent/InputEventCollection.h"
-#include "Utility/TimeString.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 class MacroRecorder
 {
@@ -32,7 +32,8 @@ public:
         if (record->getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(now - activationTime).count() > RECORDING_BUTTON_COOLDOWN) {
             activationTime = now;
             if (recording) {
-                std::string str = getTimeStr();
+                auto ptime =  boost::date_time::second_clock<boost::posix_time::ptime>::local_time();
+                std::string str = boost::posix_time::to_simple_string(ptime);
                 std::cout << "Saved recording to \"RecordedMacros/" << str << "\"" << std::endl;
 
                 auto macroData = currentRecordingMacro->getData();
