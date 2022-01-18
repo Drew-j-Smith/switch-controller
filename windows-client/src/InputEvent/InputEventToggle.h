@@ -44,8 +44,8 @@ public:
         }
     }
 
-    void setActive(const bool active) {
-        this->active = active;
+    void setActive(const bool newActive) {
+        this->active = newActive;
     }
 
     int getInputValue() const override {
@@ -59,7 +59,6 @@ public:
 
     std::string toString() const override { return ""; }
     boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
-    bool operator==(const InputEvent& other) const override { return false; }
 };
 
 

@@ -35,7 +35,7 @@ public:
     int getInputValue() const override { 
         if (!sf::Joystick::isConnected(joystickIndex) || !sf::Joystick::hasAxis(joystickIndex, axis))
             return 128;
-        int value = (100 + sf::Joystick::getAxisPosition(joystickIndex, axis) * SCALING) / 200.0 * 255.0;
+        int value = (int)((100 + sf::Joystick::getAxisPosition(joystickIndex, axis) * SCALING) / 200.0 * 255.0);
         if (value > 255)
             value = 255;
         if (value < 0)
@@ -51,7 +51,6 @@ public:
 
     std::string toString() const override { return ""; }
     boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
-    bool operator==(const InputEvent& other) const override { return false; }
 };
 
 #endif

@@ -29,7 +29,6 @@ public:
 
     std::string toString() const override { return ""; }
     boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
-    bool operator==(const InputEvent& other) const override { return false; }
 };
 
 #endif

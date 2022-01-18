@@ -30,21 +30,22 @@ public:
             
             std::cerr << "Error loading SfKeyboardInputEvent key \"" << keycode << "\".\n";
             std::cerr << "Error: \"" << e.what() << "\"\n";
-            sf::Keyboard::Key key = sf::Keyboard::Unknown;
+            key = sf::Keyboard::Unknown;
         }
     }
 
     int getInputValue() const override { return sf::Keyboard::isKeyPressed(key); }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { return nullptr; }
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override {
+        return nullptr;
+    }
     std::string getTypeName() const override { return ""; }
 
     void update() override {}
 
     std::string toString() const override { return ""; }
     boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
-    bool operator==(const InputEvent& other) const override { return false; }
 };
 
 #endif

@@ -18,9 +18,10 @@ InputManager::InputManager(const boost::property_tree::ptree & tree, const int t
         loadInputEvent(it);
     }
 
-    int turboLoopTime = tree.get("turbo loop time", 15);
+    // wrap each event in a turbo event which
+    // which keeps the input the same unless inputs[26] is pressed
     for (int i = 0; i < 14; i++) {
-        std::shared_ptr<InputEvent> turboEvent = std::make_shared<InputEventTurbo>(turboLoopTime, inputs[i]);
+        std::shared_ptr<InputEvent> turboEvent = std::make_shared<InputEventTurbo>(turboButtonLoopTime, inputs[i]);
         inputs[i] = std::make_shared<InputEventSwitch>(turboEvent, inputs[i], inputs[26]);
     }
 }
@@ -138,13 +139,13 @@ unsigned char InputManager::getControlStickData(int stick) const {
     const int actualStick = stick * 2; // there are 2 inputs per control stick
 
     if (inputs[offset + actualStick]->isDigital()) {
-        return 128 + inputs[offset + actualStick]->getInputValue() * 127
-            - inputs[offset + actualStick + 1]->getInputValue() * 128;
+        return (unsigned char)(128 + inputs[offset + actualStick]->getInputValue() * 127
+            - inputs[offset + actualStick + 1]->getInputValue() * 128);
     } else {
         if (isInDeadzone((stick >= 2) * 2) && isInDeadzone((stick >= 2) * 2 + 1)) {
             return 128;
         } else 
-            return inputs[offset + actualStick]->getInputValue();
+            return (unsigned char)inputs[offset + actualStick]->getInputValue();
     }
 }
     
