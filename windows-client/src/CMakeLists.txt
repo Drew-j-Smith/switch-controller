@@ -20,8 +20,7 @@ Utility/TimeString.cpp
 )
 
 add_library(SRC_LIB OBJECT ${CMAKE_SRC_FILES})
-target_include_directories(SRC_LIB PUBLIC ${CMAKE_INCLUDE_DIRS})
-target_link_directories(SRC_LIB PUBLIC ${FFMPEG_LIBRARY_DIRS})
+target_include_directories(SRC_LIB SYSTEM PUBLIC ${CMAKE_INCLUDE_DIRS})
 target_precompile_headers(SRC_LIB PUBLIC pch.h)
 set(CMAKE_LIBS ${CMAKE_LIBS} SRC_LIB)
 set(CMAKE_LIBS ${CMAKE_LIBS} PARENT_SCOPE)
