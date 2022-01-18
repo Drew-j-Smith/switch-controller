@@ -83,9 +83,9 @@ private:
         }
     }
 
-    void getDataWithoutLock(std::vector<uint8_t>& data) override {
-		data.resize(this->data.size());
-        std::copy(this->data.begin(), this->data.end(), data.begin());
+    void getDataWithoutLock(std::vector<uint8_t>& dataCopy) override {
+		dataCopy.resize(this->data.size());
+        std::copy(this->data.begin(), this->data.end(), dataCopy.begin());
     }
 
 public:

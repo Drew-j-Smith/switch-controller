@@ -24,15 +24,12 @@ private:
     std::map<int, std::shared_ptr<FFmpegDecoder>> decoders;
 
     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-    std::string inputFormat; std::string deviceName; std::map<std::string, std::string> options;
+    std::string inputFormatStr; std::string deviceNameStr; std::map<std::string, std::string> options;
 
     std::atomic<bool> recording;
     std::thread recordingThread;
 
-    void openStream(std::string inputFormatStr, std::string deviceName, std::map<std::string, std::string> optionsMap, std::vector<std::shared_ptr<FFmpegFrameSink>> sinks);
-    void openCodecContext(int* streamIndex, AVCodecContext** decoderContext, AVFormatContext* formatContex, enum AVMediaType type);
-
-    bool checkOverlap(std::vector<std::shared_ptr<FFmpegFrameSink>> sinks);
+    void openStream();
 
     void free();
 public:

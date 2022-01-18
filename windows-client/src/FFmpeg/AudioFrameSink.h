@@ -45,7 +45,7 @@ public:
 
     void virtualInit(AVCodecContext* decoderContext) override {
         // getting the channel layout or setting it to default
-        int channel_layout = decoderContext->channel_layout;
+        uint64_t channel_layout = decoderContext->channel_layout;
         if (channel_layout == 0) {
             channel_layout = av_get_default_channel_layout(decoderContext->channels);
         }
@@ -69,7 +69,7 @@ public:
     }
 
     void virtualOutputFrame(AVFrame* frame) override {
-        int out_samples = av_rescale_rnd(swr_get_delay(swr, frame->sample_rate) + frame->nb_samples, 48000, frame->sample_rate, AV_ROUND_UP);
+        int64_t out_samples = av_rescale_rnd(swr_get_delay(swr, frame->sample_rate) + frame->nb_samples, 48000, frame->sample_rate, AV_ROUND_UP);
         uint8_t* output;
         int res;
 
@@ -80,7 +80,7 @@ public:
             output = data.data() + data.size() - out_samples * av_get_bytes_per_sample(outputSampleFormat);
         }
 
-        res = swr_convert(swr, &output, out_samples, (const uint8_t**)frame->extended_data, frame->nb_samples);
+        res = swr_convert(swr, &output, (int)out_samples, (const uint8_t**)frame->extended_data, frame->nb_samples);
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
@@ -89,7 +89,7 @@ public:
         }
 
         if (loopRecording) {
-            if (loopBufferPosition + out_samples * av_get_bytes_per_sample(outputSampleFormat) >= data.size()) {
+            if (loopBufferPosition + out_samples * av_get_bytes_per_sample(outputSampleFormat) >= (int64_t)data.size()) {
                 std::copy(dataBuffer.begin(),
                           dataBuffer.begin() + (data.size() - loopBufferPosition),
                           data.begin() + loopBufferPosition);
@@ -106,11 +106,11 @@ public:
         }
     }
 
-    void getDataWithoutLock(std::vector<uint8_t>& data) override {
-        data.resize(this->data.size());
+    void getDataWithoutLock(std::vector<uint8_t>& dataCopy) override {
+        dataCopy.resize(this->data.size());
         if (loopRecording) {
-            std::copy(this->data.begin() + loopBufferPosition, this->data.end(), data.begin());
-            std::copy(this->data.begin(), this->data.begin() + loopBufferPosition, data.begin() + (this->data.size() - loopBufferPosition));
+            std::copy(this->data.begin() + loopBufferPosition, this->data.end(), dataCopy.begin());
+            std::copy(this->data.begin(), this->data.begin() + loopBufferPosition, dataCopy.begin() + (this->data.size() - loopBufferPosition));
         } else {
             std::copy(this->data.begin(), this->data.end(), data.begin());
         }

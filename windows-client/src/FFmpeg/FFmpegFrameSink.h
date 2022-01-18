@@ -55,9 +55,9 @@ public:
         return lastFrame;
     }
 
-    long long getNextData(std::vector<uint8_t>& data, long long lastFrame) {
+    long long getNextData(std::vector<uint8_t>& data, long long lastFrameSeen) {
         std::unique_lock<std::mutex> lock(dataMutex);
-        while (this->lastFrame == lastFrame) {
+        while (this->lastFrame == lastFrameSeen) {
             dataCV.wait(lock);
         }
         getDataWithoutLock(data);

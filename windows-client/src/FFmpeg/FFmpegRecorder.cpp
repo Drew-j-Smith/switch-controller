@@ -13,7 +13,16 @@
 }
 
 FFmpegRecorder::FFmpegRecorder(std::string inputFormat, std::string deviceName, std::map<std::string, std::string> options, std::vector<std::shared_ptr<FFmpegFrameSink>> sinks) {
-    if (checkOverlap(sinks)) {
+    std::set<AVMediaType> types;
+    bool overlap = false;
+    for (auto sink : sinks) {
+        if (types.find(sink->getType()) == types.end()) {
+            types.insert(sink->getType());
+        } else {
+            overlap = true;
+        }
+    }
+    if (overlap) {
         std::string errStr = "Only one frame sink of each type may be used";
         std::cerr << errStr << '\n';
         throw std::runtime_error(errStr);
@@ -23,23 +32,11 @@ FFmpegRecorder::FFmpegRecorder(std::string inputFormat, std::string deviceName, 
         std::cerr << errStr << '\n';
         throw std::runtime_error(errStr);
     }
-    
-    this->inputFormat = inputFormat;
-    this->deviceName = deviceName;
+
+    this->inputFormatStr = inputFormat;
+    this->deviceNameStr = deviceName;
     this->options = options;
     this->sinks = sinks;
-}
-
-bool FFmpegRecorder::checkOverlap(std::vector<std::shared_ptr<FFmpegFrameSink>> sinks) {
-    std::set<AVMediaType> types;
-    for (auto sink : sinks) {
-        if (types.find(sink->getType()) == types.end()) {
-            types.insert(sink->getType());
-        } else {
-            return true;
-        }
-    }
-    return false;
 }
 
 void FFmpegRecorder::free() {
@@ -49,7 +46,7 @@ void FFmpegRecorder::free() {
     av_frame_free(&frame);
 }
 
-void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceName, std::map<std::string, std::string> optionsMap, std::vector<std::shared_ptr<FFmpegFrameSink>> sinks) {
+void FFmpegRecorder::openStream() {
     avdevice_register_all();
 
     // finding input format and setting options dict
@@ -57,15 +54,15 @@ void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
     if (inputFormatStr.size() > 0) { // If no input format is set, load a file
         inputFormat = av_find_input_format(inputFormatStr.c_str());
     }
-    AVDictionary* options = nullptr;
-    for (auto& pair : optionsMap) {
-        av_dict_set(&options, pair.first.c_str(), pair.second.c_str(), 0);
+    AVDictionary* optionsDic = nullptr;
+    for (auto& pair : options) {
+        av_dict_set(&optionsDic, pair.first.c_str(), pair.second.c_str(), 0);
     }
  
     // open input file, and allocate format context
-    if (avformat_open_input(&formatContext, deviceName.c_str(), inputFormat, &options) < 0) {
+    if (avformat_open_input(&formatContext, deviceNameStr.c_str(), inputFormat, &optionsDic) < 0) {
         free();
-        std::string errStr = "Could not open stream " + deviceName + " in FFmpeg Recorder";
+        std::string errStr = "Could not open stream " + deviceNameStr + " in FFmpeg Recorder";
         std::cerr << errStr << '\n';
         throw std::runtime_error(errStr);
     }
@@ -73,21 +70,15 @@ void FFmpegRecorder::openStream(std::string inputFormatStr, std::string deviceNa
     // retrieve stream information
     if (avformat_find_stream_info(formatContext, nullptr) < 0) {
         free();
-        std::string errStr = "Could not find stream information for " + deviceName + " in FFmpeg Recorder";
+        std::string errStr = "Could not find stream information for " + deviceNameStr + " in FFmpeg Recorder";
         std::cerr << errStr << '\n';
         throw std::runtime_error(errStr);
     }
     
     // open stream ctx for each frame sink
     for (auto sink : sinks) {
-        try {
-            std::shared_ptr<FFmpegDecoder> decoder = std::make_shared<FFmpegDecoder>(formatContext, sink);
-            decoders.insert({decoder->getStreamIndex(), decoder});
-        }
-        catch (std::exception& e) {
-            free();
-            throw;
-        }
+        std::shared_ptr<FFmpegDecoder> decoder = std::make_shared<FFmpegDecoder>(formatContext, sink);
+        decoders.insert({decoder->getStreamIndex(), decoder});
     }
 
     if(decoders.size() == 0) {
@@ -105,7 +96,7 @@ void FFmpegRecorder::start() {
     recording.store(true);
 
     recordingThread = std::thread([&](){
-        openStream(inputFormat, deviceName, options, sinks);
+        openStream();
 
         AVPacket pkt;
         frame = av_frame_alloc();
@@ -119,29 +110,14 @@ void FFmpegRecorder::start() {
             // check if the pack goes to a frame sink
             if (decoders.find(pkt.stream_index) != decoders.end()) {
                 auto decoder = decoders.at(pkt.stream_index);
-                try {
-                    decoder->decodePacket(&pkt, frame);
-                }
-                catch (std::runtime_error& e) {
-                    free();
-                    throw;
-                }
-                
+                decoder->decodePacket(&pkt, frame);
             }
             av_packet_unref(&pkt);
         }
 
         // flushing decoders
         for (auto it : decoders) {
-            try { 
-                it.second->decodePacket(nullptr, frame);
-            }
-            catch (std::runtime_error& e) {
-                free();
-                throw;
-            }
+            it.second->decodePacket(nullptr, frame);
         }
-
-        free();
     });
 }
