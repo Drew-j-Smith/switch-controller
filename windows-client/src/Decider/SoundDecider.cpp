@@ -13,17 +13,17 @@ static double dotProduct(const std::vector<float> & v) {
 
 static double dotProduct(const std::vector<float> & v1, const std::vector<float> & v2) {
     double total = 0.0;
-    int max = v1.size() < v2.size() ? v1.size() : v2.size();
+    int max = (int)(v1.size() < v2.size() ? v1.size() : v2.size());
     for (int i = 0; i < max; i++) {
         total += v1[i] * v2[i];
     }
     return total;
 }
 
-static std::vector<float> scalarMultiplication(const std::vector<float> & v, const float scale) {
+static std::vector<float> scalarMultiplication(const std::vector<float> & v, const double scale) {
     std::vector<float> v2(v.size());
     for (int i = 0; i < v.size(); i++) {
-        v2[i] = v[i] * scale;
+        v2[i] = (float)(v[i] * scale);
     }
     return v2;
 }
@@ -36,10 +36,10 @@ static std::vector<float> vectorSubtraction(const std::vector<float> & v1, const
     return v3;
 }
 
-static std::vector<float> vectorSubtraction(const std::vector<float> & v, const float scalar) {
+static std::vector<float> vectorSubtraction(const std::vector<float> & v, const double scalar) {
     std::vector<float> v3(v.size());
     for (int i = 0; i < v3.size(); i++) {
-        v3[i] = v[i] - scalar;
+        v3[i] = (float)(v[i] - scalar);
     }
     return v3;
 }
@@ -64,7 +64,7 @@ static std::vector<float> findFrequencies(std::shared_ptr<fftwPlan> plan, const 
     plan->execute();
 
     std::vector<float> frequencies(plan->getOutSize());
-    for (long long i = 0; i < frequencies.size(); i++) {
+    for (unsigned long long i = 0; i < frequencies.size(); i++) {
         //freq gap = 1/(dt*N)
         frequencies[i] = (conjugate(plan->getOut()[i])) / plan->getInSize();
     }
