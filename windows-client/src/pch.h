@@ -17,6 +17,7 @@
 #include <array>
 #include <map>
 #include <sstream>
+#include <complex>
 
 #include <thread>
 #include <atomic>

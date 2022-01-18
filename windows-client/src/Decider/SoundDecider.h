@@ -16,10 +16,10 @@ private:
     std::vector<float> matchAudio;
     
     // fftw
-    float* fftwIn;
-    fftwf_complex* fftwOut;
-    fftwf_plan p;
-    int size;
+    std::vector<float> fftwIn;
+    std::vector<std::complex<float>> fftwOut;
+    fftwf_plan fftwPlan;
+    int fftwSize;
 
     std::vector<float> matchFrequencies;
     double matchThreshold;
@@ -31,9 +31,7 @@ public:
     SoundDecider(const boost::property_tree::ptree & tree); // dont forget to set name
 
     ~SoundDecider() {
-        fftwf_destroy_plan(p);
-        fftwf_free(fftwIn);
-        fftwf_free(fftwOut);
+        fftwf_destroy_plan(fftwPlan);
     }
 
     void update(std::vector<float> soundData);

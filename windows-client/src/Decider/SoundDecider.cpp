@@ -52,21 +52,17 @@ static double vectorMean(const std::vector<float> & v) {
     return sum / v.size();
 }
 
-static float conjugate(const fftwf_complex & num) {
-    return num[0] * num[0] + num[1] * num[1];
-}
-
 std::vector<float> SoundDecider::findFrequencies(const std::vector<float> & samples) {
-    for (long long i = 0; i < size; i++) {
+    for (long long i = 0; i < fftwSize; i++) {
         fftwIn[i] = samples[i];
     }
 
-    fftwf_execute(p);
+    fftwf_execute(fftwPlan);
 
-    std::vector<float> frequencies(size / 2 + 1);
+    std::vector<float> frequencies(fftwSize / 2 + 1);
     for (unsigned long long i = 0; i < frequencies.size(); i++) {
         //freq gap = 1/(dt*N)
-        frequencies[i] = conjugate(fftwOut[i]) / size;
+        frequencies[i] = std::conj(fftwOut[i]).real() / fftwSize;
     }
     return frequencies;
 }
@@ -101,10 +97,10 @@ SoundDecider::SoundDecider(const boost::property_tree::ptree & tree) {
     audioSink->getData(rawData);
     matchAudio = std::vector<float>((float*)rawData.data(), (float*)(rawData.data() + rawData.size()));
 
-    size = (int)matchAudio.size();
-    fftwIn = (float*) fftwf_malloc(sizeof(float) * size);
-    fftwOut = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * (size / 2 + 1));
-    p = fftwf_plan_dft_r2c_1d(size, fftwIn, (fftwf_complex*)fftwOut, FFTW_MEASURE);
+    fftwSize = (int)matchAudio.size();
+    fftwIn.resize(fftwSize);
+    fftwOut.resize(fftwSize / 2 + 1);
+    fftwPlan = fftwf_plan_dft_r2c_1d(fftwSize, fftwIn.data(), (fftwf_complex*)fftwOut.data(), FFTW_MEASURE);
     matchFrequencies = findFrequencies(matchAudio);
     matchValue.store(0);
 }
