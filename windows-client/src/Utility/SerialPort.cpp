@@ -5,7 +5,7 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
-std::unique_ptr<boost::asio::serial_port> initializeSerialPort(std::string serialPort, unsigned long long baud) {
+std::unique_ptr<boost::asio::serial_port> initializeSerialPort(std::string serialPort, unsigned int baud) {
     try {
         std::cout << "Intializing serial communication.\n";
         boost::asio::io_service io;
@@ -21,7 +21,6 @@ std::unique_ptr<boost::asio::serial_port> initializeSerialPort(std::string seria
         std::cerr << "\tDoes the port exist?" << std::endl;
         throw;
     }
-    return nullptr;
 }
 
 

@@ -54,11 +54,11 @@ void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const st
     }
 }
 
-void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) const{
+void Macro::getDataframe(const unsigned long long time, unsigned char outData[8]) const{
     if (this->data.size() == 0)
         return;
     int low = 0;
-    int high = this->data.size();
+    int high = (int)this->data.size();
     while(high - low > 1){
         int mid = (low + high) / 2;
         if(getTime(mid) > time)
@@ -71,19 +71,19 @@ void Macro::getDataframe(const unsigned long long time, unsigned char data[8]) c
     memcpy(macroData + 1, this->data[low].data() + sizeof(unsigned long long), 7);
 
     if (mode == macroPriority)
-        mergeData(macroData, data);
+        mergeData(macroData, outData);
     else if (mode == inputPriority)
-        mergeData(data, macroData);
+        mergeData(outData, macroData);
 
     if (mode == blockInput || mode == macroPriority)
-        memcpy(data, macroData, 8);
+        memcpy(outData, macroData, 8);
 }
 
-void Macro::appendData(const unsigned long long time, const unsigned char data[8]){
-    if (this->data.size() == 0 || memcmp(this->data.back().data() + sizeof(unsigned long long), data + 1, 7) != 0) {
+void Macro::appendData(const unsigned long long time, const unsigned char outData[8]){
+    if (this->data.size() == 0 || memcmp(this->data.back().data() + sizeof(unsigned long long), outData + 1, 7) != 0) {
         std::array<unsigned char, sizeof(unsigned long long) + 7> dataframe;
         memcpy(dataframe.data(), &time, sizeof(unsigned long long));
-        memcpy(dataframe.data() + sizeof(unsigned long long), data + 1, 7);
+        memcpy(dataframe.data() + sizeof(unsigned long long), outData + 1, 7);
         this->data.push_back(dataframe);
     }
 }

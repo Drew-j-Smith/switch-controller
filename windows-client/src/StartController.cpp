@@ -28,6 +28,7 @@ void StartController(std::string& configFilename) {
     }
     catch (boost::property_tree::json_parser::json_parser_error& e) {
         std::cerr << "Error parsing config file\n";
+        std::cerr << e.what() << '\n';
         return;
     }
 
@@ -56,6 +57,7 @@ void StartController(std::string& configFilename) {
     }
     catch (std::exception& e) {
         std::cerr << "Failure connecting via serial port.\n";
+        std::cerr << e.what() << "\n";
         return;
     }
 

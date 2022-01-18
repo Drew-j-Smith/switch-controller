@@ -10,10 +10,10 @@ private:
     float* in;
     fftwf_complex* out;
     fftwf_plan p;
-    long long size;
+    int size;
 
 public:
-    fftwPlan(long long size) : size(size) {
+    fftwPlan(int size) : size(size) {
         in = (float*) fftwf_malloc(sizeof(float) * size);
         out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * (size / 2 + 1));
         p = fftwf_plan_dft_r2c_1d(size, in, (fftwf_complex*)out, FFTW_MEASURE);
@@ -26,8 +26,8 @@ public:
 
     float* getIn() { return in; }
     fftwf_complex* getOut() { return out; }
-    long long getInSize() { return size; }
-    long long getOutSize() { return size / 2 + 1; }
+    int getInSize() { return size; }
+    int getOutSize() { return size / 2 + 1; }
     void execute() { fftwf_execute(p); }
 
     static int loadWisdom(const char* filename) {

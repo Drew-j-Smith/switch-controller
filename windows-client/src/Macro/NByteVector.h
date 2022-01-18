@@ -87,9 +87,9 @@ void NByteVector<frameSize>::load(const std::string & filename, const bool isHex
                     if (!isxdigit(currentChar))
                         break;
                     if (i % 2 == 0)
-                        buffer[i/2] = hexToInt(currentChar) * 16;
+                        buffer[i/2] = (char)hexToInt(currentChar) * 16;
                     else
-                        buffer[i/2] += hexToInt(currentChar);
+                        buffer[i/2] += (char)hexToInt(currentChar);
                 }
                 if (i != frameSize * 2){
                     std::cerr << "Non-hex character loaded from file \"" << filename << "\"\n";

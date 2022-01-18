@@ -101,7 +101,7 @@ SoundDecider::SoundDecider(const boost::property_tree::ptree & tree) {
     audioSink->getData(rawData);
     matchAudio = std::vector<float>((float*)rawData.data(), (float*)(rawData.data() + rawData.size()));
 
-    plan = std::make_shared<fftwPlan>(matchAudio.size());
+    plan = std::make_shared<fftwPlan>((int)matchAudio.size());
     matchFrequencies = findFrequencies(plan, matchAudio);
     matchValue.store(0);
 }
