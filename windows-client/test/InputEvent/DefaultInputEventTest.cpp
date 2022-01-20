@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE(DefaultInputEventTest);
     BOOST_AUTO_TEST_CASE(TestMakeShared)
     {
         DefaultInputEvent i;
-        std::shared_ptr<InputEvent> j = i.makeShared(boost::property_tree::ptree(), std::map<std::string, std::shared_ptr<InputEvent>>());
+        std::shared_ptr<InputEvent> j = i.makeShared(boost::property_tree::ptree(), Factory<InputEvent>({}));
         BOOST_TEST((i == *j));
     }
     BOOST_AUTO_TEST_CASE(TestGetTypeName)
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_SUITE(ActiveInputEventTest);
     BOOST_AUTO_TEST_CASE(TestMakeShared)
     {
         ActiveInputEvent i;
-        std::shared_ptr<InputEvent> j = i.makeShared(boost::property_tree::ptree(), std::map<std::string, std::shared_ptr<InputEvent>>());
+        std::shared_ptr<InputEvent> j = i.makeShared(boost::property_tree::ptree(), Factory<InputEvent>({}));
         BOOST_TEST((i == *j));
     }
     BOOST_AUTO_TEST_CASE(TestGetTypeName)

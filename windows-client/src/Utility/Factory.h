@@ -17,7 +17,7 @@ public:
 
     std::shared_ptr<T> generateObject(const boost::property_tree::ptree & tree) {
         // TODO throw meaningful errors
-        std::string type = tree.get<std::string>("TypeName");
+        std::string type = tree.get<std::string>("type");
         return (map.at(type))->makeShared(tree, *this);
     }
 };

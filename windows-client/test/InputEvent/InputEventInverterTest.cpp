@@ -29,7 +29,8 @@ BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
         tree.add_child("type", boost::property_tree::ptree("InputEventInverter"));
         tree.add_child("event", DefaultInputEvent().toPtree());
         std::map<std::string, std::shared_ptr<InputEvent>> map = {{"DefaultInputEvent", std::make_shared<DefaultInputEvent>()}};
-        std::shared_ptr<InputEvent> j = i.makeShared(tree, map);
+        Factory<InputEvent> factory(map);
+        std::shared_ptr<InputEvent> j = i.makeShared(tree, factory);
         BOOST_TEST((i == *j));
     }
     BOOST_AUTO_TEST_CASE(TestMakeSharedActive)
@@ -39,7 +40,8 @@ BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
         tree.add_child("type", boost::property_tree::ptree("InputEventInverter"));
         tree.add_child("event", ActiveInputEvent().toPtree());
         std::map<std::string, std::shared_ptr<InputEvent>> map = {{"ActiveInputEvent", std::make_shared<ActiveInputEvent>()}};
-        std::shared_ptr<InputEvent> j = i.makeShared(tree, map);
+        Factory<InputEvent> factory(map);
+        std::shared_ptr<InputEvent> j = i.makeShared(tree, factory);
         BOOST_TEST((i == *j));
     }
     BOOST_AUTO_TEST_CASE(TestGetTypeName)
