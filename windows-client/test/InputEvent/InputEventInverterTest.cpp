@@ -84,6 +84,7 @@ BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
             BOOST_TEST(false, "Error was not thrown");
         }
         catch (std::invalid_argument& e) {
+            e;
             BOOST_TEST(true, "Error was thrown");
             return;
         }
