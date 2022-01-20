@@ -52,11 +52,10 @@ public:
     InputManager(const boost::property_tree::ptree & tree, const int turboButtonLoopTime);
 
     /**
-     * @brief Gets the user's inputs in the form of a character array
+     * @brief Gets the user's inputs in the form of a uint8_t array
      * 
-     * @param data the array to store the user's inputs
      */
-    void getData(unsigned char* data) const;
+    std::array<uint8_t, 8> getData() const;
 private:
     /**
      * @brief loads an InputEvent into the input array

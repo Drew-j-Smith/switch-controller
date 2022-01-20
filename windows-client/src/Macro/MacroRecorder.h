@@ -26,7 +26,7 @@ public:
         record = std::make_shared<InputEventCollection>(tree.find("record")->second);
     }
 
-    void update(const unsigned char data[8]) {
+    void update(const std::array<uint8_t, 8>& data) {
         auto now = std::chrono::steady_clock::now();
         
         if (record->getInputValue() && std::chrono::duration_cast<std::chrono::milliseconds>(now - activationTime).count() > RECORDING_BUTTON_COOLDOWN) {
@@ -36,15 +36,15 @@ public:
                 std::string str = boost::posix_time::to_simple_string(ptime);
                 std::cout << "Saved recording to \"RecordedMacros/" << str << "\"" << std::endl;
 
+                currentRecordingMacro->saveData("RecordedMacros/" + str);
                 auto macroData = currentRecordingMacro->getData();
-                macroData.save("RecordedMacros/" + str);
                 lastRecordedMacro->setData(macroData);
                 currentRecordingMacro->setData({});
             }
             recording = !recording;
         }
         if (recording) {
-            currentRecordingMacro->appendData(std::chrono::duration_cast<std::chrono::milliseconds>(now - activationTime).count(), data);
+            currentRecordingMacro->appendData({(uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(now - activationTime).count(), data});
         }
     }
 

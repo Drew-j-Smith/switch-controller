@@ -47,13 +47,13 @@ void StartController(std::string& configFilename) {
     std::unique_ptr<boost::asio::serial_port> port;
 
     // sending a nuetral signal
-    unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
+    std::array<uint8_t, 8> send = {85, 0, 0, 128, 128, 128, 128, 8};
     unsigned char recieve[1];
 
     try {
         port = initializeSerialPort(tree.get<std::string>("serial port"), 57600);
 
-        testSerialPort(port, 8, send, 1, recieve);
+        testSerialPort(port, 8, send.data(), 1, recieve);
     }
     catch (std::exception& e) {
         std::cerr << "Failure connecting via serial port.\n";
@@ -70,7 +70,7 @@ void StartController(std::string& configFilename) {
         // auto begin = std::chrono::steady_clock::now();
         
 
-        inputManager.getData(send);
+        send = inputManager.getData();
         recorder.update(send);
         
         macroCollection.activateMacros();

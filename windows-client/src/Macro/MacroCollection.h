@@ -18,7 +18,7 @@ public:
     MacroCollection(const std::vector<std::shared_ptr<Macro>> & macros, const std::shared_ptr<DeciderCollectionBase> & deciders);
     MacroCollection(const boost::property_tree::ptree & tree, const std::shared_ptr<DeciderCollectionBase> & deciders);
 
-    void getData(unsigned char data[8]);
+    std::array<uint8_t, 8> getData(const std::array<uint8_t, 8>& dataToMerge);
     void activateMacros();
     bool isMacroActive() const { return activeMacros.size(); }
     void deactivateMacros() { activeMacros.clear(); }

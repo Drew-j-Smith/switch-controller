@@ -5,17 +5,21 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "NByteVector.h"
 #include "Decider/Decider.h"
 #include "InputEvent/DefaultInputEvent.h"
 #include "InputEvent/InputEventCollection.h"
 
 class Macro {
 public:
+    struct MacroData {
+        uint64_t time;
+        std::array<uint8_t, 8> data;
+    };
+
     enum InputMergeMode {blockInput, macroPriority, inputPriority};
 
     Macro() {};
-    Macro(const std::string & name, const NByteVector<sizeof(unsigned long long) + 7> & data, const std::shared_ptr<InputEvent> & inputEvent,
+    Macro(const std::string & name, const std::vector<MacroData>& data, const std::shared_ptr<InputEvent> & inputEvent,
         const std::shared_ptr<Decider> & decider, const InputMergeMode mode);
     Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Decider>> & deciderList);
     
@@ -23,7 +27,7 @@ public:
     void setNextMacroLists(const std::vector<std::vector<std::weak_ptr<Macro>>> & newNextMacroLists) { this->nextMacroLists = newNextMacroLists; }
 private:
     std::string name = "";
-    NByteVector<sizeof(unsigned long long) + 7> data = {};
+    std::vector<MacroData> data;
     std::shared_ptr<InputEvent> inputEvent = std::make_shared<DefaultInputEvent>();
     std::shared_ptr<Decider> decider = std::make_shared<DefaultDecider>();
     InputMergeMode mode = inputPriority;
@@ -42,14 +46,15 @@ public:
     InputMergeMode getMode() { return mode; }
     void setMode(const InputMergeMode newMode) { this->mode = newMode; }
 
-    const NByteVector<sizeof(unsigned long long) + 7> getData() const { return data; }
-    void setData(const NByteVector<sizeof(unsigned long long) + 7> newData) { this->data = newData; }
-    void appendData(const unsigned long long, const unsigned char[8]);
-    void getDataframe(const unsigned long long, unsigned char[8]) const;
-    unsigned long long getTime(int index) const { return data.size() > 0 ? *(unsigned long long*)data[index].data() : 0; }
-    unsigned long long lastTime()         const { return data.size() > 0 ? *(unsigned long long*)data.back().data() : 0; }
+    void saveData(std::string filename) const;
+    void loadData(std::string filename);
+    void setData(const std::vector<MacroData>& newData) { data = newData; }
+    std::vector<MacroData> getData() const { return data; }
+    void appendData(const MacroData& inData);
+    std::array<uint8_t, 8> getDataframe(uint64_t time, const std::array<uint8_t, 8>& dataToMerge) const;
+    uint64_t lastTime() const { return data.size() > 0 ? data.back().time : 0; }
 
-    static void mergeData(unsigned char priortyData[8], const unsigned char dataToMerge[8]);
+    static std::array<uint8_t, 8> mergeData(const std::array<uint8_t, 8>& priortyData, const std::array<uint8_t, 8>& dataToMerge);
     InputMergeMode strToInputMergeMode(const std::string & str);
 };
 

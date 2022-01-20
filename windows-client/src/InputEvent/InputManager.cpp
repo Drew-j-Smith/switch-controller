@@ -108,22 +108,24 @@ int InputManager::testInMap(const std::map<std::string, int> & map, const std::s
     return -1;
 }
 
-void InputManager::getData(unsigned char* data) const {
-    data[0] = 85;
-    data[1] = 0;
-    data[2] = 0;
+std::array<uint8_t, 8> InputManager::getData() const {
+    std::array<uint8_t, 8> res;
+    res[0] = 85;
+    res[1] = 0;
+    res[2] = 0;
     for (int i = 0; i < 8; i++) {
         if (inputs[i]->getInputValue())
-            data[1] |= (1 << i);
+            res[1] |= (1 << i);
     }
     for (int i = 0; i < 6; i++) {
         if (inputs[i + 8]->getInputValue())
-            data[2] |= (1 << i);
+            res[2] |= (1 << i);
     }
     for (int i = 0; i < 4; i++) {
-        data[i + 3] = getControlStickData(i);
+        res[i + 3] = getControlStickData(i);
     }
-    data[7] = getDpadData();
+    res[7] = getDpadData();
+    return res;
 }
 
 bool InputManager::isInDeadzone(int stick) const {

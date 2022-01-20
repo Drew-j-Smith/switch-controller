@@ -19,7 +19,8 @@ MacroCollection::MacroCollection(const boost::property_tree::ptree & tree, const
     }
 }
 
-void MacroCollection::getData(unsigned char data[8]) {
+std::array<uint8_t, 8> MacroCollection::getData(const std::array<uint8_t, 8>& dataToMerge) {
+    std::array<uint8_t, 8> res = dataToMerge;
     if(activeMacros.size()){
         auto now = std::chrono::steady_clock::now();
         std::vector<std::shared_ptr<Macro>> toAdd;
@@ -27,7 +28,7 @@ void MacroCollection::getData(unsigned char data[8]) {
 
         for (auto it : activeMacros) {
             unsigned long long time = std::chrono::duration_cast<std::chrono::milliseconds>(now - it.second).count();
-            it.first->getDataframe(time, data);
+            res = it.first->getDataframe(time, res);
 
             if (it.first->lastTime() < time){
                 toAdd.push_back(it.first->getNextMacro());
@@ -42,6 +43,7 @@ void MacroCollection::getData(unsigned char data[8]) {
             if (m)
                 activeMacros.insert({m, std::chrono::steady_clock::now()});
     }
+    return res;
 }
 
 void MacroCollection::activateMacros() {

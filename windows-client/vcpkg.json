@@ -8,6 +8,7 @@
       "boost-asio",
       "boost-test",
       "boost-date-time",
+      "boost-endian",
       "fftw3",
       "ffmpeg"
     ]
