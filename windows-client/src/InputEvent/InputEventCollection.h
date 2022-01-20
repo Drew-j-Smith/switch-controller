@@ -22,7 +22,7 @@ public:
     int getInputValue() const override;
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override;
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override;
     std::string getTypeName() const override { return ""; }
 
     virtual void update() {}

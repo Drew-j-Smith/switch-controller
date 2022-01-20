@@ -47,10 +47,9 @@ public:
     };
     bool isDigital() const override { return event->isDigital(); }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const override { 
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override { 
         boost::property_tree::ptree childTree = tree.get_child("event");
-        std::shared_ptr<InputEvent> childEvent = eventMap.at(childTree.get<std::string>("type"))->makeShared(childTree, eventMap);
-        return std::make_shared<InputEventInverter>(childEvent); 
+        return std::make_shared<InputEventInverter>(factory.generateObject(childTree)); 
     }
     std::string getTypeName() const override { return "InputEventInverter"; }
 
