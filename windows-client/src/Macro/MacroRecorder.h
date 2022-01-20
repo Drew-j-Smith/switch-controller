@@ -33,7 +33,7 @@ public:
             activationTime = now;
             if (recording) {
                 auto ptime =  boost::date_time::second_clock<boost::posix_time::ptime>::local_time();
-                std::string str = boost::posix_time::to_simple_string(ptime);
+                std::string str = boost::posix_time::to_iso_string(ptime) + ".hex";
                 std::cout << "Saved recording to \"RecordedMacros/" << str << "\"" << std::endl;
 
                 currentRecordingMacro->saveData("RecordedMacros/" + str);

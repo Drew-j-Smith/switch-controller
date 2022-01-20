@@ -57,11 +57,12 @@ void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const st
 
 std::array<uint8_t, 8> Macro::getDataframe(uint64_t time, const std::array<uint8_t, 8>& dataToMerge) const {
     MacroData searchData = {time, {}};
-    auto res = std::lower_bound(data.begin(), data.end(), searchData, 
+    auto res = std::upper_bound(data.begin(), data.end(), searchData, 
         [](const MacroData& a, const MacroData& b) {
             return a.time < b.time;
          }
-    );
+    ) - 1;
+    // subtract one to round down instead of up
 
     if (mode == macroPriority)
         return mergeData(res->data, dataToMerge);
@@ -110,7 +111,10 @@ std::array<uint8_t, 8> Macro::mergeData(const std::array<uint8_t, 8>& priortyDat
 
 
 void Macro::saveData(std::string filename) const {
-    std::ofstream outfile(filename, std::ios::out | std::ios::binary);
+    std::ofstream outfile(filename, std::ios::binary);
+    if (!outfile.is_open()) {
+        std::cerr << "Could not open file " << filename << '\n';
+    }
     for (auto macroData : data) {
         boost::endian::native_to_little_inplace(macroData.time);
         outfile.write((char*)&macroData, sizeof(MacroData));
@@ -118,7 +122,10 @@ void Macro::saveData(std::string filename) const {
 }
 void Macro::loadData(std::string filename) {
     data.clear();
-    std::ifstream infile(filename, std::ios::in | std::ios::binary);
+    std::ifstream infile(filename, std::ios::binary);
+    if (!infile.is_open()) {
+        std::cerr << "Could not open file " << filename << '\n';
+    }
     while (!infile.eof()) {
         MacroData macroData;
         infile.read((char*)&macroData, sizeof(MacroData));

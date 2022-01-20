@@ -78,7 +78,7 @@ void StartController(std::string& configFilename) {
             macroCollection.deactivateMacros();
         }
         if (macroCollection.isMacroActive()){
-            macroCollection.getData(send);
+            send = macroCollection.getData(send);
         }
 
         boost::asio::write(*port, boost::asio::buffer(send, 8));
