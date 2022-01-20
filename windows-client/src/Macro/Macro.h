@@ -33,8 +33,6 @@ private:
     InputMergeMode mode = inputPriority;
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
-
-    std::shared_ptr<Macro> cycleVector(int macroIndex);
 public:
     const std::string & getName() const { return name; }
     void setName(const std::string & newName) { this->name = newName; }

@@ -77,8 +77,8 @@ void Macro::appendData(const MacroData& inData) {
     }
 }
 
-//helper function to Macro::getNextMacro()
-std::shared_ptr<Macro> Macro::cycleVector(int macroIndex) {
+std::shared_ptr<Macro> Macro::getNextMacro() {
+    int macroIndex = decider->nextListIndex();
     if (nextMacroLists.size() == 0)
         return nullptr;
     if(nextMacroLists[macroIndex].size() == 0)
@@ -86,10 +86,6 @@ std::shared_ptr<Macro> Macro::cycleVector(int macroIndex) {
     if(nextMacroLists[macroIndex].size() != 1)
         std::rotate(nextMacroLists[macroIndex].begin(), nextMacroLists[macroIndex].begin() + 1, nextMacroLists[macroIndex].end());
     return nextMacroLists[macroIndex].back().lock();
-}
-
-std::shared_ptr<Macro> Macro::getNextMacro() {
-    return cycleVector(decider->nextListIndex());
 }
 
 std::array<uint8_t, 8> Macro::mergeData(const std::array<uint8_t, 8>& priortyData, const std::array<uint8_t, 8>& dataToMerge){
