@@ -6,7 +6,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_TEST_FILES 
 ArduinoControllerTest.cpp
 InputEvent/DefaultInputEventTest.cpp
-InputEvent/InputEventGeneratorTest.cpp
 InputEvent/InputEventInverterTest.cpp
 InputEvent/InputEventTest.cpp
 )
