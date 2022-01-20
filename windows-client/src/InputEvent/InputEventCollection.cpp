@@ -54,3 +54,13 @@ int InputEventCollection::getInputValue() const {
 
     return 1;
 }
+
+
+std::shared_ptr<InputEvent> InputEventCollection::makeShared(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<InputEvent>> & eventMap) const {
+    std::vector<std::shared_ptr<InputEvent>> inputEvents;
+    boost::property_tree::ptree childTree = tree.get_child("events");
+    for (auto event : childTree) {
+        inputEvents.push_back(eventMap.at(event.second.get<std::string>("type"))->makeShared(event.second, eventMap));
+    }
+    return std::make_shared<InputEventCollection>(inputEvents); 
+}
