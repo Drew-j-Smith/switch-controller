@@ -1,9 +1,22 @@
 #ifndef FFMPEG_FRAME_SINK_H
 #define FFMPEG_FRAME_SINK_H
 
+// TODO
+// FFmpeg has a lot of warnings
+// Changing level to 2 on MSCV
+// This does have the potential to break 
+// in the future and on other compilers
+#ifdef _MSC_VER
+#pragma warning( push, 2 )
+#endif
+
 extern "C" {
     #include <libavformat/avformat.h>
 }
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 #include "pch.h"
 
