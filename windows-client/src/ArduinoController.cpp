@@ -25,6 +25,10 @@ R"(Select one of the following options:
 
 int main(int argc, const char** argv)
 {
+    // Unused for now
+    argc;
+    argv;
+
     int option = 0;
     std::string configFilename = "data/config.json";
 
@@ -62,6 +66,7 @@ int main(int argc, const char** argv)
                     }
                     catch (std::exception& e) {
                         std::cerr << "Failure connecting via serial port.\n";
+                        std::cerr << e.what() << '\n';
                     }
                 }
                 break;
@@ -69,14 +74,14 @@ int main(int argc, const char** argv)
                 {
                     std::string inputFormat = "dshow";
                     std::string deviceName = "video=Game Capture HD60 S";
-                    std::map<std::string, std::string> options = {{"pixel_format", "bgr24"}};
+                    std::map<std::string, std::string> ffmpegOptions = {{"pixel_format", "bgr24"}};
                     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
                     std::shared_ptr<VideoFrameSink> videoSink = std::make_shared<VideoFrameSink>();
                     sinks.push_back(videoSink);
 
                     av_log_set_level(AV_LOG_QUIET);
 
-                    FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
+                    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
                     recorder.start();
 
                     videoSink->waitForInit();
@@ -103,7 +108,8 @@ int main(int argc, const char** argv)
                 break;
             case 7:
                 {
-                    std::getline(std::cin, std::string());
+                    std::string tempStr;
+                    std::getline(std::cin, tempStr);
 
                     std::string inputFormat;
                     std::string deviceName;
@@ -132,13 +138,13 @@ int main(int argc, const char** argv)
                         std::cin >> bufferSize;
                     }
 
-                    std::map<std::string, std::string> options = {};
+                    std::map<std::string, std::string> ffmpegOptions = {};
                     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
                     std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000,
                         loopRecord == 'y', 48000 * bufferSize);
                     sinks.push_back(audioSink);
 
-                    FFmpegRecorder recorder(inputFormat, deviceName, options, sinks);
+                    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
                     recorder.start();
 
                     audioSink->waitForInit();
