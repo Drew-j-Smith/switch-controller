@@ -23,7 +23,11 @@ public:
     };
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override { return nullptr; }
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override {
+        boost::property_tree::ptree childTree = tree.get_child("event");
+        int loopTime = tree.get<int>("loop time");
+        return std::make_shared<InputEventTurbo>(loopTime, factory.generateObject(childTree));
+    }
     std::string getTypeName() const override { return ""; }
 
     void update() override {}

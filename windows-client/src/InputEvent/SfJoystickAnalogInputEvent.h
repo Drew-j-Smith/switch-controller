@@ -44,7 +44,12 @@ public:
     }
     bool isDigital() const override { return false; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override { return nullptr; }
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override {
+        // Unused parameters
+        factory;
+
+        return std::make_shared<SfJoystickAnalogInputEvent>(tree);
+    }
     std::string getTypeName() const override { return ""; }
 
     void update() override {}

@@ -38,7 +38,10 @@ public:
     bool isDigital() const override { return true; }
 
     std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override {
-        return nullptr;
+        // Unused parameters
+        factory;
+        
+        return std::make_shared<SfKeyboardInputEvent>(tree);
     }
     std::string getTypeName() const override { return ""; }
 
