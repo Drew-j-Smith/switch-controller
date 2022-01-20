@@ -14,14 +14,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "Utility/PtreeConstructable.h"
+#include "Utility/FactoryObject.h"
 
 /**
  * @brief The InputEvent class is used to abstract various digital
  * and analogue input methods.
  * 
  */
-class InputEvent : public PtreeConstructable<InputEvent>
+class InputEvent : public FactoryObject<InputEvent>
 {
 public:
     /**

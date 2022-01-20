@@ -1,17 +1,14 @@
-#ifndef PTREE_CONSTRUCTABLE_H
-#define PTREE_CONSTRUCTABLE_H
+#ifndef FACTORY_OBJECT_H
+#define FACTORY_OBJECT_H
 
 #include "pch.h"
 
 #include <boost/property_tree/ptree.hpp>
 
-template<class T>
-class PtreeConstructable;
-
 #include "Factory.h"
 
 template<class T>
-class PtreeConstructable
+class FactoryObject
 {
 public:
     virtual std::shared_ptr<T> makeShared(const boost::property_tree::ptree & tree, Factory<T> & factory) const = 0;
