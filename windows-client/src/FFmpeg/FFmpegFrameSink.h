@@ -41,6 +41,8 @@ protected:
     }
 
 public:
+    virtual ~FFmpegFrameSink() {}
+
     void init(AVCodecContext* decoderContext) {
         virtualInit(decoderContext);
         std::lock_guard<std::mutex> lock(initMutex);

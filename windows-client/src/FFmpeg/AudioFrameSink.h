@@ -39,7 +39,7 @@ public:
         }
     }
 
-    ~AudioFrameSink() {
+    ~AudioFrameSink() override {
         swr_free(&swr);
     }
 

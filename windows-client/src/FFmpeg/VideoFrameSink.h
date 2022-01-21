@@ -91,7 +91,7 @@ private:
 public:
     VideoFrameSink() {}
 
-    ~VideoFrameSink() {
+    ~VideoFrameSink() override {
         sws_freeContext(swsContext);
     }
 

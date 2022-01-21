@@ -21,6 +21,8 @@
 class Decider
 {
 public:
+    virtual ~Decider() {}
+
     /**
      * @brief Get the name of the object.
      * 

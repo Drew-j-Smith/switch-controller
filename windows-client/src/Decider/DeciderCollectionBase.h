@@ -8,6 +8,7 @@
 class DeciderCollectionBase
 {
 public:
+    virtual ~DeciderCollectionBase() {}
     virtual std::map<std::string, std::shared_ptr<Decider>> generateMap() const = 0;
 };
 

@@ -25,7 +25,7 @@ private:
 public:
     ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<VideoFrameSink> & videoFrameSink);
     ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree);
-    ~ImageProcessingDeciderCollection();
+    ~ImageProcessingDeciderCollection() override;
 
     void setDeciders(const std::vector<std::shared_ptr<ImageProcessingDecider>> & newDeciders) { this->deciders = newDeciders; }
     void setVideoFrameSink(const std::shared_ptr<VideoFrameSink> & newVideoFrameSink) { this->videoFrameSink = newVideoFrameSink; }

@@ -20,7 +20,7 @@ private:
 
 public:
     SoundDeciderCollection(const boost::property_tree::ptree & tree);
-    ~SoundDeciderCollection();
+    ~SoundDeciderCollection() override;
 
     std::map<std::string, std::shared_ptr<Decider>> generateMap() const override;
 };

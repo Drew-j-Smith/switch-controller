@@ -30,7 +30,7 @@ private:
 public:
     SoundDecider(const boost::property_tree::ptree & tree); // dont forget to set name
 
-    ~SoundDecider() {
+    ~SoundDecider() override {
         fftwf_destroy_plan(fftwPlan);
     }
 
