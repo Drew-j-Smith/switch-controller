@@ -3,6 +3,8 @@
 
 #include "FFmpegFrameSink.h"
 
+#include <boost/circular_buffer.hpp>
+
 extern "C" {
     #include <libavutil/opt.h>
     #include <libavutil/channel_layout.h>
@@ -21,8 +23,7 @@ private:
     int outSampleRate = 48000;
 
     bool loopRecording = false;
-    std::vector<uint8_t> dataBuffer;
-    int64_t loopBufferPosition = 0;
+    boost::circular_buffer<uint8_t> circularData;
 public:
     AudioFrameSink() {}
 
@@ -32,10 +33,7 @@ public:
         outSampleRate(outSampleRate),
         loopRecording(loopRecording) {
         if (loopRecording) {
-            // I don't know the best way to do this but I am just going 
-            // to set the buffer to be 1 sec. of audio data
-            dataBuffer.resize(outSampleRate * av_get_bytes_per_sample(outputSampleFormat));
-            data.resize(loopBufferSize * av_get_bytes_per_sample(outputSampleFormat));
+            circularData.resize(loopBufferSize * av_get_bytes_per_sample(outputSampleFormat));
         }
     }
 
@@ -73,7 +71,8 @@ public:
         int res;
 
         if (loopRecording) {
-            output = dataBuffer.data();
+            data.resize(out_samples * av_get_bytes_per_sample(outputSampleFormat));
+            output = data.data();
         } else {
             data.resize(data.size() + out_samples * av_get_bytes_per_sample(outputSampleFormat));
             output = data.data() + data.size() - out_samples * av_get_bytes_per_sample(outputSampleFormat);
@@ -87,29 +86,16 @@ public:
         }
 
         if (loopRecording) {
-            if (loopBufferPosition + out_samples * av_get_bytes_per_sample(outputSampleFormat) >= (int64_t)data.size()) {
-                std::copy(dataBuffer.begin(),
-                          dataBuffer.begin() + (data.size() - loopBufferPosition),
-                          data.begin() + loopBufferPosition);
-                std::copy(dataBuffer.begin() + (data.size() - loopBufferPosition),
-                          dataBuffer.begin() + out_samples * av_get_bytes_per_sample(outputSampleFormat),
-                          data.begin());
-                loopBufferPosition -= data.size();
-            } else {
-                std::copy(dataBuffer.begin(),
-                          dataBuffer.begin() + out_samples * av_get_bytes_per_sample(outputSampleFormat),
-                          data.begin() + loopBufferPosition);
-            }
-            loopBufferPosition += out_samples * av_get_bytes_per_sample(outputSampleFormat);
+            circularData.insert(circularData.end(), data.begin(), data.end());
         }
     }
 
     void getDataWithoutLock(std::vector<uint8_t>& dataCopy) override {
-        dataCopy.resize(this->data.size());
         if (loopRecording) {
-            std::copy(this->data.begin() + loopBufferPosition, this->data.end(), dataCopy.begin());
-            std::copy(this->data.begin(), this->data.begin() + loopBufferPosition, dataCopy.begin() + (this->data.size() - loopBufferPosition));
+            dataCopy.resize(this->circularData.size());
+            std::copy(this->circularData.begin(), this->circularData.end(), dataCopy.begin());
         } else {
+            dataCopy.resize(this->data.size());
             std::copy(this->data.begin(), this->data.end(), dataCopy.begin());
         }
     }
