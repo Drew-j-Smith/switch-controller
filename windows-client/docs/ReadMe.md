@@ -8,15 +8,15 @@ is not easily put into code documentation.
 
 ## Dependencies
 
-- [Boost](https://www.boost.org/) : used for serial library and json parsing (required)
+- [Boost](https://www.boost.org/) : used for serial, json parsing, date-time calculation, endian and circular buffer
 
-- [OpenCV](https://opencv.org/) : used for image processing (optional w/code tweeks)
+- [OpenCV](https://opencv.org/) : used for image processing
 
-- [SFML](https://www.sfml-dev.org/) : used for inputs (optional w/code tweeks)
+- [SFML](https://www.sfml-dev.org/) : used for inputs
 
-- [FFTW](http://www.fftw.org/) : used for audio processing (optional w/code tweeks)
+- [FFTW](http://www.fftw.org/) : used for audio processing
 
-- [AudioFile](https://github.com/adamstark/AudioFile) : used for audio loading (optional w/code tweeks)
+- [FFmpeg](https://www.ffmpeg.org/) : used to load video and sound
 
 ## Data packets
 
