@@ -24,22 +24,6 @@ private:
 
     bool loopRecording = false;
     boost::circular_buffer<uint8_t> circularData;
-public:
-    AudioFrameSink() {}
-
-    AudioFrameSink(int64_t outChannelLayout, AVSampleFormat outputSampleFormat, int outSampleRate, bool loopRecording = false, int64_t loopBufferSize = 0) :
-        outChannelLayout(outChannelLayout),
-        outputSampleFormat(outputSampleFormat),
-        outSampleRate(outSampleRate),
-        loopRecording(loopRecording) {
-        if (loopRecording) {
-            circularData.resize(loopBufferSize * av_get_bytes_per_sample(outputSampleFormat));
-        }
-    }
-
-    ~AudioFrameSink() override {
-        swr_free(&swr);
-    }
 
     void virtualInit(AVCodecContext* decoderContext) override {
         // getting the channel layout or setting it to default
@@ -98,6 +82,23 @@ public:
             dataCopy.resize(this->data.size());
             std::copy(this->data.begin(), this->data.end(), dataCopy.begin());
         }
+    }
+
+public:
+    AudioFrameSink() {}
+
+    AudioFrameSink(int64_t outChannelLayout, AVSampleFormat outputSampleFormat, int outSampleRate, bool loopRecording = false, int64_t loopBufferSize = 0) :
+        outChannelLayout(outChannelLayout),
+        outputSampleFormat(outputSampleFormat),
+        outSampleRate(outSampleRate),
+        loopRecording(loopRecording) {
+        if (loopRecording) {
+            circularData.resize(loopBufferSize * av_get_bytes_per_sample(outputSampleFormat));
+        }
+    }
+
+    ~AudioFrameSink() override {
+        swr_free(&swr);
     }
 
     AVMediaType getType() const override {
