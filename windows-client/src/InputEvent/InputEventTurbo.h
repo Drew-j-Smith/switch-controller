@@ -15,6 +15,12 @@ public:
         this->toggleEvent = std::make_shared<InputEventToggle>(loopTime, event);
         this->event = event;
     }
+    InputEventTurbo(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
 
     int getInputValue() const override {
         if (!event->getInputValue())

@@ -23,6 +23,12 @@ class DefaultInputEvent : public InputEvent
 {
 public:
     DefaultInputEvent() {};
+    DefaultInputEvent(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
     int getInputValue() const override { return 0; }
     bool isDigital() const override { return true; }
 
@@ -54,6 +60,12 @@ class ActiveInputEvent : public InputEvent
 {
 public:
     ActiveInputEvent() {};
+    ActiveInputEvent(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
     int getInputValue() const override { return 1; }
     bool isDigital() const override { return true; }
 

@@ -15,6 +15,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "Utility/FactoryObject.h"
+#include "Utility/InputEventFactory.h"
 
 /**
  * @brief The InputEvent class is used to abstract various digital

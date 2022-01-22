@@ -7,6 +7,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include "InputEvent/InputEvent.h"
+
 void CreateConfig(std::string& configFilename);
 void EditConfig(std::string& configFilename);
 void StartController(std::string& configFilename);
@@ -28,6 +30,11 @@ int main(int argc, const char** argv)
     // Unused for now
     argc;
     argv;
+
+    InputEventFactory factory;
+    std::shared_ptr<InputEvent> a = factory.create("DefaultInputEvent", boost::property_tree::ptree());
+    std::shared_ptr<InputEvent> b = factory.create("ActiveInputEvent", boost::property_tree::ptree());
+    std::cout << a->getTypeName() << ' ' << b->getTypeName() << '\n';
 
     int option = 0;
     std::string configFilename = "data/config.json";

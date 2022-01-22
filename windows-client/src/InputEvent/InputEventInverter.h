@@ -36,6 +36,12 @@ public:
         }
         this->event = event;
     };
+    InputEventInverter(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
 
     int getInputValue() const override {
         if (isDigital()) {

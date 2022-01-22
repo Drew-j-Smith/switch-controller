@@ -27,6 +27,12 @@ public:
         this->event2 = event2;
         this->deciderEvent = deciderEvent;
     }
+    InputEventSwitch(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
 
     int getInputValue() const override {
         if (deciderEvent->getInputValue())

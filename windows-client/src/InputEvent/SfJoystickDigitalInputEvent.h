@@ -26,6 +26,12 @@ public:
         button = tree.get("button", 0);
         assertConnected();
     }
+    SfJoystickDigitalInputEvent(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
     void assertConnected() {
         if (!sf::Joystick::isConnected(joystickIndex))
             std::cerr << "Joystick " << joystickIndex << " was requested but is not connected.\n";

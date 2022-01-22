@@ -10,6 +10,7 @@
       "boost-date-time",
       "boost-endian",
       "boost-circular-buffer",
+      "boost-functional",
       "fftw3",
       "ffmpeg"
     ]

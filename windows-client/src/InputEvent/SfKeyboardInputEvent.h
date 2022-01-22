@@ -33,6 +33,12 @@ public:
             key = sf::Keyboard::Unknown;
         }
     }
+    SfKeyboardInputEvent(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
 
     int getInputValue() const override { return sf::Keyboard::isKeyPressed(key); }
     bool isDigital() const override { return true; }

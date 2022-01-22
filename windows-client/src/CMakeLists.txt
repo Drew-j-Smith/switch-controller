@@ -15,6 +15,7 @@ InputEvent/InputEventToggle.cpp
 InputEvent/InputManager.cpp
 Macro/Macro.cpp
 Macro/MacroCollection.cpp
+Utility/InputEventFactory.cpp
 Utility/SerialPort.cpp
 )
 

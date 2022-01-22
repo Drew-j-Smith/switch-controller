@@ -26,6 +26,12 @@ public:
         this->event = event;
         toggles.insert(this);
     }
+    InputEventToggle(const boost::property_tree::ptree& tree, 
+        const InputEventFactory& factory) {
+        //Unused variables
+        tree;
+        factory;
+    }
 
     ~InputEventToggle() {
         toggles.erase(this);
