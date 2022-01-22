@@ -63,8 +63,7 @@ public:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            std::cerr << "Error Initializing AudioFrameSink\n" << error << '\n';
-            throw std::exception("Error Initializing AudioFrameSink");
+            throw std::runtime_error("Error Initializing AudioFrameSink " + std::string(error));
         }
     }
 
@@ -84,8 +83,7 @@ public:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            std::cerr << "Error converting audio in AudioFrameSink" << error << '\n';
-            throw std::exception("Error converting audio");
+            throw std::runtime_error("Error converting audio in AudioFrameSink: " + std::string(error));
         }
 
         if (loopRecording) {

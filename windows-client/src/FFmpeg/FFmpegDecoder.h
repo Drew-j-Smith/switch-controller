@@ -18,9 +18,9 @@ private:
     int streamIndex;
 public:
     FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FFmpegFrameSink> sink);
-    ~FFmpegDecoder() { free(); };
-
-    void free();
+    ~FFmpegDecoder() {
+        avcodec_free_context(&decoderContext);
+    };
 
     void decodePacket(const AVPacket* packet, AVFrame* frame);
     int getStreamIndex() const { return streamIndex; }

@@ -16,45 +16,30 @@ void FFmpegDecoder::openCodecContext()
 {
     this->streamIndex = av_find_best_stream(formatContext, this->sink->getType(), -1, -1, nullptr, 0);
     if (this->streamIndex < 0) {
-        free();
-        std::string errStr = "Could not find " + std::string(av_get_media_type_string(this->sink->getType())) + " stream in FFmpeg Decoder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Could not find " + std::string(av_get_media_type_string(this->sink->getType())) + " stream in FFmpeg Decoder");
     }
     AVStream* stream = formatContext->streams[this->streamIndex];
 
     // find decoder for the stream
     const AVCodec* decoder = avcodec_find_decoder(stream->codecpar->codec_id);
     if (!decoder) {
-        free();
-        std::string errStr = "Failed to find " + std::string(av_get_media_type_string(this->sink->getType())) + " codec in FFmpeg Decoder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Failed to find " + std::string(av_get_media_type_string(this->sink->getType())) + " codec in FFmpeg Decoder");
     }
 
     // Allocate a codec context for the decoder
     this->decoderContext = avcodec_alloc_context3(decoder);
     if (!this->decoderContext) {
-        free();
-        std::string errStr = "Failed to allocate the " + std::string(av_get_media_type_string(this->sink->getType())) + " codec context in FFmpeg Decoder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Failed to allocate the " + std::string(av_get_media_type_string(this->sink->getType())) + " codec context in FFmpeg Decoder");
     }
 
     // Copy codec parameters from input stream to output codec context
     if (avcodec_parameters_to_context(this->decoderContext, stream->codecpar) < 0) {
-        free();
-        std::string errStr = "Failed to copy " + std::string(av_get_media_type_string(this->sink->getType())) + " codec parameters to decoder context in FFmpeg Decoder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Failed to copy " + std::string(av_get_media_type_string(this->sink->getType())) + " codec parameters to decoder context in FFmpeg Decoder");
     }
 
     // Init the decoders
     if (avcodec_open2(this->decoderContext, decoder, nullptr) < 0) {
-        free();
-        std::string errStr = "Failed to open " + std::string(av_get_media_type_string(this->sink->getType())) + " codec in FFmpeg Decoder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Failed to open " + std::string(av_get_media_type_string(this->sink->getType())) + " codec in FFmpeg Decoder");
     }
 }
 
@@ -65,21 +50,15 @@ FFmpegDecoder::FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FFm
     sink->init(this->decoderContext);
 }
 
-void FFmpegDecoder::free() {
-    avcodec_free_context(&decoderContext);
-}
-
 void FFmpegDecoder::decodePacket(const AVPacket* packet, AVFrame* frame) {
     int ret = 0;
  
     // submit the packet to the decoder
     ret = avcodec_send_packet(decoderContext, packet);
     if (ret < 0) {
-        free();
         char error[AV_ERROR_MAX_STRING_SIZE];
-        std::string errStr(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret));
-        std::cerr << "Error submitting a packet for decoding (" << errStr << ")\n";
-        throw std::runtime_error("Error submitting a packet for decoding (" + errStr + ")");
+        av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret);
+        throw std::runtime_error("Error submitting a packet for decoding: " + std::string(error));
     }
  
     // get all the available frames from the decoder
@@ -91,11 +70,9 @@ void FFmpegDecoder::decodePacket(const AVPacket* packet, AVFrame* frame) {
             if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
                 return;
 
-            free();
             char error[AV_ERROR_MAX_STRING_SIZE];
-            std::string errStr(av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret));
-            std::cerr << "Error during decoding (" << errStr << ")  in FFmpeg Decoder\n";
-            throw std::runtime_error("Error during decoding (" + errStr + ")  in FFmpeg Decoder");
+            av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret);
+            throw std::runtime_error("Error during decoding (" + std::string(error) + ")  in FFmpeg Decoder");
         }
  
         // send frame to frame sink

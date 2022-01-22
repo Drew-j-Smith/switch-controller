@@ -49,7 +49,13 @@ int main(int argc, const char** argv)
                 EditConfig(configFilename);
                 break;
             case 4:
-                StartController(configFilename);
+                {
+                    try {
+                        StartController(configFilename);
+                    } catch (std::exception e) {
+                        std::cerr << e.what() << '\n';
+                    }
+                }
                 break;
             case 5:
                 {

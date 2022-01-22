@@ -41,16 +41,14 @@ private:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            std::cerr << "Error getting linesize in VideoFrameSink " << error << '\n';
-            throw std::runtime_error("Error getting linesize in VideoFrameSink");
+            throw std::runtime_error("Error getting linesize in VideoFrameSink: " + std::string(error));
         }
 
         res = av_image_get_buffer_size(outputPixelFormat, outputWidth, outputHeight, 1);
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            std::cerr << "Error getting plane size in VideoFrameSink " << error << '\n';
-            throw std::runtime_error("Error getting plane size in VideoFrameSink");
+            throw std::runtime_error("Error getting plane size in VideoFrameSink: " + std::string(error));
         }
         data.resize(res);
 
@@ -69,7 +67,6 @@ private:
 
     void virtualOutputFrame(AVFrame* frame) override {
         if (frame->width != width || frame->height != height || frame->format != pixelFormat) {
-            std::cerr << "Cannot support changing input format in VideoFrameSink\n";
             throw std::runtime_error("Cannot support changing input format");
         }
 
@@ -78,8 +75,7 @@ private:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            std::cerr << "Error converting audio in VideoFrameSink" << error << '\n';
-            throw std::runtime_error("Error converting image in VideoFrameSink");
+            throw std::runtime_error("Error converting image in VideoFrameSink: " + std::string(error));
         }
     }
 

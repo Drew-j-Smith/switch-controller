@@ -23,27 +23,16 @@ FFmpegRecorder::FFmpegRecorder(std::string inputFormat, std::string deviceName, 
         }
     }
     if (overlap) {
-        std::string errStr = "Only one frame sink of each type may be used";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Only one frame sink of each type may be used");
     }
     if (sinks.size() == 0) {
-        std::string errStr = "The sink size must be greater than 0";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("The sink size must be greater than 0");
     }
 
     this->inputFormatStr = inputFormat;
     this->deviceNameStr = deviceName;
     this->options = options;
     this->sinks = sinks;
-}
-
-void FFmpegRecorder::free() {
-    recording.store(false);
-    decoders.clear();
-    avformat_close_input(&formatContext);
-    av_frame_free(&frame);
 }
 
 void FFmpegRecorder::openStream() {
@@ -61,18 +50,12 @@ void FFmpegRecorder::openStream() {
  
     // open input file, and allocate format context
     if (avformat_open_input(&formatContext, deviceNameStr.c_str(), inputFormat, &optionsDic) < 0) {
-        free();
-        std::string errStr = "Could not open stream " + deviceNameStr + " in FFmpeg Recorder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Could not open stream " + deviceNameStr);
     }
  
     // retrieve stream information
     if (avformat_find_stream_info(formatContext, nullptr) < 0) {
-        free();
-        std::string errStr = "Could not find stream information for " + deviceNameStr + " in FFmpeg Recorder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("Could not find stream information for " + deviceNameStr);
     }
     
     // open stream ctx for each frame sink
@@ -82,9 +65,7 @@ void FFmpegRecorder::openStream() {
     }
 
     if(decoders.size() == 0) {
-        std::string errStr = "No frame sinks were loaded in FFmpegRecorder";
-        std::cerr << errStr << '\n';
-        throw std::runtime_error(errStr);
+        throw std::runtime_error("No frame sinks were loaded in FFmpegRecorder");
     }
  
     // print stream info
@@ -96,28 +77,31 @@ void FFmpegRecorder::start() {
     recording.store(true);
 
     recordingThread = std::thread([&](){
-        openStream();
+        try {
+            openStream();
 
-        AVPacket pkt;
-        frame = av_frame_alloc();
-        if (!frame) {
-            free();
-            std::cerr << "Could not allocate frame in FFmpeg Recorder\n";
-            throw std::runtime_error("Could not allocate frame");
-        }
-        // read until there are no more frames or canceled
-        while (recording.load() && av_read_frame(formatContext, &pkt) >= 0) {
-            // check if the pack goes to a frame sink
-            if (decoders.find(pkt.stream_index) != decoders.end()) {
-                auto decoder = decoders.at(pkt.stream_index);
-                decoder->decodePacket(&pkt, frame);
+            AVPacket pkt;
+            frame = av_frame_alloc();
+            if (!frame) {
+                throw std::runtime_error("Could not allocate frame");
             }
-            av_packet_unref(&pkt);
-        }
+            // read until there are no more frames or canceled
+            while (recording.load() && av_read_frame(formatContext, &pkt) >= 0) {
+                // check if the pack goes to a frame sink
+                if (decoders.find(pkt.stream_index) != decoders.end()) {
+                    auto decoder = decoders.at(pkt.stream_index);
+                    decoder->decodePacket(&pkt, frame);
+                }
+                av_packet_unref(&pkt);
+            }
 
-        // flushing decoders
-        for (auto it : decoders) {
-            it.second->decodePacket(nullptr, frame);
+            // flushing decoders
+            for (auto it : decoders) {
+                it.second->decodePacket(nullptr, frame);
+            }
+        } catch (std::exception& e) {
+            std::cerr << e.what() << '\n';
+            throw;
         }
     });
 }

@@ -32,7 +32,6 @@ public:
      */
     InputEventInverter(std::shared_ptr<InputEvent> event) {
         if (!event->isDigital()) {
-            std::cerr << "Invalid type for InputEventInverter: " << event->getTypeName() << std::endl;
             throw std::invalid_argument("Invalid type for InputEventInverter: " + event->getTypeName());
         }
         this->event = event;
