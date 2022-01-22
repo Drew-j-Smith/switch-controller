@@ -96,11 +96,12 @@ int main(int argc, const char** argv)
                     cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data.data());
 
                     std::atomic<bool> running = true;
+                    std::string title = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
 
                     std::thread t([&]() {
                         while (running.load()) {
                             lastFrame = videoSink->getNextData(data, lastFrame);
-                            cv::imshow("test", mat);
+                            cv::imshow(title, mat);
                             cv::waitKey(1);
                         }
                     });

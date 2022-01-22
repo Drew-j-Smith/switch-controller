@@ -34,6 +34,7 @@ public:
     FFmpegRecorder(std::string inputFormat, std::string deviceName, std::map<std::string, std::string> options, std::vector<std::shared_ptr<FFmpegFrameSink>> sinks);
     ~FFmpegRecorder() {
         stop();
+        decoders.clear();
         avformat_close_input(&formatContext);
         av_frame_free(&frame);
      };

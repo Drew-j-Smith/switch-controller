@@ -99,6 +99,13 @@ void FFmpegRecorder::start() {
             for (auto it : decoders) {
                 it.second->decodePacket(nullptr, frame);
             }
+
+            // need to call these methods here... for some reason
+            // if these methods aren't called in this thread it crashes
+            decoders.clear();
+            avformat_close_input(&formatContext);
+            av_frame_free(&frame);
+
         } catch (std::exception& e) {
             std::cerr << e.what() << '\n';
             throw;
