@@ -110,7 +110,7 @@ public:
             std::copy(this->data.begin() + loopBufferPosition, this->data.end(), dataCopy.begin());
             std::copy(this->data.begin(), this->data.begin() + loopBufferPosition, dataCopy.begin() + (this->data.size() - loopBufferPosition));
         } else {
-            std::copy(this->data.begin(), this->data.end(), data.begin());
+            std::copy(this->data.begin(), this->data.end(), dataCopy.begin());
         }
     }
 
