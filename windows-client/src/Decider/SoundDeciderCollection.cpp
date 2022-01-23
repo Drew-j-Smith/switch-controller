@@ -61,4 +61,4 @@ std::map<std::string, std::shared_ptr<Decider>> SoundDeciderCollection::generate
         map.insert({decider->getName(), decider});
     }
     return map;
-};
+}
