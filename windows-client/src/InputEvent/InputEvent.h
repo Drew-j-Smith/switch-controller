@@ -44,6 +44,25 @@ public:
     virtual bool isDigital() const = 0;
 
     virtual void update() = 0;
+
+    /**
+     * @brief Get the Schema of the input event
+     *
+     * @details The schema will have the same shape that the input event will
+     * expect in its constructor. The names of the nodes are expected to be the
+     * same while the child of the nodes represent the data expected.
+     * There are 4 types of data (as of now):
+     * 1. String
+     * 2. Integer
+     * 3. Array (the array will have a child with the expected type)
+     * 4. InputEvent (the InputEvent must be a valid ptree to construct another
+     * InputEvent)
+     *
+     * @return boost::property_tree::ptree the Schema of the input event
+     */
+    virtual boost::property_tree::ptree getSchema() {
+        return boost::property_tree::ptree(); // TODO temporary definition
+    }
 };
 
 #endif
