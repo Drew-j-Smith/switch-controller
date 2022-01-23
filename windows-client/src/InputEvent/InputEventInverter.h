@@ -4,77 +4,86 @@
 /**
  * @file InputEventInverter.h
  * @author Drew Smith
- * @brief The InputInverter class inverts any input recieved from a InputEvent class.
+ * @brief The InputInverter class inverts any input recieved from a InputEvent
+ * class.
  * @date 2021-04-21
- * 
+ *
  */
 
 #include "pch.h"
 
-#include "InputEvent.h"
 #include "DefaultInputEvent.h"
+#include "InputEvent.h"
 
 /**
- * @brief The InputInverter class inverts any input recieved from a InputEvent class.
- * It contains one event.
- * 
+ * @brief The InputInverter class inverts any input recieved from a InputEvent
+ * class. It contains one event.
+ *
  */
-class InputEventInverter : public InputEvent
-{
+class InputEventInverter : public InputEvent {
 private:
     std::shared_ptr<InputEvent> event;
+
 public:
-    InputEventInverter() : event(std::make_shared<DefaultInputEvent>()) {};
+    InputEventInverter() : event(std::make_shared<DefaultInputEvent>()){};
     /**
      * @brief Construct a new InputEventInverter object.
-     * 
+     *
      * @param event The event to be negated
      */
     InputEventInverter(std::shared_ptr<InputEvent> event) {
         if (!event->isDigital()) {
-            throw std::invalid_argument("Invalid type for InputEventInverter: " + event->getTypeName());
+            throw std::invalid_argument(
+                "Invalid type for InputEventInverter: " + event->getTypeName());
         }
         this->event = event;
     };
-    InputEventInverter(const boost::property_tree::ptree& tree, InputEventFactory& factory) {
+    InputEventInverter(const boost::property_tree::ptree &tree,
+                       InputEventFactory &factory) {
         boost::property_tree::ptree childTree = tree.get_child("event");
         event = factory.create(tree);
     }
 
     int getInputValue() const override {
         if (isDigital()) {
-            return !event->getInputValue(); 
+            return !event->getInputValue();
         } else {
             return 255 - event->getInputValue();
         }
     };
     bool isDigital() const override { return event->isDigital(); }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override { 
+    std::shared_ptr<InputEvent>
+    makeShared(const boost::property_tree::ptree &tree,
+               Factory<InputEvent> &factory) const override {
         boost::property_tree::ptree childTree = tree.get_child("event");
-        return std::make_shared<InputEventInverter>(factory.generateObject(childTree)); 
+        return std::make_shared<InputEventInverter>(
+            factory.generateObject(childTree));
     }
     std::string getTypeName() const override { return "InputEventInverter"; }
 
     void update() override { event->update(); }
 
-    std::string toString() const override { return "InputEventInverter: (" + event->toString() + ")"; }
-    boost::property_tree::ptree toPtree() const override { 
+    std::string toString() const override {
+        return "InputEventInverter: (" + event->toString() + ")";
+    }
+    boost::property_tree::ptree toPtree() const override {
         boost::property_tree::ptree result;
-        result.add_child("type", boost::property_tree::ptree("InputEventInverter"));
+        result.add_child("type",
+                         boost::property_tree::ptree("InputEventInverter"));
         result.add_child("event", event->toPtree());
         return result;
     }
-    bool operator==(const InputEvent& other) const override { 
+    bool operator==(const InputEvent &other) const override {
         if (!InputEvent::operator==(other))
             return false;
-        const InputEventInverter* otherPtr = reinterpret_cast<const InputEventInverter*>(&other);
+        const InputEventInverter *otherPtr =
+            reinterpret_cast<const InputEventInverter *>(&other);
         return *event == *otherPtr->event;
     }
-    bool operator!=(const InputEvent& other) const override { 
+    bool operator!=(const InputEvent &other) const override {
         return !operator==(other);
     }
 };
-
 
 #endif

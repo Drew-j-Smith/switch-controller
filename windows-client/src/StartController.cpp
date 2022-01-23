@@ -1,32 +1,32 @@
 
-#include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
-#include <boost/property_tree/ptree.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "pch.h"
 
-#include "Utility/SerialPort.h"
-#include "boost/asio/read.hpp"
-#include "boost/asio/write.hpp"
-#include "Macro/MacroCollection.h"
-#include "InputEvent/InputManager.h"
 #include "Decider/DeciderCollection.h"
-#include "Macro/MacroRecorder.h"
 #include "InputEvent/InputEventToggle.h"
+#include "InputEvent/InputManager.h"
+#include "Macro/MacroCollection.h"
+#include "Macro/MacroRecorder.h"
+#include "Utility/SerialPort.h"
 
-void StartController(std::string& configFilename) {
+void StartController(std::string &configFilename) {
     std::cout << "Initializing...\n";
     std::cout << "Loading config files.\n";
 
+    // Updating joysticks to see if they are connected
     sf::Joystick::update();
 
     boost::property_tree::ptree tree;
     try {
         boost::property_tree::read_json(configFilename, tree);
-    }
-    catch (boost::property_tree::json_parser::json_parser_error& e) {
+    } catch (boost::property_tree::json_parser::json_parser_error &e) {
         std::cerr << "Error parsing config file\n";
         std::cerr << e.what() << '\n';
         return;
@@ -34,13 +34,15 @@ void StartController(std::string& configFilename) {
 
     InputManager inputManager(tree.find("controls")->second, 15);
 
-    auto deciders = std::make_shared<DeciderCollection>(tree.find("deciders")->second);
+    auto deciders =
+        std::make_shared<DeciderCollection>(tree.find("deciders")->second);
     MacroCollection macroCollection(tree.find("macros")->second, deciders);
 
     MacroRecorder recorder(tree.find("controls")->second);
     macroCollection.pushBackMacro(recorder.getLastRecordedMacro());
-    
-    InputEventCollection stopMacrosEvent(tree.find("controls")->second.find("stopMacros")->second);
+
+    InputEventCollection stopMacrosEvent(
+        tree.find("controls")->second.find("stopMacros")->second);
 
     std::cout << "Config files loaded.\n";
 
@@ -51,33 +53,31 @@ void StartController(std::string& configFilename) {
     unsigned char recieve[1];
 
     try {
-        port = initializeSerialPort(tree.get<std::string>("serial port"), 57600);
+        port =
+            initializeSerialPort(tree.get<std::string>("serial port"), 57600);
 
         testSerialPort(port, 8, send.data(), 1, recieve);
-    }
-    catch (std::exception& e) {
+    } catch (std::exception &e) {
         std::cerr << "Failure connecting via serial port.\n";
         std::cerr << e.what() << "\n";
         return;
     }
 
-
-
     while (true) {
         sf::Joystick::update();
         InputEventToggle::updateAll();
-        
+
         // auto begin = std::chrono::steady_clock::now();
-        
 
         send = inputManager.getData();
         recorder.update(send);
-        
+
         macroCollection.activateMacros();
-        if (macroCollection.isMacroActive() && stopMacrosEvent.getInputValue()) {
+        if (macroCollection.isMacroActive() &&
+            stopMacrosEvent.getInputValue()) {
             macroCollection.deactivateMacros();
         }
-        if (macroCollection.isMacroActive()){
+        if (macroCollection.isMacroActive()) {
             send = macroCollection.getData(send);
         }
 
@@ -87,10 +87,10 @@ void StartController(std::string& configFilename) {
         }
         // if ((int)(recieve[0]) != 85)
         //     std::cout << (int)(recieve[0]) << std::endl;
-        
 
         // auto end = std::chrono::steady_clock::now();
-        // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << std::endl;
+        // std::cout <<
+        // std::chrono::duration_cast<std::chrono::milliseconds>(end -
+        // begin).count() << std::endl;
     }
-
 }

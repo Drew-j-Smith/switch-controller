@@ -6,13 +6,11 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "DeciderCollectionBase.h"
-#include "ImageProcessingDecider.h"
-#include "FFmpeg/VideoFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
+#include "FFmpeg/VideoFrameSink.h"
+#include "ImageProcessingDecider.h"
 
-
-class ImageProcessingDeciderCollection : public DeciderCollectionBase
-{
+class ImageProcessingDeciderCollection : public DeciderCollectionBase {
 private:
     std::vector<std::shared_ptr<ImageProcessingDecider>> deciders;
     std::shared_ptr<FFmpegRecorder> ffmpegRecorder;
@@ -23,16 +21,30 @@ private:
     void startImageProcessingThread();
 
 public:
-    ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<VideoFrameSink> & videoFrameSink);
-    ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree);
+    ImageProcessingDeciderCollection(
+        const std::vector<std::shared_ptr<ImageProcessingDecider>> &deciders,
+        const std::shared_ptr<VideoFrameSink> &videoFrameSink);
+    ImageProcessingDeciderCollection(const boost::property_tree::ptree &tree);
     ~ImageProcessingDeciderCollection() override;
 
-    void setDeciders(const std::vector<std::shared_ptr<ImageProcessingDecider>> & newDeciders) { this->deciders = newDeciders; }
-    void setVideoFrameSink(const std::shared_ptr<VideoFrameSink> & newVideoFrameSink) { this->videoFrameSink = newVideoFrameSink; }
-    const std::vector<std::shared_ptr<ImageProcessingDecider>> getDeciders() const { return deciders; }
-    const std::shared_ptr<VideoFrameSink> getVideoFrameSink() { return videoFrameSink; }
+    void setDeciders(const std::vector<std::shared_ptr<ImageProcessingDecider>>
+                         &newDeciders) {
+        this->deciders = newDeciders;
+    }
+    void setVideoFrameSink(
+        const std::shared_ptr<VideoFrameSink> &newVideoFrameSink) {
+        this->videoFrameSink = newVideoFrameSink;
+    }
+    const std::vector<std::shared_ptr<ImageProcessingDecider>>
+    getDeciders() const {
+        return deciders;
+    }
+    const std::shared_ptr<VideoFrameSink> getVideoFrameSink() {
+        return videoFrameSink;
+    }
 
-    std::map<std::string, std::shared_ptr<Decider>> generateMap() const override;
+    std::map<std::string, std::shared_ptr<Decider>>
+    generateMap() const override;
 };
 
 #endif

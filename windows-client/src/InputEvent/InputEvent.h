@@ -7,7 +7,7 @@
  * @brief The InputEvent class is used to abstract various digital
  * and analogue input methods.
  * @date 2021-04-21
- * 
+ *
  */
 
 #include "pch.h"
@@ -20,26 +20,24 @@
 /**
  * @brief The InputEvent class is used to abstract various digital
  * and analogue input methods.
- * 
+ *
  */
-class InputEvent : public FactoryObject<InputEvent>
-{
+class InputEvent : public FactoryObject<InputEvent> {
 public:
-
     virtual ~InputEvent() {}
-    
+
     /**
      * @brief Gets the input value from the object.
      * if the input is digital the result will be [0, 1]
      * if the input is analog the result will be [0, 255]
-     * 
-     * @return int 
+     *
+     * @return int
      */
     virtual int getInputValue() const = 0;
 
     /**
      * @brief The value decides if the input acts as a digital or analogue input
-     * 
+     *
      * @return true getInputValue will return [0, 1]
      * @return false getInputValue will return [0, 255]
      */
@@ -47,6 +45,5 @@ public:
 
     virtual void update() = 0;
 };
-
 
 #endif

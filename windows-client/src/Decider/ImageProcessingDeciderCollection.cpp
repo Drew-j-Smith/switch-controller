@@ -1,35 +1,42 @@
 #include "ImageProcessingDeciderCollection.h"
 
-static void matchImage(std::shared_ptr<ImageProcessingDecider> decider, const cv::Mat & screenshot){
+static void matchImage(std::shared_ptr<ImageProcessingDecider> decider,
+                       const cv::Mat &screenshot) {
     decider->update(screenshot);
 }
 
 void ImageProcessingDeciderCollection::startImageProcessingThread() {
     imageProcessing.store(true);
-    imageProcessingThread = std::thread([&](){
+    imageProcessingThread = std::thread([&]() {
         std::vector<std::future<void>> futures;
         this->videoFrameSink->waitForInit();
         std::vector<uint8_t> data;
         long long lastFrame = this->videoFrameSink->getData(data);
-        cv::Mat screenshot = cv::Mat(this->videoFrameSink->getHeight(), this->videoFrameSink->getWidth(), CV_8UC3, data.data());
-        
+        cv::Mat screenshot =
+            cv::Mat(this->videoFrameSink->getHeight(),
+                    this->videoFrameSink->getWidth(), CV_8UC3, data.data());
+
         while (imageProcessing.load()) {
             lastFrame = this->videoFrameSink->getNextData(data, lastFrame);
-            for (auto & decider : deciders) {
-                futures.push_back(std::async(std::launch::async, matchImage, decider, screenshot));
+            for (auto &decider : deciders) {
+                futures.push_back(std::async(std::launch::async, matchImage,
+                                             decider, screenshot));
             }
             futures.clear();
         }
     });
 }
 
-ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const std::vector<std::shared_ptr<ImageProcessingDecider>> & deciders, const std::shared_ptr<VideoFrameSink> & videoFrameSink) {
+ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(
+    const std::vector<std::shared_ptr<ImageProcessingDecider>> &deciders,
+    const std::shared_ptr<VideoFrameSink> &videoFrameSink) {
     this->deciders = deciders;
     this->videoFrameSink = videoFrameSink;
-    startImageProcessingThread(); 
+    startImageProcessingThread();
 }
 
-ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::property_tree::ptree & tree) {
+ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(
+    const boost::property_tree::ptree &tree) {
     auto imageTree = tree.find("image deciders");
     if (imageTree == tree.not_found()) {
         std::cerr << "The image tree was loaded but not found in the config.\n";
@@ -45,7 +52,8 @@ ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::
 
     av_log_set_level(AV_LOG_QUIET);
 
-    this->ffmpegRecorder = std::make_shared<FFmpegRecorder>(inputFormat, deviceName, options, sinks);
+    this->ffmpegRecorder = std::make_shared<FFmpegRecorder>(
+        inputFormat, deviceName, options, sinks);
     this->ffmpegRecorder->start();
 
     for (auto decider : imageTree->second) {
@@ -53,7 +61,8 @@ ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(const boost::
             // TODO
         }
         if (decider.second.get("type", "") == "image processing") {
-            deciders.push_back(std::make_shared<ImageProcessingDecider>(decider.second));
+            deciders.push_back(
+                std::make_shared<ImageProcessingDecider>(decider.second));
         }
     }
 
@@ -66,7 +75,8 @@ ImageProcessingDeciderCollection::~ImageProcessingDeciderCollection() {
         imageProcessingThread.join();
 }
 
-std::map<std::string, std::shared_ptr<Decider>> ImageProcessingDeciderCollection::generateMap() const {
+std::map<std::string, std::shared_ptr<Decider>>
+ImageProcessingDeciderCollection::generateMap() const {
     std::map<std::string, std::shared_ptr<Decider>> map;
     for (auto decider : deciders) {
         map.insert({decider->getName(), decider});

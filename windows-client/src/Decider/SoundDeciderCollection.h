@@ -6,9 +6,9 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "DeciderCollectionBase.h"
-#include "SoundDecider.h"
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
+#include "SoundDecider.h"
 
 class SoundDeciderCollection : public DeciderCollectionBase {
 private:
@@ -19,10 +19,11 @@ private:
     std::shared_ptr<AudioFrameSink> audioSink;
 
 public:
-    SoundDeciderCollection(const boost::property_tree::ptree & tree);
+    SoundDeciderCollection(const boost::property_tree::ptree &tree);
     ~SoundDeciderCollection() override;
 
-    std::map<std::string, std::shared_ptr<Decider>> generateMap() const override;
+    std::map<std::string, std::shared_ptr<Decider>>
+    generateMap() const override;
 };
 
 #endif

@@ -7,7 +7,7 @@
  * @brief The DefaultInputEvent is a basic implementation of InputEvent
  * which is a digital input that always returns 0.
  * @date 2021-10-17
- * 
+ *
  */
 
 #include "pch.h"
@@ -17,19 +17,20 @@
 /**
  * @brief The DefaultInputEvent is a basic implementation of InputEvent
  * which is a digital input that always returns 0.
- * 
+ *
  */
-class DefaultInputEvent : public InputEvent
-{
+class DefaultInputEvent : public InputEvent {
 public:
-    DefaultInputEvent() {};
-    DefaultInputEvent([[maybe_unused]] const boost::property_tree::ptree& tree, [[maybe_unused]] const InputEventFactory& factory) {
-    }
+    DefaultInputEvent(){};
+    DefaultInputEvent([[maybe_unused]] const boost::property_tree::ptree &tree,
+                      [[maybe_unused]] const InputEventFactory &factory) {}
     int getInputValue() const override { return 0; }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared([[maybe_unused]] const boost::property_tree::ptree & tree, [[maybe_unused]] Factory<InputEvent> & factory) const override { 
-        return std::make_shared<DefaultInputEvent>(); 
+    std::shared_ptr<InputEvent>
+    makeShared([[maybe_unused]] const boost::property_tree::ptree &tree,
+               [[maybe_unused]] Factory<InputEvent> &factory) const override {
+        return std::make_shared<DefaultInputEvent>();
     }
     std::string getTypeName() const override { return "DefaultInputEvent"; }
 
@@ -38,7 +39,8 @@ public:
     std::string toString() const override { return "DefaultInputEvent"; }
     boost::property_tree::ptree toPtree() const override {
         boost::property_tree::ptree result;
-        result.add_child("type", boost::property_tree::ptree("DefaultInputEvent"));
+        result.add_child("type",
+                         boost::property_tree::ptree("DefaultInputEvent"));
         return result;
     }
 };
@@ -46,19 +48,20 @@ public:
 /**
  * @brief The ActiveInputEvent is a basic implementation of InputEvent
  * which is a digital input that always returns 1.
- * 
+ *
  */
-class ActiveInputEvent : public InputEvent
-{
+class ActiveInputEvent : public InputEvent {
 public:
-    ActiveInputEvent() {};
-    ActiveInputEvent([[maybe_unused]] const boost::property_tree::ptree& tree, [[maybe_unused]] const InputEventFactory& factory) {
-    }
+    ActiveInputEvent(){};
+    ActiveInputEvent([[maybe_unused]] const boost::property_tree::ptree &tree,
+                     [[maybe_unused]] const InputEventFactory &factory) {}
     int getInputValue() const override { return 1; }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared([[maybe_unused]] const boost::property_tree::ptree & tree, [[maybe_unused]] Factory<InputEvent> & factory) const override { 
-        return std::make_shared<ActiveInputEvent>(); 
+    std::shared_ptr<InputEvent>
+    makeShared([[maybe_unused]] const boost::property_tree::ptree &tree,
+               [[maybe_unused]] Factory<InputEvent> &factory) const override {
+        return std::make_shared<ActiveInputEvent>();
     }
     std::string getTypeName() const override { return "ActiveInputEvent"; }
 
@@ -67,10 +70,10 @@ public:
     std::string toString() const override { return "ActiveInputEvent"; }
     boost::property_tree::ptree toPtree() const override {
         boost::property_tree::ptree result;
-        result.add_child("type", boost::property_tree::ptree("ActiveInputEvent"));
+        result.add_child("type",
+                         boost::property_tree::ptree("ActiveInputEvent"));
         return result;
     }
 };
-
 
 #endif

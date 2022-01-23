@@ -1,4 +1,3 @@
 #include "InputEventToggle.h"
 
-
-std::set<InputEventToggle*> InputEventToggle::toggles = {};
+std::set<InputEventToggle *> InputEventToggle::toggles = {};

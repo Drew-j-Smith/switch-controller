@@ -3,13 +3,13 @@
 
 #include "pch.h"
 
-#include "InputEvent/InputEvent.h"
 #include "Decider.h"
+#include "InputEvent/InputEvent.h"
 
-class InputEventDecider : public Decider
-{
+class InputEventDecider : public Decider {
 private:
     std::shared_ptr<InputEvent> event;
+
 public:
     InputEventDecider(std::string name, std::shared_ptr<InputEvent> event) {
         this->name = name;
@@ -18,6 +18,5 @@ public:
 
     int nextListIndex() const override { return event->getInputValue(); };
 };
-
 
 #endif

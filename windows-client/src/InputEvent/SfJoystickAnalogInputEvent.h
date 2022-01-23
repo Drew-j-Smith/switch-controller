@@ -9,38 +9,46 @@
 
 #include "InputEvent.h"
 
-class SfJoystickAnalogInputEvent : public InputEvent
-{
+class SfJoystickAnalogInputEvent : public InputEvent {
 private:
     unsigned int joystickIndex = 0;
     sf::Joystick::Axis axis = sf::Joystick::X;
     const double SCALING = 1.4;
+
 public:
-    SfJoystickAnalogInputEvent() {};
-    SfJoystickAnalogInputEvent(unsigned int joystickIndex, sf::Joystick::Axis axis) { 
-        this->joystickIndex = joystickIndex; 
+    SfJoystickAnalogInputEvent(){};
+    SfJoystickAnalogInputEvent(unsigned int joystickIndex,
+                               sf::Joystick::Axis axis) {
+        this->joystickIndex = joystickIndex;
         this->axis = axis;
         assertConnected();
     }
-    SfJoystickAnalogInputEvent(const boost::property_tree::ptree & tree) { 
+    SfJoystickAnalogInputEvent(const boost::property_tree::ptree &tree) {
         joystickIndex = tree.get("joystick index", 0);
-        axis = (sf::Joystick::Axis) tree.get("axis", 0);
+        axis = (sf::Joystick::Axis)tree.get("axis", 0);
         assertConnected();
     }
-    SfJoystickAnalogInputEvent(const boost::property_tree::ptree& tree, [[maybe_unused]] const InputEventFactory& factory) {
+    SfJoystickAnalogInputEvent(
+        const boost::property_tree::ptree &tree,
+        [[maybe_unused]] const InputEventFactory &factory) {
         joystickIndex = tree.get<int>("joystick index");
-        axis = (sf::Joystick::Axis) tree.get<int>("axis", 0);
+        axis = (sf::Joystick::Axis)tree.get<int>("axis", 0);
         assertConnected();
     }
     void assertConnected() {
         if (!sf::Joystick::isConnected(joystickIndex))
-            std::cerr << "Joystick " << joystickIndex << " was requested but is not connected.\n";
+            std::cerr << "Joystick " << joystickIndex
+                      << " was requested but is not connected.\n";
     }
 
-    int getInputValue() const override { 
-        if (!sf::Joystick::isConnected(joystickIndex) || !sf::Joystick::hasAxis(joystickIndex, axis))
+    int getInputValue() const override {
+        if (!sf::Joystick::isConnected(joystickIndex) ||
+            !sf::Joystick::hasAxis(joystickIndex, axis))
             return 128;
-        int value = (int)((100 + sf::Joystick::getAxisPosition(joystickIndex, axis) * SCALING) / 200.0 * 255.0);
+        int value =
+            (int)((100 + sf::Joystick::getAxisPosition(joystickIndex, axis) *
+                             SCALING) /
+                  200.0 * 255.0);
         if (value > 255)
             value = 255;
         if (value < 0)
@@ -49,7 +57,9 @@ public:
     }
     bool isDigital() const override { return false; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, [[maybe_unused]] Factory<InputEvent> & factory) const override {
+    std::shared_ptr<InputEvent>
+    makeShared(const boost::property_tree::ptree &tree,
+               [[maybe_unused]] Factory<InputEvent> &factory) const override {
         return std::make_shared<SfJoystickAnalogInputEvent>(tree);
     }
     std::string getTypeName() const override { return ""; }
@@ -57,7 +67,9 @@ public:
     void update() override {}
 
     std::string toString() const override { return ""; }
-    boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }
+    boost::property_tree::ptree toPtree() const override {
+        return boost::property_tree::ptree();
+    }
 };
 
 #endif

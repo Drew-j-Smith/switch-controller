@@ -2,8 +2,10 @@
 
 #include <boost/endian/conversion.hpp>
 
-Macro::Macro(const std::string & name, const std::vector<MacroData>& data, const std::shared_ptr<InputEvent> & inputEvent,
-    const std::shared_ptr<Decider> & decider, const InputMergeMode mode){
+Macro::Macro(const std::string &name, const std::vector<MacroData> &data,
+             const std::shared_ptr<InputEvent> &inputEvent,
+             const std::shared_ptr<Decider> &decider,
+             const InputMergeMode mode) {
     this->name = name;
     this->data = data;
     this->inputEvent = inputEvent;
@@ -11,7 +13,9 @@ Macro::Macro(const std::string & name, const std::vector<MacroData>& data, const
     this->mode = mode;
 }
 
-Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Decider>> & deciderList) {
+Macro::Macro(
+    const boost::property_tree::ptree &tree,
+    const std::map<std::string, std::shared_ptr<Decider>> &deciderList) {
     name = tree.get("name", "");
     std::string filename = tree.get("filename", "");
     loadData(filename);
@@ -27,19 +31,22 @@ Macro::Macro(const boost::property_tree::ptree & tree, const std::map<std::strin
     mode = strToInputMergeMode(tree.get("input merge mode", ""));
 }
 
-Macro::InputMergeMode Macro::strToInputMergeMode(const std::string & str) {
+Macro::InputMergeMode Macro::strToInputMergeMode(const std::string &str) {
     if (str == "block input")
         return blockInput;
     if (str == "input priority")
         return inputPriority;
     if (str == "macro priority")
         return macroPriority;
-    
-    std::cerr << "Unrecognized input merge mode \"" << str << "\" in macro \"" << name << "\"\n";
+
+    std::cerr << "Unrecognized input merge mode \"" << str << "\" in macro \""
+              << name << "\"\n";
     return inputPriority;
 }
 
-void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const std::map<std::string, std::shared_ptr<Macro>> & macroMap){
+void Macro::setNextMacroLists(
+    const boost::property_tree::ptree &tree,
+    const std::map<std::string, std::shared_ptr<Macro>> &macroMap) {
     boost::property_tree::ptree nextMacroTree;
     for (auto macroTree : tree) {
         if (macroTree.second.get("name", "") == name) {
@@ -55,13 +62,15 @@ void Macro::setNextMacroLists(const boost::property_tree::ptree & tree, const st
     }
 }
 
-std::array<uint8_t, 8> Macro::getDataframe(uint64_t time, const std::array<uint8_t, 8>& dataToMerge) const {
+std::array<uint8_t, 8>
+Macro::getDataframe(uint64_t time,
+                    const std::array<uint8_t, 8> &dataToMerge) const {
     MacroData searchData = {time, {}};
-    auto res = std::upper_bound(data.begin(), data.end(), searchData, 
-        [](const MacroData& a, const MacroData& b) {
-            return a.time < b.time;
-         }
-    ) - 1;
+    auto res = std::upper_bound(data.begin(), data.end(), searchData,
+                                [](const MacroData &a, const MacroData &b) {
+                                    return a.time < b.time;
+                                }) -
+               1;
     // subtract one to round down instead of up
 
     if (mode == macroPriority)
@@ -72,7 +81,7 @@ std::array<uint8_t, 8> Macro::getDataframe(uint64_t time, const std::array<uint8
         return res->data;
 }
 
-void Macro::appendData(const MacroData& inData) {
+void Macro::appendData(const MacroData &inData) {
     if (data.size() == 0 || data.back().data != inData.data) {
         data.push_back(inData);
     }
@@ -82,14 +91,18 @@ std::shared_ptr<Macro> Macro::getNextMacro() {
     int macroIndex = decider->nextListIndex();
     if (nextMacroLists.size() == 0)
         return nullptr;
-    if(nextMacroLists[macroIndex].size() == 0)
+    if (nextMacroLists[macroIndex].size() == 0)
         return nullptr;
-    if(nextMacroLists[macroIndex].size() != 1)
-        std::rotate(nextMacroLists[macroIndex].begin(), nextMacroLists[macroIndex].begin() + 1, nextMacroLists[macroIndex].end());
+    if (nextMacroLists[macroIndex].size() != 1)
+        std::rotate(nextMacroLists[macroIndex].begin(),
+                    nextMacroLists[macroIndex].begin() + 1,
+                    nextMacroLists[macroIndex].end());
     return nextMacroLists[macroIndex].back().lock();
 }
 
-std::array<uint8_t, 8> Macro::mergeData(const std::array<uint8_t, 8>& priortyData, const std::array<uint8_t, 8>& dataToMerge){
+std::array<uint8_t, 8>
+Macro::mergeData(const std::array<uint8_t, 8> &priortyData,
+                 const std::array<uint8_t, 8> &dataToMerge) {
     std::array<uint8_t, 8> res;
     res[0] = priortyData[0];
     res[1] = priortyData[1] | dataToMerge[1];
@@ -109,7 +122,6 @@ std::array<uint8_t, 8> Macro::mergeData(const std::array<uint8_t, 8>& priortyDat
     return res;
 }
 
-
 void Macro::saveData(std::string filename) const {
     std::ofstream outfile(filename, std::ios::binary);
     if (!outfile.is_open()) {
@@ -117,7 +129,7 @@ void Macro::saveData(std::string filename) const {
     }
     for (auto macroData : data) {
         boost::endian::native_to_little_inplace(macroData.time);
-        outfile.write((char*)&macroData, sizeof(MacroData));
+        outfile.write((char *)&macroData, sizeof(MacroData));
     }
 }
 void Macro::loadData(std::string filename) {
@@ -128,7 +140,7 @@ void Macro::loadData(std::string filename) {
     }
     while (!infile.eof()) {
         MacroData macroData;
-        infile.read((char*)&macroData, sizeof(MacroData));
+        infile.read((char *)&macroData, sizeof(MacroData));
         boost::endian::little_to_native_inplace(macroData.time);
         data.push_back(macroData);
     }

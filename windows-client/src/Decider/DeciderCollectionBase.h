@@ -3,13 +3,13 @@
 
 #include "pch.h"
 
-#include  "Decider.h"
+#include "Decider.h"
 
-class DeciderCollectionBase
-{
+class DeciderCollectionBase {
 public:
     virtual ~DeciderCollectionBase() {}
-    virtual std::map<std::string, std::shared_ptr<Decider>> generateMap() const = 0;
+    virtual std::map<std::string, std::shared_ptr<Decider>>
+    generateMap() const = 0;
 };
 
 #endif

@@ -11,7 +11,9 @@
 #include "InputEvent/SfKeyboardInputEvent.h"
 
 InputEventFactory::InputEventFactory() {
-    #define AC_ADD_FACTORY(class) factories[#class] = boost::bind(boost::factory<std::shared_ptr<class>>(), _1, _2);
+#define AC_ADD_FACTORY(class)                                                  \
+    factories[#class] =                                                        \
+        boost::bind(boost::factory<std::shared_ptr<class>>(), _1, _2);
     AC_ADD_FACTORY(DefaultInputEvent);
     AC_ADD_FACTORY(ActiveInputEvent);
     AC_ADD_FACTORY(InputEventCollection);

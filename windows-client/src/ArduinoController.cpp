@@ -1,20 +1,20 @@
 #include "pch.h"
 
-#include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/AudioFrameSink.h"
+#include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/VideoFrameSink.h"
 #include "Utility/SerialPort.h"
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "InputEvent/InputEvent.h"
 
-void CreateConfig(std::string& configFilename);
-void EditConfig(std::string& configFilename);
-void StartController(std::string& configFilename);
+void CreateConfig(std::string &configFilename);
+void EditConfig(std::string &configFilename);
+void StartController(std::string &configFilename);
 
 const std::string options =
-R"(Select one of the following options:
+    R"(Select one of the following options:
     1. Set config file
     2. Create config file
     3. Edit config File
@@ -25,8 +25,7 @@ R"(Select one of the following options:
     8. Exit
 )";
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
-{
+int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
     boost::property_tree::ptree a1;
     boost::property_tree::ptree b1;
@@ -43,150 +42,154 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
 
     while (option != 8) {
         std::cout << options;
-        std::cout << "The current config file is: \"" << configFilename << "\"\n";
+        std::cout << "The current config file is: \"" << configFilename
+                  << "\"\n";
         std::cin >> option;
         switch (option) {
-            case 1:
-                std::cout << "Enter the config filename: ";
-                std::getline(std::cin, configFilename);
-                std::getline(std::cin, configFilename);
-                break;
-            case 2:
-                CreateConfig(configFilename);
-                break;
-            case 3:
-                EditConfig(configFilename);
-                break;
-            case 4:
-                {
-                    try {
-                        StartController(configFilename);
-                    } catch (std::exception e) {
-                        std::cerr << e.what() << '\n';
-                    }
+        case 1:
+            std::cout << "Enter the config filename: ";
+            std::getline(std::cin, configFilename);
+            std::getline(std::cin, configFilename);
+            break;
+        case 2:
+            CreateConfig(configFilename);
+            break;
+        case 3:
+            EditConfig(configFilename);
+            break;
+        case 4: {
+            try {
+                StartController(configFilename);
+            } catch (std::exception e) {
+                std::cerr << e.what() << '\n';
+            }
+        } break;
+        case 5: {
+            try {
+                boost::property_tree::ptree tree;
+                boost::property_tree::read_json(configFilename, tree);
+                auto port = initializeSerialPort(
+                    tree.get<std::string>("serial port"), 57600);
+
+                // sending a nuetral signal
+                unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
+                unsigned char recieve[1];
+
+                testSerialPort(port, 8, send, 1, recieve);
+            } catch (std::exception &e) {
+                std::cerr << "Failure connecting via serial port.\n";
+                std::cerr << e.what() << '\n';
+            }
+        } break;
+        case 6: {
+            std::string inputFormat = "dshow";
+            std::string deviceName = "video=Game Capture HD60 S";
+            std::map<std::string, std::string> ffmpegOptions = {
+                {"pixel_format", "bgr24"}};
+            std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+            std::shared_ptr<VideoFrameSink> videoSink =
+                std::make_shared<VideoFrameSink>();
+            sinks.push_back(videoSink);
+
+            av_log_set_level(AV_LOG_QUIET);
+
+            FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions,
+                                    sinks);
+            recorder.start();
+
+            videoSink->waitForInit();
+            std::vector<uint8_t> data;
+            long long lastFrame = videoSink->getData(data);
+            cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(),
+                                  CV_8UC3, data.data());
+
+            std::atomic<bool> running = true;
+            std::string title = std::to_string(
+                std::chrono::steady_clock::now().time_since_epoch().count());
+
+            std::thread t([&]() {
+                while (running.load()) {
+                    lastFrame = videoSink->getNextData(data, lastFrame);
+                    cv::imshow(title, mat);
+                    cv::waitKey(1);
                 }
-                break;
-            case 5:
-                {
-                    try {
-                        boost::property_tree::ptree tree;
-                        boost::property_tree::read_json(configFilename, tree);
-                        auto port = initializeSerialPort(tree.get<std::string>("serial port"), 57600);
-                        
-                        // sending a nuetral signal
-                        unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
-                        unsigned char recieve[1];
+            });
 
-                        testSerialPort(port, 8, send, 1, recieve);
-                    }
-                    catch (std::exception& e) {
-                        std::cerr << "Failure connecting via serial port.\n";
-                        std::cerr << e.what() << '\n';
-                    }
-                }
-                break;
-            case 6:
-                {
-                    std::string inputFormat = "dshow";
-                    std::string deviceName = "video=Game Capture HD60 S";
-                    std::map<std::string, std::string> ffmpegOptions = {{"pixel_format", "bgr24"}};
-                    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-                    std::shared_ptr<VideoFrameSink> videoSink = std::make_shared<VideoFrameSink>();
-                    sinks.push_back(videoSink);
+            std::cout << "Press enter to stop\n";
+            std::cin.get();
+            std::cin.get();
+            running.store(false);
+            t.join();
+        } break;
+        case 7: {
+            std::string tempStr;
+            std::getline(std::cin, tempStr);
 
-                    av_log_set_level(AV_LOG_QUIET);
+            std::string inputFormat;
+            std::string deviceName;
+            std::string recordTimeStr;
+            char loopRecord;
+            int64_t bufferSize = 0;
 
-                    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
-                    recorder.start();
+            // dshow
+            // audio=Game Capture HD60 S Audio
+            // ffplay -f s16le -ar 48k -ac 1 test.pcm
 
-                    videoSink->waitForInit();
-                    std::vector<uint8_t> data;
-                    long long lastFrame = videoSink->getData(data);
-                    cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(), CV_8UC3, data.data());
+            std::cout << "Enter the input format (empty to load a file):\n";
+            std::getline(std::cin, inputFormat);
 
-                    std::atomic<bool> running = true;
-                    std::string title = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+            std::cout << "Enter the device/filename:\n";
+            std::getline(std::cin, deviceName);
 
-                    std::thread t([&]() {
-                        while (running.load()) {
-                            lastFrame = videoSink->getNextData(data, lastFrame);
-                            cv::imshow(title, mat);
-                            cv::waitKey(1);
-                        }
-                    });
+            std::cout << "Enter the recording time in seconds (empty to read "
+                         "an entire file)\n";
+            std::getline(std::cin, recordTimeStr);
 
-                    std::cout << "Press enter to stop\n";
-                    std::cin.get();
-                    std::cin.get();
-                    running.store(false);
-                    t.join();
-                }
-                break;
-            case 7:
-                {
-                    std::string tempStr;
-                    std::getline(std::cin, tempStr);
+            std::cout << "Use loop recording (y/n):\n";
+            std::cin >> loopRecord;
 
-                    std::string inputFormat;
-                    std::string deviceName;
-                    std::string recordTimeStr;
-                    char loopRecord;
-                    int64_t bufferSize = 0;
+            if (loopRecord == 'y') {
+                std::cout << "Enter the buffer size in seconds:\n";
+                std::cin >> bufferSize;
+            }
 
-                    // dshow
-                    // audio=Game Capture HD60 S Audio
-                    // ffplay -f s16le -ar 48k -ac 1 test.pcm
+            std::map<std::string, std::string> ffmpegOptions = {};
+            std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+            std::shared_ptr<AudioFrameSink> audioSink =
+                std::make_shared<AudioFrameSink>(
+                    AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000,
+                    loopRecord == 'y', 48000 * bufferSize);
+            sinks.push_back(audioSink);
 
-                    std::cout << "Enter the input format (empty to load a file):\n";
-                    std::getline(std::cin, inputFormat);
+            FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions,
+                                    sinks);
+            recorder.start();
 
-                    std::cout << "Enter the device/filename:\n";
-                    std::getline(std::cin, deviceName);
+            audioSink->waitForInit();
+            if (recordTimeStr.length() > 0) {
+                std::this_thread::sleep_for(
+                    std::chrono::seconds(std::stoi(recordTimeStr)));
+            } else {
+                recorder.join();
+            }
 
-                    std::cout << "Enter the recording time in seconds (empty to read an entire file)\n";
-                    std::getline(std::cin, recordTimeStr);
+            recorder.stop();
+            std::vector<uint8_t> data;
+            audioSink->getData(data);
 
-                    std::cout << "Use loop recording (y/n):\n";
-                    std::cin >> loopRecord;
+            std::cout << "Enter the output filename:\n";
+            std::string audioFilename;
+            std::getline(std::cin, audioFilename);
+            std::getline(std::cin, audioFilename);
 
-                    if (loopRecord == 'y') {
-                        std::cout << "Enter the buffer size in seconds:\n";
-                        std::cin >> bufferSize;
-                    }
-
-                    std::map<std::string, std::string> ffmpegOptions = {};
-                    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-                    std::shared_ptr<AudioFrameSink> audioSink = std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000,
-                        loopRecord == 'y', 48000 * bufferSize);
-                    sinks.push_back(audioSink);
-
-                    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
-                    recorder.start();
-
-                    audioSink->waitForInit();
-                    if (recordTimeStr.length() > 0) {
-                        std::this_thread::sleep_for(std::chrono::seconds(std::stoi(recordTimeStr)));
-                    } else {
-                        recorder.join();
-                    }
-                    
-                    recorder.stop();
-                    std::vector<uint8_t> data;
-                    audioSink->getData(data);
-
-                    std::cout << "Enter the output filename:\n";
-                    std::string audioFilename;
-                    std::getline(std::cin, audioFilename);
-                    std::getline(std::cin, audioFilename);
-
-                    std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
-                    outfile.write((const char*)data.data(), data.size());
-                }
-                break;
-            case 8:
-                break;
-            default:
-                std::cout << "Unkown option: " << option << "\n";
+            std::ofstream outfile(audioFilename,
+                                  std::ios::out | std::ios::binary);
+            outfile.write((const char *)data.data(), data.size());
+        } break;
+        case 8:
+            break;
+        default:
+            std::cout << "Unkown option: " << option << "\n";
         }
     }
 

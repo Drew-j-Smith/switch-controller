@@ -6,29 +6,26 @@
 #include <iostream>
 
 extern "C" {
-    #include <libavformat/avformat.h>
+#include <libavformat/avformat.h>
 }
 
-class FFmpegDecoder
-{
+class FFmpegDecoder {
 private:
-    AVFormatContext* formatContext;
-    AVCodecContext* decoderContext;
+    AVFormatContext *formatContext;
+    AVCodecContext *decoderContext;
     std::shared_ptr<FFmpegFrameSink> sink;
     int streamIndex;
-public:
-    FFmpegDecoder(AVFormatContext* formatContext, std::shared_ptr<FFmpegFrameSink> sink);
-    ~FFmpegDecoder() {
-        avcodec_free_context(&decoderContext);
-    };
 
-    void decodePacket(const AVPacket* packet, AVFrame* frame);
+public:
+    FFmpegDecoder(AVFormatContext *formatContext,
+                  std::shared_ptr<FFmpegFrameSink> sink);
+    ~FFmpegDecoder() { avcodec_free_context(&decoderContext); };
+
+    void decodePacket(const AVPacket *packet, AVFrame *frame);
     int getStreamIndex() const { return streamIndex; }
+
 private:
     void openCodecContext();
 };
-
-
-
 
 #endif
