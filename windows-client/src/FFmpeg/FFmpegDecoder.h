@@ -3,7 +3,7 @@
 
 #include "FFmpegFrameSink.h"
 
-#include <iostream>
+#include "pch.h"
 
 extern "C" {
 #include <libavformat/avformat.h>

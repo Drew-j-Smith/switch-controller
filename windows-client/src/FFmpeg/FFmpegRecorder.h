@@ -8,13 +8,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-#include <atomic>
-#include <cassert>
-#include <map>
-#include <set>
-#include <string>
-#include <thread>
-#include <vector>
+#include "pch.h"
 
 class FFmpegRecorder {
 private:

@@ -1,8 +1,6 @@
 
 #include "FFmpegDecoder.h"
 
-#include <stdexcept>
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavdevice/avdevice.h>

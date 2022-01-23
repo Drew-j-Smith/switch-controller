@@ -1,7 +1,6 @@
 #include "FFmpegRecorder.h"
 
-#include <iostream>
-#include <stdexcept>
+#include "pch.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
