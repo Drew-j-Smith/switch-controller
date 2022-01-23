@@ -5,7 +5,7 @@
 
 static double dotProduct(const std::vector<float> & v) {
     double total = 0.0f;
-    for (int i = 0; i < v.size(); i++) {
+    for (int i = 0; i < (int)v.size(); i++) {
         total += v[i] * v[i];
     }
     return total;
@@ -22,7 +22,7 @@ static double dotProduct(const std::vector<float> & v1, const std::vector<float>
 
 static std::vector<float> scalarMultiplication(const std::vector<float> & v, const double scale) {
     std::vector<float> v2(v.size());
-    for (int i = 0; i < v.size(); i++) {
+    for (int i = 0; i < (int)v.size(); i++) {
         v2[i] = (float)(v[i] * scale);
     }
     return v2;
@@ -30,7 +30,7 @@ static std::vector<float> scalarMultiplication(const std::vector<float> & v, con
 
 static std::vector<float> vectorSubtraction(const std::vector<float> & v1, const std::vector<float> & v2) {
     std::vector<float> v3(v1.size() < v2.size() ? v1.size() : v2.size());
-    for (int i = 0; i < v3.size(); i++) {
+    for (int i = 0; i < (int)v3.size(); i++) {
         v3[i] = v1[i] - v2[i];
     }
     return v3;
@@ -38,7 +38,7 @@ static std::vector<float> vectorSubtraction(const std::vector<float> & v1, const
 
 static std::vector<float> vectorSubtraction(const std::vector<float> & v, const double scalar) {
     std::vector<float> v3(v.size());
-    for (int i = 0; i < v3.size(); i++) {
+    for (int i = 0; i < (int)v3.size(); i++) {
         v3[i] = (float)(v[i] - scalar);
     }
     return v3;
@@ -46,7 +46,7 @@ static std::vector<float> vectorSubtraction(const std::vector<float> & v, const 
 
 static double vectorMean(const std::vector<float> & v) {
     double sum = 0;
-    for (int i = 0; i < v.size(); i++) {
+    for (int i = 0; i < (int)v.size(); i++) {
         sum += v[i];
     }
     return sum / v.size();

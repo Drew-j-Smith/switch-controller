@@ -33,9 +33,7 @@ public:
             key = sf::Keyboard::Unknown;
         }
     }
-    SfKeyboardInputEvent(const boost::property_tree::ptree& tree, const InputEventFactory& factory) {
-        //Unused variables
-        factory;
+    SfKeyboardInputEvent(const boost::property_tree::ptree& tree, [[maybe_unused]] const InputEventFactory& factory) {
 
         std::string keycode = tree.get<std::string>("key");
         if(isalpha(keycode.at(0))){
@@ -48,10 +46,7 @@ public:
     int getInputValue() const override { return sf::Keyboard::isKeyPressed(key); }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override {
-        // Unused parameters
-        factory;
-        
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, [[maybe_unused]] Factory<InputEvent> & factory) const override {
         return std::make_shared<SfKeyboardInputEvent>(tree);
     }
     std::string getTypeName() const override { return ""; }

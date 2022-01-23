@@ -25,11 +25,8 @@ R"(Select one of the following options:
     8. Exit
 )";
 
-int main(int argc, const char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
 {
-    // Unused for now
-    argc;
-    argv;
 
     boost::property_tree::ptree a1;
     boost::property_tree::ptree b1;

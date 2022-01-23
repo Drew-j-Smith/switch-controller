@@ -25,6 +25,9 @@
 class InputEvent : public FactoryObject<InputEvent>
 {
 public:
+
+    virtual ~InputEvent() {}
+    
     /**
      * @brief Gets the input value from the object.
      * if the input is digital the result will be [0, 1]

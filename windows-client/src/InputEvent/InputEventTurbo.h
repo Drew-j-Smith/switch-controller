@@ -15,7 +15,7 @@ public:
         this->toggleEvent = std::make_shared<InputEventToggle>(loopTime, event);
         this->event = event;
     }
-    InputEventTurbo(const boost::property_tree::ptree& tree, InputEventFactory& factory) {
+    InputEventTurbo(const boost::property_tree::ptree& tree, InputEventFactory&& factory) {
         int loopTime = tree.get<int>("loop time");
         boost::property_tree::ptree childTree = tree.get_child("event");
         event = factory.create(childTree);

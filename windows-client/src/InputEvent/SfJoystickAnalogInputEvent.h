@@ -27,10 +27,7 @@ public:
         axis = (sf::Joystick::Axis) tree.get("axis", 0);
         assertConnected();
     }
-    SfJoystickAnalogInputEvent(const boost::property_tree::ptree& tree, const InputEventFactory& factory) {
-        //Unused variables
-        factory;
-
+    SfJoystickAnalogInputEvent(const boost::property_tree::ptree& tree, [[maybe_unused]] const InputEventFactory& factory) {
         joystickIndex = tree.get<int>("joystick index");
         axis = (sf::Joystick::Axis) tree.get<int>("axis", 0);
         assertConnected();
@@ -52,10 +49,7 @@ public:
     }
     bool isDigital() const override { return false; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override {
-        // Unused parameters
-        factory;
-
+    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, [[maybe_unused]] Factory<InputEvent> & factory) const override {
         return std::make_shared<SfJoystickAnalogInputEvent>(tree);
     }
     std::string getTypeName() const override { return ""; }

@@ -18,7 +18,7 @@ public:
     InputEventCollection() {};
     InputEventCollection(const std::vector<std::shared_ptr<InputEvent>> & inputEvents) { this->inputEvents = inputEvents; };
     InputEventCollection(const boost::property_tree::ptree & tree);
-    InputEventCollection(const boost::property_tree::ptree& tree, InputEventFactory& factory);
+    InputEventCollection(const boost::property_tree::ptree& tree, InputEventFactory&& factory);
 
     int getInputValue() const override;
     bool isDigital() const override { return true; }
@@ -26,7 +26,7 @@ public:
     std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override;
     std::string getTypeName() const override { return ""; }
 
-    virtual void update() {}
+    virtual void update() override {}
 
     std::string toString() const override { return ""; }
     boost::property_tree::ptree toPtree() const override {return boost::property_tree::ptree(); }

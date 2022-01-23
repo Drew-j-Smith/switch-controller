@@ -23,20 +23,12 @@ class DefaultInputEvent : public InputEvent
 {
 public:
     DefaultInputEvent() {};
-    DefaultInputEvent(const boost::property_tree::ptree& tree, 
-        const InputEventFactory& factory) {
-        //Unused variables
-        tree;
-        factory;
+    DefaultInputEvent([[maybe_unused]] const boost::property_tree::ptree& tree, [[maybe_unused]] const InputEventFactory& factory) {
     }
     int getInputValue() const override { return 0; }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override { 
-        // Unused parameters
-        tree;
-        factory;
-        
+    std::shared_ptr<InputEvent> makeShared([[maybe_unused]] const boost::property_tree::ptree & tree, [[maybe_unused]] Factory<InputEvent> & factory) const override { 
         return std::make_shared<DefaultInputEvent>(); 
     }
     std::string getTypeName() const override { return "DefaultInputEvent"; }
@@ -60,20 +52,12 @@ class ActiveInputEvent : public InputEvent
 {
 public:
     ActiveInputEvent() {};
-    ActiveInputEvent(const boost::property_tree::ptree& tree, 
-        const InputEventFactory& factory) {
-        //Unused variables
-        tree;
-        factory;
+    ActiveInputEvent([[maybe_unused]] const boost::property_tree::ptree& tree, [[maybe_unused]] const InputEventFactory& factory) {
     }
     int getInputValue() const override { return 1; }
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent> makeShared(const boost::property_tree::ptree & tree, Factory<InputEvent> & factory) const override { 
-        // Unused parameters
-        tree;
-        factory;
-        
+    std::shared_ptr<InputEvent> makeShared([[maybe_unused]] const boost::property_tree::ptree & tree, [[maybe_unused]] Factory<InputEvent> & factory) const override { 
         return std::make_shared<ActiveInputEvent>(); 
     }
     std::string getTypeName() const override { return "ActiveInputEvent"; }

@@ -25,7 +25,7 @@ private:
     double matchThreshold;
     std::atomic<double> matchValue;
 
-    std::vector<float> SoundDecider::findFrequencies(const std::vector<float> & samples);
+    std::vector<float> findFrequencies(const std::vector<float> & samples);
 
 public:
     SoundDecider(const boost::property_tree::ptree & tree); // dont forget to set name

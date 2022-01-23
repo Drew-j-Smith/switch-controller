@@ -7,6 +7,10 @@ endif()
 
 project(ArduinoController)
 
+set(CMAKE_CXX_STANDARD 17)
+
+# set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*")
+
 # needed for boost json parser to not give a warning
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 

@@ -2,7 +2,7 @@
 
 #include "DefaultInputEvent.h"
 #include "SfKeyboardInputEvent.h"
-#include "SFJoystickDigitalInputEvent.h"
+#include "SfJoystickDigitalInputEvent.h"
 #include "InputEventInverter.h"
 #include "InputEventToggle.h"
 #include "InputEventTurbo.h"
@@ -48,7 +48,7 @@ int InputEventCollection::getInputValue() const {
     if (inputEvents.size() == 0)
         return 0;
 
-    for (int i = 0; i < inputEvents.size(); i++) 
+    for (int i = 0; i < (int)inputEvents.size(); i++) 
         if (!inputEvents[i]->getInputValue())
             return 0;
 
@@ -65,7 +65,7 @@ std::shared_ptr<InputEvent> InputEventCollection::makeShared(const boost::proper
     return std::make_shared<InputEventCollection>(newInputEvents); 
 }
 
-InputEventCollection::InputEventCollection(const boost::property_tree::ptree& tree, InputEventFactory& factory) {
+InputEventCollection::InputEventCollection(const boost::property_tree::ptree& tree, InputEventFactory&& factory) {
     boost::property_tree::ptree childTree = tree.get_child("events");
     for (auto event : childTree) {
         inputEvents.push_back(factory.create(event.second));

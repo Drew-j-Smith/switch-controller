@@ -26,7 +26,7 @@ public:
         this->event = event;
         toggles.insert(this);
     }
-    InputEventToggle(const boost::property_tree::ptree& tree, InputEventFactory& factory) {
+    InputEventToggle(const boost::property_tree::ptree& tree, InputEventFactory&& factory) {
         cooldown = tree.get<int>("button cooldown");
         boost::property_tree::ptree childTree = tree.get_child("event");
         event = factory.create(childTree);

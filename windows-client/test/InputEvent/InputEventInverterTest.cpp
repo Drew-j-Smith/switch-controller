@@ -83,8 +83,7 @@ BOOST_AUTO_TEST_SUITE(InputEventInverterTest);
             InputEventInverter i(std::make_shared<SfJoystickAnalogInputEvent>());
             BOOST_TEST(false, "Error was not thrown");
         }
-        catch (std::invalid_argument& e) {
-            e;
+        catch ([[maybe_unused]] std::invalid_argument& e) {
             BOOST_TEST(true, "Error was thrown");
             return;
         }
