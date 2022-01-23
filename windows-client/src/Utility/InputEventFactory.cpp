@@ -12,11 +12,12 @@
 
 InputEventFactory::InputEventFactory() {
 #define AC_ADD_FACTORY(class)                                                  \
-    factories[#class] =                                                        \
-        boost::bind(boost::factory<std::shared_ptr<class>>(), _1, _2);
+    factories[#class] = boost::bind(boost::factory<std::shared_ptr<class>>(),  \
+                                    _1, boost::ref(*this));
     AC_ADD_FACTORY(DefaultInputEvent);
     AC_ADD_FACTORY(ActiveInputEvent);
     AC_ADD_FACTORY(InputEventCollection);
+    AC_ADD_FACTORY(InputEventInverter);
     AC_ADD_FACTORY(InputEventSwitch);
     AC_ADD_FACTORY(InputEventToggle);
     AC_ADD_FACTORY(InputEventTurbo);

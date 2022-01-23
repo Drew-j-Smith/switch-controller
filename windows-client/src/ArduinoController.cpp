@@ -29,13 +29,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
     boost::property_tree::ptree a1;
     boost::property_tree::ptree b1;
+    boost::property_tree::ptree c1;
     a1.add("type", "DefaultInputEvent");
     b1.add("type", "ActiveInputEvent");
+    c1.add("type", "InputEventInverter");
+    c1.add_child("event", a1);
 
     InputEventFactory factory;
     std::shared_ptr<InputEvent> a = factory.create(a1);
     std::shared_ptr<InputEvent> b = factory.create(b1);
-    std::cout << a->getTypeName() << ' ' << b->getTypeName() << '\n';
+    std::shared_ptr<InputEvent> c = factory.create(c1);
+    std::cout << a->getTypeName() << ' ' << b->getTypeName() << ' '
+              << c->getTypeName() << '\n';
 
     int option = 0;
     std::string configFilename = "data/config.json";

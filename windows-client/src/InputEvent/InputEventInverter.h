@@ -41,7 +41,7 @@ public:
     InputEventInverter(const boost::property_tree::ptree &tree,
                        InputEventFactory &factory) {
         boost::property_tree::ptree childTree = tree.get_child("event");
-        event = factory.create(tree);
+        event = factory.create(childTree);
     }
 
     int getInputValue() const override {

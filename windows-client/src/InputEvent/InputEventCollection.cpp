@@ -76,7 +76,7 @@ InputEventCollection::makeShared(const boost::property_tree::ptree &tree,
 }
 
 InputEventCollection::InputEventCollection(
-    const boost::property_tree::ptree &tree, InputEventFactory &&factory) {
+    const boost::property_tree::ptree &tree, InputEventFactory &factory) {
     boost::property_tree::ptree childTree = tree.get_child("events");
     for (auto event : childTree) {
         inputEvents.push_back(factory.create(event.second));

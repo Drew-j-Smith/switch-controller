@@ -33,7 +33,7 @@ public:
         this->deciderEvent = deciderEvent;
     }
     InputEventSwitch(const boost::property_tree::ptree &tree,
-                     InputEventFactory &&factory) {
+                     InputEventFactory &factory) {
         boost::property_tree::ptree event1Tree = tree.get_child("event 1");
         boost::property_tree::ptree event2Tree = tree.get_child("event 2");
         boost::property_tree::ptree deciderEventTree =

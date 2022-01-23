@@ -23,7 +23,7 @@ public:
     };
     InputEventCollection(const boost::property_tree::ptree &tree);
     InputEventCollection(const boost::property_tree::ptree &tree,
-                         InputEventFactory &&factory);
+                         InputEventFactory &factory);
 
     int getInputValue() const override;
     bool isDigital() const override { return true; }
