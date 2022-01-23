@@ -4,9 +4,21 @@
 class InputEvent;
 #include "InputEvent/InputEvent.h"
 
+// Another false positive on MSCV
+// TODO
+// could break in the future
+
+#ifdef _MSC_VER
+#pragma warning( push, 2 )
+#endif
+
 #include <boost/function.hpp>
 #include <boost/functional/factory.hpp>
 #include <boost/bind.hpp>
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 class InputEventFactory
 {
@@ -16,9 +28,10 @@ private:
 public:
     InputEventFactory();
 
-    std::shared_ptr<InputEvent> create(std::string name, const boost::property_tree::ptree& tree) {
+    std::shared_ptr<InputEvent> create(const boost::property_tree::ptree& tree) {
         // TODO test if events are the same
-        auto event = factories[name](tree, *this);
+        std::string name = tree.get<std::string>("type");
+        auto event = factories[name](tree, boost::ref(*this));
         createdEvents.insert(event);
         return event;
     }

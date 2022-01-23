@@ -36,11 +36,9 @@ public:
         }
         this->event = event;
     };
-    InputEventInverter(const boost::property_tree::ptree& tree, 
-        const InputEventFactory& factory) {
-        //Unused variables
-        tree;
-        factory;
+    InputEventInverter(const boost::property_tree::ptree& tree, InputEventFactory& factory) {
+        boost::property_tree::ptree childTree = tree.get_child("event");
+        event = factory.create(tree);
     }
 
     int getInputValue() const override {

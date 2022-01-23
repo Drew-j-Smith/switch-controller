@@ -29,8 +29,11 @@ public:
     SfJoystickDigitalInputEvent(const boost::property_tree::ptree& tree, 
         const InputEventFactory& factory) {
         //Unused variables
-        tree;
         factory;
+
+        joystickIndex = tree.get<int>("joystick index");
+        button = tree.get<int>("button", 0);
+        assertConnected();
     }
     void assertConnected() {
         if (!sf::Joystick::isConnected(joystickIndex))

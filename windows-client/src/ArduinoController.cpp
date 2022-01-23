@@ -31,9 +31,14 @@ int main(int argc, const char** argv)
     argc;
     argv;
 
+    boost::property_tree::ptree a1;
+    boost::property_tree::ptree b1;
+    a1.add("type", "DefaultInputEvent");
+    b1.add("type", "ActiveInputEvent");
+
     InputEventFactory factory;
-    std::shared_ptr<InputEvent> a = factory.create("DefaultInputEvent", boost::property_tree::ptree());
-    std::shared_ptr<InputEvent> b = factory.create("ActiveInputEvent", boost::property_tree::ptree());
+    std::shared_ptr<InputEvent> a = factory.create(a1);
+    std::shared_ptr<InputEvent> b = factory.create(b1);
     std::cout << a->getTypeName() << ' ' << b->getTypeName() << '\n';
 
     int option = 0;

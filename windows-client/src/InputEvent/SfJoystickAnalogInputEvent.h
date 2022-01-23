@@ -27,11 +27,13 @@ public:
         axis = (sf::Joystick::Axis) tree.get("axis", 0);
         assertConnected();
     }
-    SfJoystickAnalogInputEvent(const boost::property_tree::ptree& tree, 
-        const InputEventFactory& factory) {
+    SfJoystickAnalogInputEvent(const boost::property_tree::ptree& tree, const InputEventFactory& factory) {
         //Unused variables
-        tree;
         factory;
+
+        joystickIndex = tree.get<int>("joystick index");
+        axis = (sf::Joystick::Axis) tree.get<int>("axis", 0);
+        assertConnected();
     }
     void assertConnected() {
         if (!sf::Joystick::isConnected(joystickIndex))
