@@ -30,8 +30,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
     boost::property_tree::ptree a1;
     boost::property_tree::ptree b1;
     boost::property_tree::ptree c1;
-    a1.add("type", "DefaultInputEvent");
-    b1.add("type", "ActiveInputEvent");
+    a1.add("type", "ConstantInputEvent");
+    a1.add("isDigital", true);
+    a1.add("inputValue", 0);
+    b1.add("type", "ConstantInputEvent");
+    b1.add("isDigital", true);
+    b1.add("inputValue", 1);
     c1.add("type", "InputEventInverter");
     c1.add_child("event", a1);
 

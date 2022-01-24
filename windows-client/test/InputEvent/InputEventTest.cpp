@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "InputEvent/DefaultInputEvent.h"
+#include "InputEvent/ConstantInputEvent.h"
 #include "InputEvent/InputEvent.h"
 #include "InputEvent/InputEventCollection.h"
 #include "InputEvent/InputEventInverter.h"
@@ -12,8 +12,8 @@
 #include "InputEvent/SfJoystickDigitalInputEvent.h"
 #include "InputEvent/SfKeyboardInputEvent.h"
 
-typedef std::tuple<DefaultInputEvent, ActiveInputEvent, InputEventCollection,
-                   InputEventInverter, InputEventToggle, InputEventSwitch,
+typedef std::tuple<ConstantInputEvent, InputEventCollection, InputEventInverter,
+                   InputEventToggle, InputEventSwitch,
                    SfJoystickAnalogInputEvent, SfJoystickDigitalInputEvent,
                    SfKeyboardInputEvent>
     testTypes;
@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(contructorTest, T, testTypes) {
 BOOST_AUTO_TEST_SUITE(InputEventEqualityTest);
 BOOST_AUTO_TEST_CASE_TEMPLATE(DefaultInputEventTestEquals, T, testTypes) {
     T i;
-    DefaultInputEvent j;
-    if (typeid(T) == typeid(DefaultInputEvent))
+    ConstantInputEvent j;
+    if (typeid(T) == typeid(ConstantInputEvent))
         BOOST_TEST((i == j));
     else
         BOOST_TEST(!(i == j));
@@ -35,26 +35,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(DefaultInputEventTestEquals, T, testTypes) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(DefaultInputEventTestNotEquals, T, testTypes) {
     T i;
-    DefaultInputEvent j;
-    if (typeid(T) == typeid(DefaultInputEvent))
-        BOOST_TEST(!(i != j));
-    else
-        BOOST_TEST((i != j));
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(ActiveInputEventTestEquals, T, testTypes) {
-    T i;
-    ActiveInputEvent j;
-    if (typeid(T) == typeid(ActiveInputEvent))
-        BOOST_TEST((i == j));
-    else
-        BOOST_TEST(!(i == j));
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(ActiveInputEventTestNotEquals, T, testTypes) {
-    T i;
-    ActiveInputEvent j;
-    if (typeid(T) == typeid(ActiveInputEvent))
+    ConstantInputEvent j;
+    if (typeid(T) == typeid(ConstantInputEvent))
         BOOST_TEST(!(i != j));
     else
         BOOST_TEST((i != j));

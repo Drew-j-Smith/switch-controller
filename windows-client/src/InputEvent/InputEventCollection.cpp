@@ -1,6 +1,6 @@
 #include "InputEventCollection.h"
 
-#include "DefaultInputEvent.h"
+#include "ConstantInputEvent.h"
 #include "InputEventInverter.h"
 #include "InputEventToggle.h"
 #include "InputEventTurbo.h"
@@ -18,7 +18,7 @@ InputEventCollection::InputEventCollection(
 bool InputEventCollection::loadEventType(
     const boost::property_tree::ptree::const_iterator &it) {
     if (it->second.get("type", "") == "Default") {
-        inputEvents.push_back(std::make_shared<DefaultInputEvent>());
+        inputEvents.push_back(std::make_shared<ConstantInputEvent>());
         return true;
     }
     if (it->second.get("type", "") == "SF Keyboard Input") {

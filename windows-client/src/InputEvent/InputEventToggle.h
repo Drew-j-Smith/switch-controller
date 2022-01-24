@@ -3,7 +3,7 @@
 
 #include "pch.h"
 
-#include "DefaultInputEvent.h"
+#include "ConstantInputEvent.h"
 #include "InputEvent.h"
 
 class InputEventToggle : public InputEvent {
@@ -19,7 +19,7 @@ private:
 public:
     InputEventToggle() {
         this->cooldown = 0;
-        this->event = std::make_shared<DefaultInputEvent>();
+        this->event = std::make_shared<ConstantInputEvent>();
         toggles.insert(this);
     }
     InputEventToggle(const int cooldown,

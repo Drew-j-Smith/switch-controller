@@ -3,7 +3,7 @@
 
 #include "pch.h"
 
-#include "DefaultInputEvent.h"
+#include "ConstantInputEvent.h"
 #include "InputEvent.h"
 
 class InputEventSwitch : public InputEvent {
@@ -14,7 +14,7 @@ private:
 
 public:
     InputEventSwitch() {
-        this->event1 = std::make_shared<DefaultInputEvent>();
+        this->event1 = std::make_shared<ConstantInputEvent>();
         this->event2 = event1;
         this->deciderEvent = event1;
     }

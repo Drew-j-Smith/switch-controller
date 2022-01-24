@@ -1,6 +1,6 @@
 #include "InputManager.h"
 
-#include "DefaultInputEvent.h"
+#include "ConstantInputEvent.h"
 #include "InputEventCollection.h"
 #include "InputEventSwitch.h"
 #include "InputEventTurbo.h"
@@ -10,7 +10,7 @@ InputManager::InputManager(const boost::property_tree::ptree &tree,
                            const int turboButtonLoopTime) {
     // set all inputs to be a default input
     std::shared_ptr<InputEvent> defaultInput =
-        std::make_shared<DefaultInputEvent>();
+        std::make_shared<ConstantInputEvent>();
     for (int i = 0; i < 27; i++) {
         inputs[i] = defaultInput;
     }

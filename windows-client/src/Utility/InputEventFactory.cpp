@@ -1,6 +1,6 @@
 
 #include "InputEventFactory.h"
-#include "InputEvent/DefaultInputEvent.h"
+#include "InputEvent/ConstantInputEvent.h"
 #include "InputEvent/InputEventCollection.h"
 #include "InputEvent/InputEventInverter.h"
 #include "InputEvent/InputEventSwitch.h"
@@ -14,8 +14,7 @@ InputEventFactory::InputEventFactory() {
 #define AC_ADD_FACTORY(class)                                                  \
     factories[#class] = boost::bind(boost::factory<std::shared_ptr<class>>(),  \
                                     _1, boost::ref(*this));
-    AC_ADD_FACTORY(DefaultInputEvent);
-    AC_ADD_FACTORY(ActiveInputEvent);
+    AC_ADD_FACTORY(ConstantInputEvent);
     AC_ADD_FACTORY(InputEventCollection);
     AC_ADD_FACTORY(InputEventInverter);
     AC_ADD_FACTORY(InputEventSwitch);

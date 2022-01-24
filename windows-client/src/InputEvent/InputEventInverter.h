@@ -12,7 +12,7 @@
 
 #include "pch.h"
 
-#include "DefaultInputEvent.h"
+#include "ConstantInputEvent.h"
 #include "InputEvent.h"
 
 /**
@@ -25,7 +25,7 @@ private:
     std::shared_ptr<InputEvent> event;
 
 public:
-    InputEventInverter() : event(std::make_shared<DefaultInputEvent>()){};
+    InputEventInverter() : event(std::make_shared<ConstantInputEvent>()){};
     /**
      * @brief Construct a new InputEventInverter object.
      *

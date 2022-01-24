@@ -6,7 +6,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "Decider/Decider.h"
-#include "InputEvent/DefaultInputEvent.h"
+#include "InputEvent/ConstantInputEvent.h"
 #include "InputEvent/InputEventCollection.h"
 
 class Macro {
@@ -37,7 +37,7 @@ private:
     std::string name = "";
     std::vector<MacroData> data;
     std::shared_ptr<InputEvent> inputEvent =
-        std::make_shared<DefaultInputEvent>();
+        std::make_shared<ConstantInputEvent>();
     std::shared_ptr<Decider> decider = std::make_shared<DefaultDecider>();
     InputMergeMode mode = inputPriority;
 

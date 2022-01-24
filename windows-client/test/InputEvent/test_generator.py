@@ -21,7 +21,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE({0}TestNotEquals, T, testTypes)
 """
 types = [
 "DefaultInputEvent",
-"ActiveInputEvent",
 "InputEventCollection",
 "InputEventInverter",
 "InputEventToggle",
