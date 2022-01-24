@@ -46,33 +46,27 @@ public:
     virtual void update() = 0;
 
     /**
-     * @brief Get the Schema of the input event
-     *
-     * @details The schema will have the same shape that the input event will
-     * expect in its constructor. The names of the nodes are expected to be the
-     * same while the child of the nodes represent the data expected.
-     *
-     * All schema will have a "type" node at the top level which denotes the
-     * class name.
-     *
-     * There are two potential child nodes (other nodes are expected to remain
-     * unchanged)
-     * 1. "detailed description" (optional)
-     * 2. "type" (required)
-     *
-     * The "detailed description" field will give an in depth description of the
-     * field.
-     *
-     * The "type" field descibes one of 4 types of data (as of now):
-     * 1. String
-     * 2. Integer
-     * 3. Array (will have a child "type")
-     * 4. InputEvent (must be a ptree to construct valid InputEvent)
-     *
-     * @return boost::property_tree::ptree the Schema of the input event
+     * @brief A SchemaItem is field expected to be present in the ptree
+     * constructor.
      */
-    virtual boost::property_tree::ptree getSchema() const {
-        return boost::property_tree::ptree(); // TODO temporary definition
+    struct SchemaItem {
+        // The name of the SchemaItem as it appears in a ptree.
+        std::string name;
+        // Potential types of a SchemaItem.
+        enum SchemaType { String, Integer, Event, ArrayOfEvent };
+        // Children of a SchemaItem as it appears in a ptree.
+        SchemaType type;
+        // In depth explanation of the SchemaItem.
+        std::string description;
+    };
+
+    /**
+     * @brief Get the Schema of the input event.
+     *
+     * @return std::vector<SchemaItem> the Schema of the input event
+     */
+    virtual std::vector<SchemaItem> getSchema() const {
+        return std::vector<SchemaItem>(); // TODO temporary definition
     }
 };
 
