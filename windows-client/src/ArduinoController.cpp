@@ -9,7 +9,7 @@
 
 #include "InputEvent/InputEvent.h"
 
-void CreateConfig(std::string &configFilename);
+void CreateConfig(std::string &configFilename); // TODO create header files
 void EditConfig(std::string &configFilename);
 void StartController(std::string &configFilename);
 
@@ -54,10 +54,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
         std::cout << "The current config file is: \"" << configFilename
                   << "\"\n";
         std::cin >> option;
+        std::string tempstr;
+        std::getline(std::cin, tempstr);
         switch (option) {
         case 1:
             std::cout << "Enter the config filename: ";
-            std::getline(std::cin, configFilename);
             std::getline(std::cin, configFilename);
             break;
         case 2:
@@ -131,9 +132,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             t.join();
         } break;
         case 7: {
-            std::string tempStr;
-            std::getline(std::cin, tempStr);
-
             std::string inputFormat;
             std::string deviceName;
             std::string recordTimeStr;

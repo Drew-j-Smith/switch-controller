@@ -56,6 +56,14 @@ public:
                          boost::property_tree::ptree("ConstantInputEvent"));
         return result;
     }
+
+    std::vector<SchemaItem> getSchema() const override {
+        return {
+            {"isDigital", SchemaItem::Integer,
+             "isDigital determines if the input event is digital or analog."},
+            {"inputValue", SchemaItem::Integer,
+             "inputValue determines what the constant value is."}};
+    }
 };
 
 #endif

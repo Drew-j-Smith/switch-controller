@@ -47,13 +47,14 @@ public:
 
     /**
      * @brief A SchemaItem is field expected to be present in the ptree
-     * constructor.
+     * constructor. Additionally there must be a field of "type" which is the
+     * name of the class (this will NOT be returned in the schema).
      */
     struct SchemaItem {
         // The name of the SchemaItem as it appears in a ptree.
         std::string name;
         // Potential types of a SchemaItem.
-        enum SchemaType { String, Integer, Event, ArrayOfEvent };
+        enum SchemaType { String, Integer, Event, EventArray };
         // Children of a SchemaItem as it appears in a ptree.
         SchemaType type;
         // In depth explanation of the SchemaItem.

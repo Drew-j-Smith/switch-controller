@@ -11,6 +11,10 @@ private:
     std::shared_ptr<InputEvent> event;
 
 public:
+    InputEventTurbo() {
+        this->event = std::make_shared<ConstantInputEvent>(1, true);
+        this->toggleEvent = std::make_shared<InputEventToggle>(15, event);
+    }
     InputEventTurbo(const int loopTime, std::shared_ptr<InputEvent> event) {
         this->toggleEvent = std::make_shared<InputEventToggle>(loopTime, event);
         this->event = event;
