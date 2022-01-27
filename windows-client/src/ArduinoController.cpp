@@ -70,7 +70,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
         case 4: {
             try {
                 StartController(configFilename);
-            } catch (std::exception e) {
+            } catch (std::exception &e) {
                 std::cerr << e.what() << '\n';
             }
         } break;
