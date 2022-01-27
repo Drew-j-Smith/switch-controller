@@ -2,21 +2,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "InputEvent/ConstantInputEvent.h"
-#include "InputEvent/InputEvent.h"
-#include "InputEvent/InputEventCollection.h"
-#include "InputEvent/InputEventInverter.h"
-#include "InputEvent/InputEventSwitch.h"
-#include "InputEvent/InputEventToggle.h"
-#include "InputEvent/SfJoystickAnalogInputEvent.h"
-#include "InputEvent/SfJoystickDigitalInputEvent.h"
-#include "InputEvent/SfKeyboardInputEvent.h"
+#include "InputEvent/InputEventTypes.h"
 
-typedef std::tuple<ConstantInputEvent, InputEventCollection, InputEventInverter,
-                   InputEventToggle, InputEventSwitch,
-                   SfJoystickAnalogInputEvent, SfJoystickDigitalInputEvent,
-                   SfKeyboardInputEvent>
-    testTypes;
+typedef std::tuple<AC_INPUT_EVENT_TYPES> testTypes;
 
 BOOST_AUTO_TEST_SUITE(InputEventTest);
 BOOST_AUTO_TEST_CASE_TEMPLATE(contructorTest, T, testTypes) {

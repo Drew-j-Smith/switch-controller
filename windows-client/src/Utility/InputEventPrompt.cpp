@@ -1,27 +1,21 @@
 #include "InputEventPrompt.h"
 
-#include "InputEvent/ConstantInputEvent.h"
-#include "InputEvent/InputEventCollection.h"
-#include "InputEvent/InputEventInverter.h"
-#include "InputEvent/InputEventSwitch.h"
-#include "InputEvent/InputEventToggle.h"
-#include "InputEvent/InputEventTurbo.h"
-#include "InputEvent/SfJoystickAnalogInputEvent.h"
-#include "InputEvent/SfJoystickDigitalInputEvent.h"
-#include "InputEvent/SfKeyboardInputEvent.h"
+#include "InputEvent/InputEventTypes.h"
+
+template <class T, class... args>
+static void addClass(
+    int count, const std::vector<std::string> &names,
+    std::map<std::string, std::vector<InputEvent::SchemaItem>> &schemaList) {
+    schemaList[names[count]] = T().getSchema();
+    if constexpr (sizeof...(args) > 0) {
+        addClass<args...>(count + 1, names, schemaList);
+    }
+}
 
 std::map<std::string, std::vector<InputEvent::SchemaItem>> createSchema() {
     std::map<std::string, std::vector<InputEvent::SchemaItem>> schemaList;
-#define AC_ADD_SCHEMA(class) schemaList[#class] = class().getSchema();
-    AC_ADD_SCHEMA(ConstantInputEvent);
-    AC_ADD_SCHEMA(InputEventCollection);
-    AC_ADD_SCHEMA(InputEventInverter);
-    AC_ADD_SCHEMA(InputEventSwitch);
-    AC_ADD_SCHEMA(InputEventToggle);
-    AC_ADD_SCHEMA(InputEventTurbo);
-    AC_ADD_SCHEMA(SfJoystickAnalogInputEvent);
-    AC_ADD_SCHEMA(SfJoystickDigitalInputEvent);
-    AC_ADD_SCHEMA(SfKeyboardInputEvent);
+    std::vector<std::string> names = {AC_INPUT_EVENT_NAMES};
+    addClass<AC_INPUT_EVENT_TYPES>(0, names, schemaList);
     return schemaList;
 }
 
