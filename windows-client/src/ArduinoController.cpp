@@ -9,7 +9,7 @@
 
 #include "InputEvent/InputEvent.h"
 
-void CreateConfig(std::string &configFilename); // TODO create header files
+void CreateConfig(); // TODO create header files
 void EditConfig(std::string &configFilename);
 void StartController(std::string &configFilename);
 
@@ -62,7 +62,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             std::getline(std::cin, configFilename);
             break;
         case 2:
-            CreateConfig(configFilename);
+            CreateConfig();
             break;
         case 3:
             EditConfig(configFilename);
