@@ -46,8 +46,12 @@ boost::property_tree::ptree promptForEventType(
         for (auto event : schemaList) {
             std::cout << "  " << event.first << '\n';
         }
-        std::cout << "Enter an InputEvent:";
+        std::cout << "Enter an InputEvent (or an empty string to not include "
+                     "an event):";
         std::getline(std::cin, strline);
+        if (strline.length() == 0) {
+            return boost::property_tree::ptree();
+        }
         it = schemaList.find(strline);
     }
     boost::property_tree::ptree ptreeEvent =
@@ -96,7 +100,10 @@ boost::property_tree::ptree promptForInputEvent(
         }
 
         case InputEvent::SchemaItem::SchemaType::Event: {
-            res.add_child(schemaItem.name, promptForEventType(schemaList));
+            auto event = promptForEventType(schemaList);
+            if (event.size() > 0) {
+                res.add_child(schemaItem.name, event);
+            }
             break;
         }
 

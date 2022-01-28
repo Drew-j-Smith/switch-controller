@@ -15,6 +15,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "InputEvent.h"
+#include "Utility/InputEventFactory.h"
 
 /**
  * @brief This class takes inputs and converts them into a character array which
@@ -33,14 +34,12 @@ private:
     const int JOYSTICK_DEADZONE = 30;
 
     /**
-     * @brief An array of InputEvent that represent user input
-     * 0-13 buttons
-     * 14-21 controlSticks
-     * 22-25 dpad
-     * 26 turbo button
-     * see InputManager.cpp for full definition
+     * @brief An array of InputEvent that represent user input see
+     * InputManager.cpp
      */
-    std::shared_ptr<InputEvent> inputs[27];
+    std::shared_ptr<InputEvent> buttonEvents[14];
+    std::shared_ptr<InputEvent> controlStickEvents[8];
+    std::shared_ptr<InputEvent> dpadEvents[4];
 
 public:
     /**
@@ -48,17 +47,24 @@ public:
      *
      * @param tree A dictionary of an input name to an InputEvent (see
      * InputEvent instances for a detailed desciption)
-     *
-     * @param turboButtonLoopTime determines how quickly turbo buttons alternate
+     * @param factory The factory used to construct InputEvents from the tree
      */
     InputManager(const boost::property_tree::ptree &tree,
-                 const int turboButtonLoopTime);
+                 InputEventFactory &factory);
 
     /**
      * @brief Gets the user's inputs in the form of a uint8_t array
      *
      */
     std::array<uint8_t, 8> getData() const;
+
+    /**
+     * @brief Get the Schema of the InputManager.
+     *
+     * @return std::vector<InputEvent::SchemaItem> the Schema of the
+     * InputManager.
+     */
+    static std::vector<InputEvent::SchemaItem> getSchema();
 
 private:
     /**
@@ -67,7 +73,8 @@ private:
      * @param it the iterator containing a name of the input and an InputEvent
      */
     void loadInputEvent(
-        const std::pair<const std::string, boost::property_tree::ptree> &it);
+        const std::pair<const std::string, boost::property_tree::ptree> &it,
+        InputEventFactory &factory);
 
     /**
      * @brief Tests if a key is in a map and returns its index else -1

@@ -32,7 +32,8 @@ void StartController(std::string &configFilename) {
         return;
     }
 
-    InputManager inputManager(tree.find("controls")->second, 15);
+    InputEventFactory factory;
+    InputManager inputManager(tree.find("controls")->second, factory);
 
     auto deciders =
         std::make_shared<DeciderCollection>(tree.find("deciders")->second);

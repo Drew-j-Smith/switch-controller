@@ -7,66 +7,47 @@
 #include "SfJoystickAnalogInputEvent.h"
 
 InputManager::InputManager(const boost::property_tree::ptree &tree,
-                           const int turboButtonLoopTime) {
+                           InputEventFactory &factory) {
     // set all inputs to be a default input
     std::shared_ptr<InputEvent> defaultInput =
         std::make_shared<ConstantInputEvent>();
-    for (int i = 0; i < 27; i++) {
-        inputs[i] = defaultInput;
+    for (auto &event : buttonEvents) {
+        event = defaultInput;
+    }
+    for (auto &event : controlStickEvents) {
+        event = defaultInput;
+    }
+    for (auto &event : dpadEvents) {
+        event = defaultInput;
     }
 
     // go througth the entire list and try to load inputs
     for (auto &it : tree) {
-        loadInputEvent(it);
-    }
-
-    // wrap each event in a turbo event which
-    // which keeps the input the same unless inputs[26] is pressed
-    for (int i = 0; i < 14; i++) {
-        std::shared_ptr<InputEvent> turboEvent =
-            std::make_shared<InputEventTurbo>(turboButtonLoopTime, inputs[i]);
-        inputs[i] = std::make_shared<InputEventSwitch>(turboEvent, inputs[i],
-                                                       inputs[26]);
+        loadInputEvent(it, factory);
     }
 }
 
 static const std::set<std::string> unusedButtons = {
     "record", "playLastRecorded", "stopMacros"};
 
-static const std::map<std::string, int> digitalInputMap = {
-    {"y", 0},
-    {"b", 1},
-    {"a", 2},
-    {"x", 3},
-    {"l", 4},
-    {"r", 5},
-    {"xl", 6},
-    {"xr", 7},
-    {"select", 8},
-    {"start", 9},
-    {"lClick", 10},
-    {"rClick", 11},
-    {"home", 12},
-    {"capture", 13},
-    {"leftStickXplus", 14},
-    {"leftStickXminus", 15},
-    {"leftStickYplus", 16},
-    {"leftStickYminus", 17},
-    {"rightStickXplus", 18},
-    {"rightStickXminus", 19},
-    {"rightStickYplus", 20},
-    {"rightStickYminus", 21},
-    {"dpadUp", 22},
-    {"dpadRight", 23},
-    {"dpadDown", 24},
-    {"dpadLeft", 25}};
+static const std::map<std::string, int> buttonMap = {
+    {"y", 0},       {"b", 1},       {"a", 2},     {"x", 3},       {"l", 4},
+    {"r", 5},       {"xl", 6},      {"xr", 7},    {"select", 8},  {"start", 9},
+    {"lClick", 10}, {"rClick", 11}, {"home", 12}, {"capture", 13}};
 
-static const std::map<std::string, int> analogInputMap = {
-    {"leftStickX", 14},  {"leftStickY", 16}, {"rightStickX", 18},
-    {"rightStickY", 20}, {"dpadX", 22},      {"dpadY", 23}};
+static const std::map<std::string, int> controlStickMap = {
+    {"leftStickXplus", 0},  {"leftStickXminus", 1},  {"leftStickYplus", 2},
+    {"leftStickYminus", 3}, {"rightStickXplus", 4},  {"rightStickXminus", 5},
+    {"rightStickYplus", 6}, {"rightStickYminus", 7}, {"leftStickX", 0},
+    {"leftStickY", 2},      {"rightStickX", 4},      {"rightStickY", 6}};
+
+static const std::map<std::string, int> dpadMap = {
+    {"dpadUp", 0},   {"dpadRight", 1}, {"dpadDown", 2},
+    {"dpadLeft", 3}, {"dpadX", 0},     {"dpadY", 2}};
 
 void InputManager::loadInputEvent(
-    const std::pair<const std::string, boost::property_tree::ptree> &it) {
+    const std::pair<const std::string, boost::property_tree::ptree> &it,
+    InputEventFactory &factory) {
     // trys to match the name to a button
     // once a match is found, the button is loaded and the function returns
 
@@ -74,21 +55,21 @@ void InputManager::loadInputEvent(
     if (unusedButtons.find(it.first) != unusedButtons.end())
         return;
 
-    int index = testInMap(digitalInputMap, it.first);
+    int index = testInMap(buttonMap, it.first);
     if (index >= 0) {
-        inputs[index] = std::make_shared<InputEventCollection>(it.second);
+        buttonEvents[index] = factory.create(it.second);
         return;
     }
 
-    index = testInMap(analogInputMap, it.first);
+    index = testInMap(controlStickMap, it.first);
     if (index >= 0) {
-        inputs[index] = std::make_shared<SfJoystickAnalogInputEvent>(it.second);
+        controlStickEvents[index] = factory.create(it.second);
         return;
     }
 
-    if (it.first == "turboButtonToggle") {
-        inputs[26] = std::make_shared<InputEventToggle>(
-            500, std::make_shared<InputEventCollection>(it.second));
+    index = testInMap(dpadMap, it.first);
+    if (index >= 0) {
+        dpadEvents[index] = factory.create(it.second);
         return;
     }
 
@@ -112,11 +93,11 @@ std::array<uint8_t, 8> InputManager::getData() const {
     res[1] = 0;
     res[2] = 0;
     for (int i = 0; i < 8; i++) {
-        if (inputs[i]->getInputValue())
+        if (buttonEvents[i]->getInputValue())
             res[1] |= (1 << i);
     }
     for (int i = 0; i < 6; i++) {
-        if (inputs[i + 8]->getInputValue())
+        if (buttonEvents[i + 8]->getInputValue())
             res[2] |= (1 << i);
     }
     for (int i = 0; i < 4; i++) {
@@ -127,46 +108,38 @@ std::array<uint8_t, 8> InputManager::getData() const {
 }
 
 bool InputManager::isInDeadzone(int stick) const {
-    const int offset = 14;             // control sticks start at inputs[14]
-    const int actualStick = stick * 2; // there are 2 inputs per control stick
-    int stickData = inputs[offset + actualStick]->getInputValue();
+    int stickData = controlStickEvents[stick * 2]->getInputValue();
     return stickData > 128 - JOYSTICK_DEADZONE &&
            stickData < 128 + JOYSTICK_DEADZONE;
 }
 
 // TODO make readable
-unsigned char InputManager::getControlStickData(int stick) const {
-    const int offset = 14;             // control sticks start at inputs[14]
-    const int actualStick = stick * 2; // there are 2 inputs per control stick
-
-    if (inputs[offset + actualStick]->isDigital()) {
-        return (
-            unsigned char)(128 +
-                           inputs[offset + actualStick]->getInputValue() * 127 -
-                           inputs[offset + actualStick + 1]->getInputValue() *
-                               128);
+uint8_t InputManager::getControlStickData(int stick) const {
+    if (controlStickEvents[stick * 2]->isDigital()) {
+        return (uint8_t)(128 +
+                         controlStickEvents[stick * 2]->getInputValue() * 127 -
+                         controlStickEvents[stick * 2 + 1]->getInputValue() *
+                             128);
     } else {
-        if (isInDeadzone((stick >= 2) * 2) &&
-            isInDeadzone((stick >= 2) * 2 + 1)) {
+        if (isInDeadzone(stick >= 2 ? 0 : 2) &&
+            isInDeadzone(stick >= 2 ? 1 : 3)) {
             return 128;
         } else
-            return (unsigned char)inputs[offset + actualStick]->getInputValue();
+            return (uint8_t)controlStickEvents[stick * 2]->getInputValue();
     }
 }
 
 unsigned char InputManager::getDpadData() const {
-    const int offset = 22; // Dpad data starts at inputs[22]
-    if (inputs[offset]->isDigital()) {
-        return getDpadData(inputs[offset]->getInputValue(),
-                           inputs[offset + 1]->getInputValue(),
-                           inputs[offset + 2]->getInputValue(),
-                           inputs[offset + 3]->getInputValue());
+    if (dpadEvents[0]->isDigital()) {
+        return getDpadData(
+            dpadEvents[0]->getInputValue(), dpadEvents[1]->getInputValue(),
+            dpadEvents[2]->getInputValue(), dpadEvents[3]->getInputValue());
     } else {
         return getDpadData(
-            inputs[offset]->getInputValue() > 128 + JOYSTICK_DEADZONE,
-            inputs[offset + 1]->getInputValue() > 128 + JOYSTICK_DEADZONE,
-            inputs[offset]->getInputValue() < 128 - JOYSTICK_DEADZONE,
-            inputs[offset + 1]->getInputValue() < 128 - JOYSTICK_DEADZONE);
+            dpadEvents[0]->getInputValue() > 128 + JOYSTICK_DEADZONE,
+            dpadEvents[1]->getInputValue() > 128 + JOYSTICK_DEADZONE,
+            dpadEvents[0]->getInputValue() < 128 - JOYSTICK_DEADZONE,
+            dpadEvents[1]->getInputValue() < 128 - JOYSTICK_DEADZONE);
     }
 }
 
@@ -196,4 +169,53 @@ unsigned char InputManager::getDpadData(bool up, bool right, bool down,
             result = 7; // up left
     }
     return result;
+}
+
+std::vector<InputEvent::SchemaItem> InputManager::getSchema() {
+    return {
+        {"y", InputEvent::SchemaItem::Event, "The y button"},
+        {"b", InputEvent::SchemaItem::Event, "The b button"},
+        {"a", InputEvent::SchemaItem::Event, "The a button"},
+        {"x", InputEvent::SchemaItem::Event, "The x button"},
+        {"l", InputEvent::SchemaItem::Event, "The l button"},
+        {"r", InputEvent::SchemaItem::Event, "The r button"},
+        {"xl", InputEvent::SchemaItem::Event, "The xl button"},
+        {"xr", InputEvent::SchemaItem::Event, "The xr button"},
+        {"select", InputEvent::SchemaItem::Event, "The select button"},
+        {"start", InputEvent::SchemaItem::Event, "The start button"},
+        {"lClick", InputEvent::SchemaItem::Event, "The left stick button"},
+        {"rClick", InputEvent::SchemaItem::Event, "The right stick button"},
+        {"home", InputEvent::SchemaItem::Event, "The home button"},
+        {"capture", InputEvent::SchemaItem::Event,
+         "The capture button (on the switch)"},
+        {"leftStickXplus", InputEvent::SchemaItem::Event,
+         "The left stick X plus (digital)"},
+        {"leftStickXminus", InputEvent::SchemaItem::Event,
+         "The left stick X minus (digital)"},
+        {"leftStickYplus", InputEvent::SchemaItem::Event,
+         "The left stick Y plus (digital)"},
+        {"leftStickYminus", InputEvent::SchemaItem::Event,
+         "The left stick Y minus (digital)"},
+        {"rightStickXplus", InputEvent::SchemaItem::Event,
+         "The right stick X plus (digital)"},
+        {"rightStickXminus", InputEvent::SchemaItem::Event,
+         "The right stick X minus (digital)"},
+        {"rightStickYplus", InputEvent::SchemaItem::Event,
+         "The right stick Y plus (digital)"},
+        {"rightStickYminus", InputEvent::SchemaItem::Event,
+         "The right stick Y minus (digital)"},
+        {"leftStickX", InputEvent::SchemaItem::Event,
+         "The left Stick X button (Analog)"},
+        {"leftStickY", InputEvent::SchemaItem::Event,
+         "The left Stick Y button (Analog)"},
+        {"rightStickX", InputEvent::SchemaItem::Event,
+         "The right Stick X button (Analog)"},
+        {"rightStickY", InputEvent::SchemaItem::Event,
+         "The right Stick Y button (Analog)"},
+        {"dpadUp", InputEvent::SchemaItem::Event, "The dpad up button"},
+        {"dpadRight", InputEvent::SchemaItem::Event, "The dpad right button"},
+        {"dpadDown", InputEvent::SchemaItem::Event, "The dpad down button"},
+        {"dpadLeft", InputEvent::SchemaItem::Event, "The dpad left button"},
+        {"dpadX", InputEvent::SchemaItem::Event, "The dpadX button (analog)"},
+        {"dpadY", InputEvent::SchemaItem::Event, "The dpadY button (analog)"}};
 }
