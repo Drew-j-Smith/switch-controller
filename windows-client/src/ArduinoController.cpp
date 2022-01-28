@@ -9,6 +9,8 @@
 
 #include "InputEvent/InputEvent.h"
 
+#include "InputEvent/InputEventTemplate.h"
+
 void CreateConfig(); // TODO create header files
 void EditConfig(std::string &configFilename);
 void StartController(std::string &configFilename);
@@ -25,7 +27,17 @@ const std::string options =
     8. Exit
 )";
 
+struct StringClass {
+    static constexpr std::string_view stringView = "hello";
+};
+struct StringClass2 {
+    static constexpr std::string_view stringView = "hello2";
+};
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
+
+    InputEventTemplate<StringClass> test;
+    InputEventTemplate<StringClass2> test;
 
     boost::property_tree::ptree a1;
     boost::property_tree::ptree b1;
