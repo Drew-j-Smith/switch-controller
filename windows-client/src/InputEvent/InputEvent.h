@@ -14,7 +14,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "Utility/FactoryObject.h"
 #include "Utility/InputEventFactory.h"
 
 /**
@@ -22,7 +21,7 @@
  * and analogue input methods.
  *
  */
-class InputEvent : public FactoryObject<InputEvent> {
+class InputEvent {
 public:
     virtual ~InputEvent() {}
 

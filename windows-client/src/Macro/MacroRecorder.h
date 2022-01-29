@@ -5,9 +5,10 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "InputEvent/InputEventCollection.h"
 #include "Macro.h"
+#include "Utility/InputEventFactory.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
+
 
 class MacroRecorder {
 private:
@@ -22,11 +23,11 @@ private:
     bool recording = false;
 
 public:
-    MacroRecorder(const boost::property_tree::ptree &tree) {
-        lastRecordedMacro->setInputEvent(std::make_shared<InputEventCollection>(
-            tree.find("playLastRecorded")->second));
-        record =
-            std::make_shared<InputEventCollection>(tree.find("record")->second);
+    MacroRecorder(const boost::property_tree::ptree &tree,
+                  InputEventFactory &factory) {
+        lastRecordedMacro->setInputEvent(
+            factory.create(tree.find("playLastRecorded")->second));
+        record = factory.create(tree.find("record")->second);
     }
 
     void update(const std::array<uint8_t, 8> &data) {

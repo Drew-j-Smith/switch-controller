@@ -58,21 +58,6 @@ public:
     int getInputValue() const override { return active; };
 
     bool isDigital() const override { return true; }
-
-    std::shared_ptr<InputEvent>
-    makeShared(const boost::property_tree::ptree &tree,
-               Factory<InputEvent> &factory) const override {
-        boost::property_tree::ptree childTree = tree.get_child("event");
-        int btnCooldown = tree.get<int>("button cooldown");
-        return std::make_shared<InputEventToggle>(
-            btnCooldown, factory.generateObject(childTree));
-    }
-    std::string getTypeName() const override { return ""; }
-
-    std::string toString() const override { return ""; }
-    boost::property_tree::ptree toPtree() const override {
-        return boost::property_tree::ptree();
-    }
 };
 
 #endif

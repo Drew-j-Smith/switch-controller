@@ -37,12 +37,13 @@ void StartController(std::string &configFilename) {
 
     auto deciders =
         std::make_shared<DeciderCollection>(tree.find("deciders")->second);
-    MacroCollection macroCollection(tree.find("macros")->second, deciders);
+    MacroCollection macroCollection(tree.find("macros")->second, deciders,
+                                    factory);
 
-    MacroRecorder recorder(tree.find("controls")->second);
+    MacroRecorder recorder(tree.find("controls")->second, factory);
     macroCollection.pushBackMacro(recorder.getLastRecordedMacro());
 
-    InputEventCollection stopMacrosEvent(
+    std::shared_ptr<InputEvent> stopMacrosEvent = factory.create(
         tree.find("controls")->second.find("stopMacros")->second);
 
     std::cout << "Config files loaded.\n";
@@ -75,7 +76,7 @@ void StartController(std::string &configFilename) {
 
         macroCollection.activateMacros();
         if (macroCollection.isMacroActive() &&
-            stopMacrosEvent.getInputValue()) {
+            stopMacrosEvent->getInputValue()) {
             macroCollection.deactivateMacros();
         }
         if (macroCollection.isMacroActive()) {

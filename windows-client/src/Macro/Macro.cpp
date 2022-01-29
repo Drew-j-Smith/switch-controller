@@ -2,27 +2,16 @@
 
 #include <boost/endian/conversion.hpp>
 
-Macro::Macro(const std::string &name, const std::vector<MacroData> &data,
-             const std::shared_ptr<InputEvent> &inputEvent,
-             const std::shared_ptr<Decider> &decider,
-             const InputMergeMode mode) {
-    this->name = name;
-    this->data = data;
-    this->inputEvent = inputEvent;
-    this->decider = decider;
-    this->mode = mode;
-}
-
-Macro::Macro(
-    const boost::property_tree::ptree &tree,
-    const std::map<std::string, std::shared_ptr<Decider>> &deciderList) {
+Macro::Macro(const boost::property_tree::ptree &tree,
+             const std::map<std::string, std::shared_ptr<Decider>> &deciderList,
+             InputEventFactory &factory) {
     name = tree.get("name", "");
     std::string filename = tree.get("filename", "");
     loadData(filename);
 
     auto inputIt = tree.find("input");
     if (inputIt != tree.not_found())
-        inputEvent = std::make_shared<InputEventCollection>(inputIt->second);
+        inputEvent = factory.create(inputIt->second);
 
     auto deciderIt = deciderList.find(tree.get("decider", ""));
     if (deciderIt != deciderList.end())

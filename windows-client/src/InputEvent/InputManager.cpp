@@ -1,10 +1,6 @@
 #include "InputManager.h"
 
 #include "ConstantInputEvent.h"
-#include "InputEventCollection.h"
-#include "InputEventSwitch.h"
-#include "InputEventTurbo.h"
-#include "SfJoystickAnalogInputEvent.h"
 
 InputManager::InputManager(const boost::property_tree::ptree &tree,
                            InputEventFactory &factory) {

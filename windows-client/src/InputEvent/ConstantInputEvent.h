@@ -36,26 +36,7 @@ public:
     int getInputValue() const override { return inputValue; }
     bool isDigital() const override { return digital; }
 
-    std::shared_ptr<InputEvent>
-    makeShared([[maybe_unused]] const boost::property_tree::ptree &tree,
-               [[maybe_unused]] Factory<InputEvent> &factory) const override {
-        // TODO not changing this method because it will be removed in the
-        // future
-        return std::make_shared<ConstantInputEvent>();
-    }
-    std::string getTypeName() const override { return "ConstantInputEvent"; }
-
     void update() override {}
-
-    std::string toString() const override { return "ConstantInputEvent"; }
-    boost::property_tree::ptree toPtree() const override {
-        // TODO not changing this method because it will be removed in the
-        // future
-        boost::property_tree::ptree result;
-        result.add_child("type",
-                         boost::property_tree::ptree("ConstantInputEvent"));
-        return result;
-    }
 
     std::vector<SchemaItem> getSchema() const override {
         return {

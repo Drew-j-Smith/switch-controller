@@ -9,13 +9,15 @@ MacroCollection::MacroCollection(
 
 MacroCollection::MacroCollection(
     const boost::property_tree::ptree &tree,
-    const std::shared_ptr<DeciderCollectionBase> &deciders) {
+    const std::shared_ptr<DeciderCollectionBase> &deciders,
+    InputEventFactory &factory) {
     this->deciders = deciders;
     std::map<std::string, std::shared_ptr<Macro>> macroMap;
     auto deciderMap = deciders->generateMap();
 
     for (auto macro : tree) {
-        macros.push_back(std::make_shared<Macro>(macro.second, deciderMap));
+        macros.push_back(
+            std::make_shared<Macro>(macro.second, deciderMap, factory));
         macroMap.insert({macros.back()->getName(), macros.back()});
     }
     for (auto macro : macros) {

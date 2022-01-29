@@ -16,17 +16,6 @@ private:
 
 public:
     SfJoystickDigitalInputEvent(){};
-    SfJoystickDigitalInputEvent(unsigned int joystickIndex,
-                                unsigned int button) {
-        this->joystickIndex = joystickIndex;
-        this->button = button;
-        assertConnected();
-    }
-    SfJoystickDigitalInputEvent(boost::property_tree::ptree tree) {
-        joystickIndex = tree.get("joystick index", 0);
-        button = tree.get("button", 0);
-        assertConnected();
-    }
     SfJoystickDigitalInputEvent(
         const boost::property_tree::ptree &tree,
         [[maybe_unused]] const InputEventFactory &factory) {
@@ -46,21 +35,10 @@ public:
             return 0;
         return sf::Joystick::isButtonPressed(joystickIndex, button);
     }
+
     bool isDigital() const override { return true; }
 
-    std::shared_ptr<InputEvent>
-    makeShared(const boost::property_tree::ptree &tree,
-               [[maybe_unused]] Factory<InputEvent> &factory) const override {
-        return std::make_shared<SfJoystickDigitalInputEvent>(tree);
-    }
-    std::string getTypeName() const override { return ""; }
-
     void update() override {}
-
-    std::string toString() const override { return ""; }
-    boost::property_tree::ptree toPtree() const override {
-        return boost::property_tree::ptree();
-    }
 };
 
 #endif

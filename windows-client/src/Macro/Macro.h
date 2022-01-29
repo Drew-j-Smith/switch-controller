@@ -7,7 +7,7 @@
 
 #include "Decider/Decider.h"
 #include "InputEvent/ConstantInputEvent.h"
-#include "InputEvent/InputEventCollection.h"
+#include "Utility/InputEventFactory.h"
 
 class Macro {
 public:
@@ -19,11 +19,9 @@ public:
     enum InputMergeMode { blockInput, macroPriority, inputPriority };
 
     Macro(){};
-    Macro(const std::string &name, const std::vector<MacroData> &data,
-          const std::shared_ptr<InputEvent> &inputEvent,
-          const std::shared_ptr<Decider> &decider, const InputMergeMode mode);
     Macro(const boost::property_tree::ptree &tree,
-          const std::map<std::string, std::shared_ptr<Decider>> &deciderList);
+          const std::map<std::string, std::shared_ptr<Decider>> &deciderList,
+          InputEventFactory &factory);
 
     void setNextMacroLists(
         const boost::property_tree::ptree &tree,

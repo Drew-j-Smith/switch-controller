@@ -10,7 +10,6 @@ Decider/SoundDecider.cpp
 Decider/SoundDeciderCollection.cpp
 FFmpeg/FFmpegDecoder.cpp
 FFmpeg/FFmpegRecorder.cpp
-InputEvent/InputEventCollection.cpp
 InputEvent/InputEventToggle.cpp
 InputEvent/InputManager.cpp
 Macro/Macro.cpp

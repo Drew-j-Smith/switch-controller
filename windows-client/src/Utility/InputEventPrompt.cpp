@@ -64,10 +64,12 @@ boost::property_tree::ptree promptForEventArrayType(
     const std::map<std::string, std::vector<InputEvent::SchemaItem>>
         &schemaList) {
     std::string strline;
+    std::cout << "Add another InputEvent? (y/n):";
+    std::getline(std::cin, strline);
     boost::property_tree::ptree ptreeEventArray;
     while (strline == "y") {
+        ptreeEventArray.add_child(" ", promptForEventType(schemaList));
         std::cout << "Add another InputEvent? (y/n):";
-        ptreeEventArray.add_child("", promptForEventType(schemaList));
         std::getline(std::cin, strline);
     }
     return ptreeEventArray;

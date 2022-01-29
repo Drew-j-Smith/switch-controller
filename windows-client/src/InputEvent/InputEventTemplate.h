@@ -32,18 +32,6 @@ public:
     virtual std::vector<SchemaItem> getSchema() const override {
         return schema; // TODO temporary definition
     }
-
-    // Potentially removed
-    std::shared_ptr<InputEvent>
-    makeShared([[maybe_unused]] const boost::property_tree::ptree &tree,
-               [[maybe_unused]] Factory<InputEvent> &factory) const override {
-        return nullptr;
-    };
-    std::string getTypeName() const override { return ""; };
-    std::string toString() const override { return ""; };
-    boost::property_tree::ptree toPtree() const override {
-        return boost::property_tree::ptree();
-    };
 };
 
 #endif

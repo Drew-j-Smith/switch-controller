@@ -27,36 +27,7 @@ const std::string options =
     8. Exit
 )";
 
-struct StringClass {
-    static constexpr std::string_view stringView = "hello";
-};
-struct StringClass2 {
-    static constexpr std::string_view stringView = "hello2";
-};
-
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
-
-    InputEventTemplate<StringClass> test;
-    InputEventTemplate<StringClass2> test;
-
-    boost::property_tree::ptree a1;
-    boost::property_tree::ptree b1;
-    boost::property_tree::ptree c1;
-    a1.add("type", "ConstantInputEvent");
-    a1.add("isDigital", true);
-    a1.add("inputValue", 0);
-    b1.add("type", "ConstantInputEvent");
-    b1.add("isDigital", true);
-    b1.add("inputValue", 1);
-    c1.add("type", "InputEventInverter");
-    c1.add_child("event", a1);
-
-    InputEventFactory factory;
-    std::shared_ptr<InputEvent> a = factory.create(a1);
-    std::shared_ptr<InputEvent> b = factory.create(b1);
-    std::shared_ptr<InputEvent> c = factory.create(c1);
-    std::cout << a->getTypeName() << ' ' << b->getTypeName() << ' '
-              << c->getTypeName() << '\n';
 
     int option = 0;
     std::string configFilename = "data/config.json";
