@@ -11,6 +11,8 @@
 
 #include "InputEvent/InputEventTemplate.h"
 
+#include "opencv2/core/utils/logger.hpp"
+
 void CreateConfig(); // TODO create header files
 void EditConfig(std::string &configFilename);
 void StartController(std::string &configFilename);
@@ -28,6 +30,9 @@ const std::string options =
 )";
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
+
+    cv::utils::logging::setLogLevel(
+        cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
 
     int option = 0;
     std::string configFilename = "data/config.json";
@@ -109,7 +114,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             });
 
             std::cout << "Press enter to stop\n";
-            std::cin.get();
             std::cin.get();
             running.store(false);
             t.join();
