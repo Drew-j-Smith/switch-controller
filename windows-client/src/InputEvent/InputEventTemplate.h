@@ -3,7 +3,8 @@
 
 #include "pch.h"
 
-#include "InputEvent/InputEvent.h"
+#include "ConstantInputEvent.h"
+#include "InputEvent.h"
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -75,18 +76,17 @@ private:
         return tree;
     }
 
-    // TODO UNTESTED
     static void
     replaceTree(boost::property_tree::ptree &tree,
                 const std::pair<const std::string, boost::property_tree::ptree>
                     &replacement) {
         auto findIt = tree.find(replacement.first);
-        while (findIt != tree.end()) {
+        while (findIt != tree.not_found()) {
             auto replacementName =
                 findIt->second.get<std::string>("replacement name");
-            tree.erase(findIt);
+            tree.erase(tree.to_iterator(findIt));
             tree.add_child(replacementName, replacement.second);
-            findIt = tree.find(replacement.first)
+            findIt = tree.find(replacement.first);
         }
         for (auto &it : tree) {
             replaceTree(it.second, replacement);
@@ -106,7 +106,7 @@ public:
          */
         boost::property_tree::ptree templateTree = createTemplate();
         for (auto &treeChild : tree) {
-            if (treeChild.first.size() > 0 && treeChild.first[0] == "$") {
+            if (treeChild.first.size() > 0 && treeChild.first[0] == '$') {
                 replaceTree(templateTree, treeChild);
             }
         }

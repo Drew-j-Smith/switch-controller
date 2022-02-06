@@ -32,19 +32,18 @@ const std::string options =
 struct TestTemplate {
     static constexpr std::string_view stringView =
         R"({
-    "test": "test",
-    "test3" : {
-        "$test2": {
-            "replacement name": "test field",
-            "description": "This is a test field",
-            "type": "String"
-        }
+    "type": "ConstantInputEvent",
+    "isDigital": "1",
+    "$test": {
+        "replacement name": "inputValue",
+        "description": "This is a test field",
+        "type": "Integer"
     },
-    "test4" : {
-        "$test2": {
-            "replacement name": "test field",
+    "test field": {
+        "$test": {
+            "replacement name": "inputValue",
             "description": "This is a test field",
-            "type": "String"
+            "type": "Integer"
         }
     }
 })";
@@ -52,7 +51,16 @@ struct TestTemplate {
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
-    InputEventTemplate<TestTemplate> test;
+    InputEventFactory factory;
+
+    boost::property_tree::ptree testTree;
+    std::stringstream testTreeStr;
+    testTreeStr << R"({
+    "$test": "0"
+})";
+
+    boost::property_tree::read_json(testTreeStr, testTree);
+    InputEventTemplate<TestTemplate> test(testTree, factory);
 
     auto schema = test.getSchema();
 
