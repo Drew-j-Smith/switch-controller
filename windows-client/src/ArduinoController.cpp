@@ -29,7 +29,38 @@ const std::string options =
     8. Exit
 )";
 
+struct TestTemplate {
+    static constexpr std::string_view stringView =
+        R"({
+    "test": "test",
+    "test3" : {
+        "$test2": {
+            "replacement name": "test field",
+            "description": "This is a test field",
+            "type": "String"
+        }
+    },
+    "test4" : {
+        "$test2": {
+            "replacement name": "test field",
+            "description": "This is a test field",
+            "type": "String"
+        }
+    }
+})";
+};
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
+
+    InputEventTemplate<TestTemplate> test;
+
+    auto schema = test.getSchema();
+
+    std::cout << "schema size: " << schema.size() << '\n';
+    for (auto &item : schema) {
+        std::cout << item.name << " " << item.description << " " << item.type
+                  << '\n';
+    }
 
     cv::utils::logging::setLogLevel(
         cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
