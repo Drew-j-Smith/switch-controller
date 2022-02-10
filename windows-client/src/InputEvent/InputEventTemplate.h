@@ -107,6 +107,8 @@ public:
         boost::property_tree::ptree templateTree = createTemplate();
         for (auto &treeChild : tree) {
             if (treeChild.first.size() > 0 && treeChild.first[0] == '$') {
+                // TODO this does not work with recursive template classes
+                // should remove $ from schema and add it back when searching
                 replaceTree(templateTree, treeChild);
             }
         }
