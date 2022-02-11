@@ -18,7 +18,7 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 add_definitions(-D_WIN32_WINNT=0x0A00)
 
 find_package(OpenCV REQUIRED)
-find_package(SFML 2 COMPONENTS window REQUIRED)
+find_package(SFML 2 COMPONENTS window graphics REQUIRED)
 find_package(Boost COMPONENTS system thread unit_test_framework REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
 find_package(FFMPEG REQUIRED)
@@ -27,6 +27,7 @@ set(CMAKE_LIBS
 ${OpenCV_LIBS}
 sfml-window
 sfml-audio
+sfml-graphics
 ${Boost_LIBRARIES}
 FFTW3::fftw3f
 ${FFMPEG_LIBRARIES}

@@ -13,6 +13,8 @@
 
 #include "opencv2/core/utils/logger.hpp"
 
+#include <SFML/SFMLRenderer.h>
+
 void CreateConfig(); // TODO create header files
 void EditConfig(std::string &configFilename);
 void StartController(std::string &configFilename);
@@ -58,6 +60,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
     testTreeStr << R"({
     "$test": "0"
 })";
+
+    SFMLRenderer renderer;
+    renderer.start();
 
     boost::property_tree::read_json(testTreeStr, testTree);
     InputEventTemplate<TestTemplate> test(testTree, factory);
