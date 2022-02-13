@@ -25,7 +25,8 @@ private:
     }
 
 public:
-    InputEventFactory();
+    InputEventFactory(
+        const std::map<std::string, std::string> &inputEventTemplates);
 
     std::shared_ptr<InputEvent>
     create(const boost::property_tree::ptree &tree) {

@@ -32,7 +32,7 @@ void StartController(std::string &configFilename) {
         return;
     }
 
-    InputEventFactory factory;
+    InputEventFactory factory({});
     InputManager inputManager(tree.find("controls")->second, factory);
 
     auto deciders =

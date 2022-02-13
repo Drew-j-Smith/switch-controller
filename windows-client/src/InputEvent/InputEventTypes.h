@@ -5,8 +5,8 @@
 #include "SfJoystickInputEvent.h"
 #include "SfKeyboardInputEvent.h"
 
-struct InputEventSwitchStruct {
-    static constexpr std::string_view stringView = R"({
+// clang-format off
+/*std::string InputEventSwitchString = R"({
     "type": "InputEventCollection",
     "operator": "or",
     "events": [
@@ -50,11 +50,8 @@ struct InputEventSwitchStruct {
         }
     ]
 })";
-};
-using InputEventSwitch = InputEventTemplate<InputEventSwitchStruct>;
 
-struct InputEventTurboStruct {
-    static constexpr std::string_view stringView = R"({
+std::string InputEventTurboString = R"({
     "type": "InputEventCollection",
     "operator": "and",
     "events": {
@@ -73,16 +70,13 @@ struct InputEventTurboStruct {
             }
         }
     }
-})";
-};
-using InputEventTurbo = InputEventTemplate<InputEventTurboStruct>;
+})";*/
+// clang-format on
 
 #define AC_INPUT_EVENT_TYPES                                                   \
     ConstantInputEvent, InputEventCollection, InputEventToggle,                \
-        SfJoystickInputEvent, SfKeyboardInputEvent, InputEventSwitch,          \
-        InputEventTurbo
+        SfJoystickInputEvent, SfKeyboardInputEvent
 
 #define AC_INPUT_EVENT_NAMES                                                   \
     "ConstantInputEvent", "InputEventCollection", "InputEventToggle",          \
-        "SfJoystickInputEvent", "SfKeyboardInputEvent", "InputEventSwitch",    \
-        "InputEventTurbo"
+        "SfJoystickInputEvent", "SfKeyboardInputEvent"

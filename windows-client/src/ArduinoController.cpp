@@ -8,6 +8,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "InputEvent/InputEvent.h"
+#include "InputEvent/InputEventTypes.h"
 
 #include "InputEvent/InputEventTemplate.h"
 
@@ -31,9 +32,8 @@ const std::string options =
     8. Exit
 )";
 
-struct TestTemplate {
-    static constexpr std::string_view stringView =
-        R"({
+std::string TestTemplateString =
+    R"({
     "type": "ConstantInputEvent",
     "isDigital": "1",
     "$test": {
@@ -49,23 +49,30 @@ struct TestTemplate {
         }
     }
 })";
-};
+
+// template <class... classes> void foo() {
+//     std::vector<InputEvent *> vec = {new classes()...};
+//     for (auto event : vec) {
+//         std::cout << event->getSchema()[0].name << '\n';
+//     }
+// }
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
-    InputEventFactory factory;
+    // SFMLRenderer renderer;
+    // renderer.start();
 
+    // foo<ConstantInputEvent, InputEventCollection>();
+
+    InputEventFactory factory({{"test", TestTemplateString}});
     boost::property_tree::ptree testTree;
     std::stringstream testTreeStr;
     testTreeStr << R"({
-    "$test": "0"
-})";
-
-    SFMLRenderer renderer;
-    renderer.start();
+        "$test": "0"
+    })";
 
     boost::property_tree::read_json(testTreeStr, testTree);
-    InputEventTemplate<TestTemplate> test(testTree, factory);
+    InputEventTemplate test(TestTemplateString, testTree, factory);
 
     auto schema = test.getSchema();
 

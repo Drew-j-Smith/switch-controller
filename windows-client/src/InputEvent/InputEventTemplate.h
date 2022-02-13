@@ -9,7 +9,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-template <class T> class InputEventTemplate : public InputEvent {
+class InputEventTemplate : public InputEvent {
 private:
     /**
      * @brief This will be the template that the InputEvent will be based upon.
@@ -25,9 +25,9 @@ private:
      * "type" - the schema type, see InputEvent::SchemaItem.
      *
      */
-    static constexpr std::string_view myString = T::stringView;
+    const std::string templateStr;
 
-    std::vector<SchemaItem> schema = createSchema(createTemplate());
+    std::vector<SchemaItem> schema;
     std::shared_ptr<InputEvent> event;
 
     static std::vector<SchemaItem>
@@ -51,7 +51,7 @@ private:
                     schemaType = InputEvent::SchemaItem::SchemaType::EventArray;
                 }
 
-                res.push_back({child.first, schemaType, description});
+                res.push_back({child.first.substr(1), schemaType, description});
             }
 
             auto childSchema = createSchema(child.second);
@@ -68,10 +68,10 @@ private:
         return res;
     };
 
-    static boost::property_tree::ptree createTemplate() {
+    boost::property_tree::ptree createTemplate() {
         boost::property_tree::ptree tree;
         std::stringstream ss;
-        ss << myString;
+        ss << templateStr;
         boost::property_tree::read_json(ss, tree);
         return tree;
     }
@@ -94,10 +94,16 @@ private:
     }
 
 public:
-    InputEventTemplate(){};
+    InputEventTemplate(const std::string &templateString)
+        : templateStr(templateString) {
+        schema = createSchema(createTemplate());
+    };
 
-    InputEventTemplate(const boost::property_tree::ptree &tree,
-                       InputEventFactory &factory) {
+    InputEventTemplate(const std::string &templateString,
+                       const boost::property_tree::ptree &tree,
+                       InputEventFactory &factory)
+        : templateStr(templateString) {
+        schema = createSchema(createTemplate());
 
         /**
          * for every item in the first level of the tree
