@@ -2,20 +2,23 @@
 
 #include "InputEvent/InputEventTypes.h"
 
-template <class T, class... args>
-static void addClass(
-    int count, const std::vector<std::string> &names,
-    std::map<std::string, std::vector<InputEvent::SchemaItem>> &schemaList) {
-    schemaList[names[count]] = T().getSchema();
-    if constexpr (sizeof...(args) > 0) {
-        addClass<args...>(count + 1, names, schemaList);
+template <class... classes>
+static std::map<std::string, std::vector<InputEvent::SchemaItem>>
+addClasses(const std::vector<std::string> &names) {
+
+    std::vector<std::shared_ptr<InputEvent>> schemas = {
+        std::make_shared<classes>()...};
+    std::map<std::string, std::vector<InputEvent::SchemaItem>> res;
+    for (int i = 0; i < names.size(); i++) {
+        res[names[i]] = schemas[i]->getSchema();
     }
+    return res;
 }
 
 std::map<std::string, std::vector<InputEvent::SchemaItem>> createSchema() {
-    std::map<std::string, std::vector<InputEvent::SchemaItem>> schemaList;
     std::vector<std::string> names = {AC_INPUT_EVENT_NAMES};
-    addClass<AC_INPUT_EVENT_TYPES>(0, names, schemaList);
+    std::map<std::string, std::vector<InputEvent::SchemaItem>> schemaList =
+        addClasses<AC_INPUT_EVENT_TYPES>(names);
     return schemaList;
 }
 
