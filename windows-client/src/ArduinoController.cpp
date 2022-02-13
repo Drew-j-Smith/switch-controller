@@ -50,19 +50,10 @@ std::string TestTemplateString =
     }
 })";
 
-// template <class... classes> void foo() {
-//     std::vector<InputEvent *> vec = {new classes()...};
-//     for (auto event : vec) {
-//         std::cout << event->getSchema()[0].name << '\n';
-//     }
-// }
-
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
     // SFMLRenderer renderer;
     // renderer.start();
-
-    // foo<ConstantInputEvent, InputEventCollection>();
 
     InputEventFactory factory({{"test", TestTemplateString}});
     boost::property_tree::ptree testTree;

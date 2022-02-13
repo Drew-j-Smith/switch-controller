@@ -10,5 +10,5 @@ InputEventFactory::InputEventFactory(
             boost::bind(boost::factory<std::shared_ptr<InputEventTemplate>>(),
                         templateString.second, _1, boost::ref(*this));
     }
-    addClass<AC_INPUT_EVENT_TYPES>(0, names);
+    addClasses<AC_INPUT_EVENT_TYPES>(names);
 }

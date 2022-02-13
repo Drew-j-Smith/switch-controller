@@ -15,12 +15,15 @@ private:
         factories;
     std::set<std::shared_ptr<InputEvent>> createdEvents;
 
-    template <class T, class... args>
-    void addClass(int count, const std::vector<std::string> &names) {
-        factories[names[count]] = boost::bind(
-            boost::factory<std::shared_ptr<T>>(), _1, boost::ref(*this));
-        if constexpr (sizeof...(args) > 0) {
-            addClass<args...>(count + 1, names);
+    template <class... classes>
+    void addClasses(const std::vector<std::string> &names) {
+        std::vector<boost::function<std::shared_ptr<InputEvent>(
+            boost::property_tree::ptree)>>
+            factoryVec = {
+                boost::bind(boost::factory<std::shared_ptr<classes>>(), _1,
+                            boost::ref(*this))...};
+        for (int i = 0; i < names.size(); i++) {
+            factories[names[i]] = factoryVec[i];
         }
     }
 
