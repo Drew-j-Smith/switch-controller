@@ -15,10 +15,15 @@ addClasses(const std::vector<std::string> &names) {
     return res;
 }
 
-std::map<std::string, std::vector<InputEvent::SchemaItem>> createSchema() {
+std::map<std::string, std::vector<InputEvent::SchemaItem>>
+createSchema(const boost::property_tree::ptree &templates) {
     std::vector<std::string> names = {AC_INPUT_EVENT_NAMES};
     std::map<std::string, std::vector<InputEvent::SchemaItem>> schemaList =
         addClasses<AC_INPUT_EVENT_TYPES>(names);
+    for (auto &templatePair : templates) {
+        schemaList[templatePair.first] =
+            InputEventTemplate(templatePair.second).getSchema();
+    }
     return schemaList;
 }
 

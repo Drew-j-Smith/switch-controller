@@ -32,8 +32,17 @@ const std::string options =
     8. Exit
 )";
 
-std::string TestTemplateString =
-    R"({
+int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
+
+    // SFMLRenderer renderer;
+    // renderer.start();
+
+    boost::property_tree::ptree testTree, testTreeTemplate;
+    std::stringstream testTreeStr, testTreeTemplateStr;
+    testTreeStr << R"({
+        "test": "0"
+    })";
+    testTreeTemplateStr << R"({
     "type": "ConstantInputEvent",
     "isDigital": "1",
     "$test": {
@@ -49,21 +58,12 @@ std::string TestTemplateString =
         }
     }
 })";
-
-int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
-
-    // SFMLRenderer renderer;
-    // renderer.start();
-
-    InputEventFactory factory({{"test", TestTemplateString}});
-    boost::property_tree::ptree testTree;
-    std::stringstream testTreeStr;
-    testTreeStr << R"({
-        "$test": "0"
-    })";
-
     boost::property_tree::read_json(testTreeStr, testTree);
-    InputEventTemplate test(TestTemplateString, testTree, factory);
+    boost::property_tree::read_json(testTreeTemplateStr, testTreeTemplate);
+
+    InputEventFactory factory({{"test", testTreeTemplate}});
+
+    InputEventTemplate test(testTreeTemplate, testTree, factory);
 
     auto schema = test.getSchema();
 

@@ -3,7 +3,8 @@
 #include "InputEvent/InputEventTypes.h"
 
 InputEventFactory::InputEventFactory(
-    const std::map<std::string, std::string> &inputEventTemplates) {
+    const std::map<std::string, boost::property_tree::ptree>
+        &inputEventTemplates) {
     std::vector<std::string> names = {AC_INPUT_EVENT_NAMES};
     for (auto templateString : inputEventTemplates) {
         factories[templateString.first] =

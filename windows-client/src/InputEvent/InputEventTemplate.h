@@ -12,8 +12,8 @@
 class InputEventTemplate : public InputEvent {
 private:
     /**
-     * @brief This will be the template that the InputEvent will be based upon.
-     * Every field that starts with $ will be replaced in the constructor
+     * @brief This will describe the template that the InputEvent will be based
+     * upon. Every field that starts with $ will be replaced in the constructor
      * each field that starts with $ is expected to have 3 children.
      *
      *
@@ -25,7 +25,6 @@ private:
      * "type" - the schema type, see InputEvent::SchemaItem.
      *
      */
-    const std::string templateStr;
 
     std::vector<SchemaItem> schema;
     std::shared_ptr<InputEvent> event;
@@ -68,25 +67,18 @@ private:
         return res;
     };
 
-    boost::property_tree::ptree createTemplate() {
-        boost::property_tree::ptree tree;
-        std::stringstream ss;
-        ss << templateStr;
-        boost::property_tree::read_json(ss, tree);
-        return tree;
-    }
-
     static void
     replaceTree(boost::property_tree::ptree &tree,
                 const std::pair<const std::string, boost::property_tree::ptree>
                     &replacement) {
-        auto findIt = tree.find(replacement.first);
+        std::string replacementWithDollar = "$" + replacement.first;
+        auto findIt = tree.find(replacementWithDollar);
         while (findIt != tree.not_found()) {
             auto replacementName =
                 findIt->second.get<std::string>("replacement name");
             tree.erase(tree.to_iterator(findIt));
             tree.add_child(replacementName, replacement.second);
-            findIt = tree.find(replacement.first);
+            findIt = tree.find(replacementWithDollar);
         }
         for (auto &it : tree) {
             replaceTree(it.second, replacement);
@@ -94,31 +86,33 @@ private:
     }
 
 public:
-    InputEventTemplate(const std::string &templateString)
-        : templateStr(templateString) {
-        schema = createSchema(createTemplate());
+    InputEventTemplate(const boost::property_tree::ptree &templateTree) {
+        schema = createSchema(templateTree);
     };
 
-    InputEventTemplate(const std::string &templateString,
+    InputEventTemplate(const boost::property_tree::ptree &templateTree,
                        const boost::property_tree::ptree &tree,
-                       InputEventFactory &factory)
-        : templateStr(templateString) {
-        schema = createSchema(createTemplate());
+                       InputEventFactory &factory) {
+        schema = createSchema(templateTree);
+
+        // make a copy of the tree
+        // I don't know of a better way
+        std::stringstream ss;
+        boost::property_tree::ptree treeCopy;
+        boost::property_tree::write_json(ss, templateTree);
+        boost::property_tree::read_json(ss, treeCopy);
 
         /**
          * for every item in the first level of the tree
-         * if it start with $, it is a target for replacement
          * replace every instance in the template tree
          */
-        boost::property_tree::ptree templateTree = createTemplate();
         for (auto &treeChild : tree) {
-            if (treeChild.first.size() > 0 && treeChild.first[0] == '$') {
-                // TODO this does not work with recursive template classes
-                // should remove $ from schema and add it back when searching
-                replaceTree(templateTree, treeChild);
+            if (treeChild.first != "type") {
+                replaceTree(treeCopy, treeChild);
             }
         }
-        event = factory.create(templateTree);
+        event = factory.create(treeCopy);
+        boost::property_tree::write_json(std::cout, treeCopy);
     };
 
     int getInputValue() const override { return event->isDigital(); }

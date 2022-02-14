@@ -11,7 +11,8 @@ boost::property_tree::ptree promptForInputEvent(
     const std::string name, const std::vector<InputEvent::SchemaItem> &schema,
     const std::map<std::string, std::vector<InputEvent::SchemaItem>>
         &schemaList);
-std::map<std::string, std::vector<InputEvent::SchemaItem>> createSchema();
+std::map<std::string, std::vector<InputEvent::SchemaItem>>
+createSchema(const boost::property_tree::ptree &templates);
 std::string promptForStringType();
 int promptForIntegerType();
 boost::property_tree::ptree promptForEventType(
