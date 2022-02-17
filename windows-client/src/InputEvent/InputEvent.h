@@ -5,7 +5,7 @@
  * @file InputEvent.h
  * @author Drew Smith
  * @brief The InputEvent class is used to abstract various digital
- * and analogue input methods.
+ * and analog input methods.
  * @date 2021-04-21
  *
  */
@@ -18,7 +18,7 @@
 
 /**
  * @brief The InputEvent class is used to abstract various digital
- * and analogue input methods.
+ * and analog input methods.
  *
  */
 class InputEvent {
@@ -35,7 +35,7 @@ public:
     virtual int getInputValue() const = 0;
 
     /**
-     * @brief The value decides if the input acts as a digital or analogue input
+     * @brief The value decides if the input acts as a digital or analog input
      *
      * @return true getInputValue will return [0, 1]
      * @return false getInputValue will return [0, 255]
