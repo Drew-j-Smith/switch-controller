@@ -14,6 +14,10 @@
 
 #include "InputEvent.h"
 
+#include <boost/log/trivial.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/stacktrace.hpp>
+
 /**
  * @brief The ConstantInputEvent is a basic implementation of InputEvent
  * which returns a constant value.
@@ -30,8 +34,19 @@ public:
         : inputValue(inputValue), digital(isDigital){};
     ConstantInputEvent(const boost::property_tree::ptree &tree,
                        [[maybe_unused]] const InputEventFactory &factory) {
-        digital = tree.get<bool>("isDigital");
-        inputValue = tree.get<int>("inputValue");
+        try {
+            digital = tree.get<bool>("isDigital");
+            inputValue = tree.get<int>("inputValue");
+        } catch (std::exception &e) {
+            std::stringstream ss;
+            ss << e.what();
+            ss << "\nUnable to parse constant input event from ptree:\n";
+            boost::property_tree::write_json(ss, tree);
+            ss << boost::stacktrace::stacktrace();
+            BOOST_LOG_TRIVIAL(error) << ss.str();
+            inputValue = 0;
+            digital = true;
+        }
     }
     int getInputValue() const override { return inputValue; }
     bool isDigital() const override { return digital; }
