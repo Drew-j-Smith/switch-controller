@@ -67,22 +67,25 @@ private:
         return res;
     };
 
-    static void
-    replaceTree(boost::property_tree::ptree &tree,
-                const std::pair<const std::string, boost::property_tree::ptree>
-                    &replacement) {
-        std::string replacementWithDollar = "$" + replacement.first;
-        auto findIt = tree.find(replacementWithDollar);
-        while (findIt != tree.not_found()) {
-            auto replacementName =
-                findIt->second.get<std::string>("replacement name");
-            tree.erase(tree.to_iterator(findIt));
-            tree.add_child(replacementName, replacement.second);
-            findIt = tree.find(replacementWithDollar);
+    static boost::property_tree::ptree
+    createTree(const boost::property_tree::ptree &templateTree,
+               const boost::property_tree::ptree &replacementTree) {
+        if (templateTree.size() == 0) {
+            return templateTree;
         }
-        for (auto &it : tree) {
-            replaceTree(it.second, replacement);
+        boost::property_tree::ptree res;
+        for (auto &child : templateTree) {
+            auto findIt = replacementTree.find(child.first.substr(1));
+            if (findIt == replacementTree.not_found()) {
+                res.add_child(child.first,
+                              createTree(child.second, replacementTree));
+            } else {
+                auto replacementName =
+                    child.second.get<std::string>("replacement name");
+                res.add_child(replacementName, findIt->second);
+            }
         }
+        return res;
     }
 
 public:
@@ -95,24 +98,9 @@ public:
                        InputEventFactory &factory) {
         schema = createSchema(templateTree);
 
-        // make a copy of the tree
-        // I don't know of a better way
-        std::stringstream ss;
-        boost::property_tree::ptree treeCopy;
-        boost::property_tree::write_json(ss, templateTree);
-        boost::property_tree::read_json(ss, treeCopy);
-
-        /**
-         * for every item in the first level of the tree
-         * replace every instance in the template tree
-         */
-        for (auto &treeChild : tree) {
-            if (treeChild.first != "type") {
-                replaceTree(treeCopy, treeChild);
-            }
-        }
-        event = factory.create(treeCopy);
-        boost::property_tree::write_json(std::cout, treeCopy);
+        auto finalTree = createTree(templateTree, tree);
+        boost::property_tree::write_json(std::cout, finalTree);
+        event = factory.create(finalTree);
     };
 
     int getInputValue() const override { return event->isDigital(); }
