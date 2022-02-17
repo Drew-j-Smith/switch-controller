@@ -1,14 +1,16 @@
 
-# enable_testing()
+enable_testing()
 
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# set(CMAKE_TEST_FILES 
-# ArduinoControllerTest.cpp
-# )
+set(CMAKE_TEST_FILES 
+ArduinoControllerTest.cpp
+InputEvent/ConstantInputEventTest.cpp
+)
 
 
-# add_executable(ArduinoControllerTest ${CMAKE_TEST_FILES})
-# target_link_libraries(ArduinoControllerTest ${CMAKE_LIBS})
+add_executable(ArduinoControllerTest ${CMAKE_TEST_FILES})
+target_link_libraries(ArduinoControllerTest ${CMAKE_LIBS})
 
-# add_test(NAME InputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=InputEventTest)
+
+add_test(NAME ConstantInputEventTest COMMAND ArduinoControllerTest --detect_memory_leaks=0 --run_test=ConstantInputEventTest)
