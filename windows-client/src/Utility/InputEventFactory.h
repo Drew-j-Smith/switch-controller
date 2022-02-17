@@ -22,7 +22,7 @@ private:
             factoryVec = {
                 boost::bind(boost::factory<std::shared_ptr<classes>>(), _1,
                             boost::ref(*this))...};
-        for (int i = 0; i < names.size(); i++) {
+        for (int i = 0; i < (int)names.size(); i++) {
             factories[names[i]] = factoryVec[i];
         }
     }

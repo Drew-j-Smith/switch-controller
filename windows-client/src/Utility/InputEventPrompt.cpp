@@ -9,7 +9,7 @@ addClasses(const std::vector<std::string> &names) {
     std::vector<std::shared_ptr<InputEvent>> schemas = {
         std::make_shared<classes>()...};
     std::map<std::string, std::vector<InputEvent::SchemaItem>> res;
-    for (int i = 0; i < names.size(); i++) {
+    for (int i = 0; i < (int)names.size(); i++) {
         res[names[i]] = schemas[i]->getSchema();
     }
     return res;
