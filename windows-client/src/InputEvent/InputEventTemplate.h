@@ -67,6 +67,7 @@ private:
         return res;
     };
 
+public:
     static boost::property_tree::ptree
     createTree(const boost::property_tree::ptree &templateTree,
                const boost::property_tree::ptree &replacementTree) {
@@ -88,7 +89,6 @@ private:
         return res;
     }
 
-public:
     InputEventTemplate(const boost::property_tree::ptree &templateTree) {
         schema = createSchema(templateTree);
     };
@@ -97,13 +97,10 @@ public:
                        const boost::property_tree::ptree &tree,
                        InputEventFactory &factory) {
         schema = createSchema(templateTree);
-
-        auto finalTree = createTree(templateTree, tree);
-        boost::property_tree::write_json(std::cout, finalTree);
-        event = factory.create(finalTree);
+        event = factory.create(createTree(templateTree, tree));
     };
 
-    int getInputValue() const override { return event->isDigital(); }
+    int getInputValue() const override { return event->getInputValue(); }
 
     bool isDigital() const override { return event->isDigital(); }
 

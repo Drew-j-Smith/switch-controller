@@ -37,42 +37,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
     // SFMLRenderer renderer;
     // renderer.start();
 
-    boost::property_tree::ptree testTree, testTreeTemplate;
-    std::stringstream testTreeStr, testTreeTemplateStr;
-    testTreeStr << R"({
-        "test": "0"
-    })";
-    testTreeTemplateStr << R"({
-    "type": "ConstantInputEvent",
-    "isDigital": "1",
-    "$test": {
-        "replacement name": "inputValue",
-        "description": "This is a test field",
-        "type": "Integer"
-    },
-    "test field": {
-        "$test": {
-            "replacement name": "inputValue",
-            "description": "This is a test field",
-            "type": "Integer"
-        }
-    }
-})";
-    boost::property_tree::read_json(testTreeStr, testTree);
-    boost::property_tree::read_json(testTreeTemplateStr, testTreeTemplate);
-
-    InputEventFactory factory({{"test", testTreeTemplate}});
-
-    InputEventTemplate test(testTreeTemplate, testTree, factory);
-
-    auto schema = test.getSchema();
-
-    std::cout << "schema size: " << schema.size() << '\n';
-    for (auto &item : schema) {
-        std::cout << item.name << " " << item.description << " " << item.type
-                  << '\n';
-    }
-
     cv::utils::logging::setLogLevel(
         cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
 
