@@ -3,11 +3,7 @@ enable_testing()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-set(CMAKE_TEST_FILES 
-ArduinoControllerTest.cpp
-InputEvent/ConstantInputEventTest.cpp
-InputEvent/InputEventTemplateTest.cpp
-)
+file(GLOB_RECURSE CMAKE_TEST_FILES CONFIGURE_DEPENDS "*.cpp")
 set(TEST_EXECUTABLE_NAME ArduinoControllerTest)
 
 add_executable(${TEST_EXECUTABLE_NAME} ${CMAKE_TEST_FILES})
