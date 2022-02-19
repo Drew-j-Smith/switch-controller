@@ -10,8 +10,6 @@
 #include "InputEvent/InputEvent.h"
 #include "InputEvent/InputEventTypes.h"
 
-#include "InputEvent/InputEventTemplate.h"
-
 #include "opencv2/core/utils/logger.hpp"
 
 #include <SFML/SFMLRenderer.h>

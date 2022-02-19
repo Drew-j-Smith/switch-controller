@@ -2,7 +2,7 @@
 
 #include "pch.h"
 
-#include "InputEvent/ConstantInputEvent.h"
+#include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
 #include <boost/property_tree/json_parser.hpp>
 
 BOOST_AUTO_TEST_SUITE(ConstantInputEventTest);

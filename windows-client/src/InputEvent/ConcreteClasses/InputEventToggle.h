@@ -4,7 +4,7 @@
 #include "pch.h"
 
 #include "ConstantInputEvent.h"
-#include "InputEvent.h"
+#include "InputEvent/InputEvent.h"
 
 class InputEventToggle : public InputEvent {
 private:

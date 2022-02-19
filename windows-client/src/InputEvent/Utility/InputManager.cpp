@@ -1,6 +1,6 @@
 #include "InputManager.h"
 
-#include "ConstantInputEvent.h"
+#include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
 
 InputManager::InputManager(const boost::property_tree::ptree &tree,
                            InputEventFactory &factory) {

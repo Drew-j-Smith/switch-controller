@@ -14,8 +14,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "InputEvent.h"
-#include "Utility/InputEventFactory.h"
+#include "InputEvent/InputEvent.h"
+#include "InputEventFactory.h"
 
 /**
  * @brief This class takes inputs and converts them into a character array which

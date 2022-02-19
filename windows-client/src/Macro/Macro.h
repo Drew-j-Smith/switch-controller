@@ -6,8 +6,8 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "Decider/Decider.h"
-#include "InputEvent/ConstantInputEvent.h"
-#include "Utility/InputEventFactory.h"
+#include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
+#include "InputEvent/InputEvent.h"
 
 class Macro {
 public:

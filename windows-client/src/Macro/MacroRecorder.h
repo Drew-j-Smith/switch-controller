@@ -5,10 +5,9 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "InputEvent/InputEvent.h"
 #include "Macro.h"
-#include "Utility/InputEventFactory.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
-
 
 class MacroRecorder {
 private:

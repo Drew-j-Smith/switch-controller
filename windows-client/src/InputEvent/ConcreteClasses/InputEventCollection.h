@@ -5,7 +5,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "InputEvent.h"
+#include "InputEvent/InputEvent.h"
 
 class InputEventCollection : public InputEvent {
 public:

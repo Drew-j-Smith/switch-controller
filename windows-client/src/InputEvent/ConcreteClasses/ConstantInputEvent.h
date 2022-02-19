@@ -12,7 +12,7 @@
 
 #include "pch.h"
 
-#include "InputEvent.h"
+#include "InputEvent/InputEvent.h"
 
 #include <boost/log/trivial.hpp>
 #include <boost/property_tree/json_parser.hpp>

@@ -10,12 +10,12 @@ Decider/SoundDecider.cpp
 Decider/SoundDeciderCollection.cpp
 FFmpeg/FFmpegDecoder.cpp
 FFmpeg/FFmpegRecorder.cpp
-InputEvent/InputEventToggle.cpp
-InputEvent/InputManager.cpp
+InputEvent/ConcreteClasses/InputEventToggle.cpp
+InputEvent/Utility/InputEventFactory.cpp
+InputEvent/Utility/InputEventPrompt.cpp
+InputEvent/Utility/InputManager.cpp
 Macro/Macro.cpp
 Macro/MacroCollection.cpp
-Utility/InputEventFactory.cpp
-Utility/InputEventPrompt.cpp
 Utility/SerialPort.cpp
 )
 

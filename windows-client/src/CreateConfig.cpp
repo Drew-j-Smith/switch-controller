@@ -1,8 +1,8 @@
 
 #include "pch.h"
 
-#include "InputEvent/InputManager.h"
-#include "Utility/InputEventPrompt.h"
+#include "InputEvent/Utility/InputEventPrompt.h"
+#include "InputEvent/Utility/InputManager.h"
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>

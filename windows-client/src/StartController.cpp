@@ -10,8 +10,8 @@
 #include "pch.h"
 
 #include "Decider/DeciderCollection.h"
-#include "InputEvent/InputEventToggle.h"
-#include "InputEvent/InputManager.h"
+#include "InputEvent/ConcreteClasses/InputEventToggle.h"
+#include "InputEvent/Utility/InputManager.h"
 #include "Macro/MacroCollection.h"
 #include "Macro/MacroRecorder.h"
 #include "Utility/SerialPort.h"

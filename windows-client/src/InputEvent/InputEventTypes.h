@@ -1,9 +1,9 @@
-#include "ConstantInputEvent.h"
-#include "InputEventCollection.h"
-#include "InputEventTemplate.h"
-#include "InputEventToggle.h"
-#include "SfJoystickInputEvent.h"
-#include "SfKeyboardInputEvent.h"
+#include "ConcreteClasses/ConstantInputEvent.h"
+#include "ConcreteClasses/InputEventCollection.h"
+#include "ConcreteClasses/InputEventTemplate.h"
+#include "ConcreteClasses/InputEventToggle.h"
+#include "ConcreteClasses/SfJoystickInputEvent.h"
+#include "ConcreteClasses/SfKeyboardInputEvent.h"
 
 // clang-format off
 /*std::string InputEventSwitchString = R"({
