@@ -28,9 +28,9 @@ public:
             isStick = tree.get<int>("isStick");
             joystickIndex = tree.get<int>("joystick index");
             if (isStick) {
-                axis = (sf::Joystick::Axis)tree.get<int>("axis", 0);
+                axis = (sf::Joystick::Axis)tree.get<int>("axis/button");
             } else {
-                button = tree.get<int>("button", 0);
+                button = tree.get<int>("axis/button");
             }
         } catch (std::exception &e) {
             std::stringstream ss;
@@ -78,6 +78,17 @@ public:
     bool isDigital() const override { return !isStick; }
 
     void update() override {}
+
+    std::vector<SchemaItem> getSchema() const override {
+        return {
+            {"isStick", SchemaItem::Integer,
+             "isDigital determines if the input event is a stick or a button."},
+            {"axis/button", SchemaItem::Integer,
+             "axis/button is the axis or button used, depending on the value "
+             "of isStick"},
+            {"joystick index", SchemaItem::Integer,
+             "joystick index is the index of the joystick"}};
+    }
 };
 
 #endif

@@ -61,11 +61,17 @@ public:
         }
     }
 
-    void setActive(const bool newActive) { this->active = newActive; }
-
     int getInputValue() const override { return active; };
 
     bool isDigital() const override { return true; }
+
+    std::vector<SchemaItem> getSchema() const override {
+        return {{"button cooldown", SchemaItem::Integer,
+                 "button cooldown is the minimum amount of time before the "
+                 "state will toggle."},
+                {"event", SchemaItem::Event,
+                 "event is the event used to toggle the state"}};
+    }
 };
 
 #endif

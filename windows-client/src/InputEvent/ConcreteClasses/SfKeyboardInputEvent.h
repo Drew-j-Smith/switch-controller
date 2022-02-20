@@ -39,6 +39,14 @@ public:
     bool isDigital() const override { return true; }
 
     void update() override {}
+
+    std::vector<SchemaItem> getSchema() const override {
+        return {{"key", SchemaItem::String,
+                 "Its an integer key code used by SFML (see "
+                 "https://www.sfml-dev.org/documentation/2.5.1/"
+                 "classsf_1_1Keyboard.php) or a letter a-z that will be "
+                 "converted to that letter key code"}};
+    }
 };
 
 #endif

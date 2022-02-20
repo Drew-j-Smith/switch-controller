@@ -63,9 +63,7 @@ public:
      *
      * @return std::vector<SchemaItem> the Schema of the input event
      */
-    virtual std::vector<SchemaItem> getSchema() const {
-        return std::vector<SchemaItem>(); // TODO temporary definition
-    }
+    virtual std::vector<SchemaItem> getSchema() const = 0;
 };
 
 #endif
