@@ -8,20 +8,16 @@
 
 class InputEventToggle : public InputEvent {
 private:
-    int cooldown;
+    int cooldown = 0;
     bool active = false;
-    std::shared_ptr<InputEvent> event;
+    std::shared_ptr<InputEvent> event = std::make_shared<ConstantInputEvent>();
     std::chrono::steady_clock::time_point lastActivation =
         std::chrono::steady_clock::now();
 
     static std::set<InputEventToggle *> toggles;
 
 public:
-    InputEventToggle() {
-        this->cooldown = 0;
-        this->event = std::make_shared<ConstantInputEvent>();
-        toggles.insert(this);
-    }
+    InputEventToggle() { toggles.insert(this); }
     InputEventToggle(const int cooldown,
                      const std::shared_ptr<InputEvent> event) {
         this->cooldown = cooldown;
@@ -30,9 +26,21 @@ public:
     }
     InputEventToggle(const boost::property_tree::ptree &tree,
                      InputEventFactory &factory) {
-        cooldown = tree.get<int>("button cooldown");
-        boost::property_tree::ptree childTree = tree.get_child("event");
-        event = factory.create(childTree);
+        try {
+            cooldown = tree.get<int>("button cooldown");
+            boost::property_tree::ptree childTree = tree.get_child("event");
+            event = factory.create(childTree);
+        } catch (std::exception &e) {
+            std::stringstream ss;
+            ss << e.what();
+            ss << "\nUnable to parse input event toggle from ptree:\n";
+            boost::property_tree::write_json(ss, tree);
+            ss << boost::stacktrace::stacktrace();
+            BOOST_LOG_TRIVIAL(error) << ss.str();
+            cooldown = 0;
+            event = std::make_shared<ConstantInputEvent>();
+        }
+        toggles.insert(this);
     }
 
     ~InputEventToggle() { toggles.erase(this); }

@@ -24,12 +24,24 @@ public:
     SfJoystickInputEvent(){};
     SfJoystickInputEvent(const boost::property_tree::ptree &tree,
                          [[maybe_unused]] const InputEventFactory &factory) {
-        isStick = tree.get<int>("isStick");
-        joystickIndex = tree.get<int>("joystick index");
-        if (isStick) {
-            axis = (sf::Joystick::Axis)tree.get<int>("axis", 0);
-        } else {
-            button = tree.get<int>("button", 0);
+        try {
+            isStick = tree.get<int>("isStick");
+            joystickIndex = tree.get<int>("joystick index");
+            if (isStick) {
+                axis = (sf::Joystick::Axis)tree.get<int>("axis", 0);
+            } else {
+                button = tree.get<int>("button", 0);
+            }
+        } catch (std::exception &e) {
+            std::stringstream ss;
+            ss << e.what();
+            ss << "\nUnable to parse SF joystick input event from ptree:\n";
+            boost::property_tree::write_json(ss, tree);
+            ss << boost::stacktrace::stacktrace();
+            BOOST_LOG_TRIVIAL(error) << ss.str();
+            isStick = false;
+            joystickIndex = 0;
+            button = 0;
         }
         assertConnected();
     }

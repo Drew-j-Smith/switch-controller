@@ -31,23 +31,36 @@ private:
         std::vector<SchemaItem> res;
         for (auto &child : tree) {
             if (child.first.size() > 0 && child.first[0] == '$') {
-                std::string schemaTypeStr =
-                    child.second.get<std::string>("type");
-                std::string description =
-                    child.second.get<std::string>("description");
+                try {
+                    std::string schemaTypeStr =
+                        child.second.get<std::string>("type");
+                    std::string description =
+                        child.second.get<std::string>("description");
 
-                InputEvent::SchemaItem::SchemaType schemaType;
-                if (schemaTypeStr == "String") {
-                    schemaType = InputEvent::SchemaItem::SchemaType::String;
-                } else if (schemaTypeStr == "Integer") {
-                    schemaType = InputEvent::SchemaItem::SchemaType::Integer;
-                } else if (schemaTypeStr == "Event") {
-                    schemaType = InputEvent::SchemaItem::SchemaType::Event;
-                } else /* if (schemaTypeStr == "EventArray") */ {
-                    schemaType = InputEvent::SchemaItem::SchemaType::EventArray;
+                    InputEvent::SchemaItem::SchemaType schemaType;
+                    if (schemaTypeStr == "String") {
+                        schemaType = InputEvent::SchemaItem::SchemaType::String;
+                    } else if (schemaTypeStr == "Integer") {
+                        schemaType =
+                            InputEvent::SchemaItem::SchemaType::Integer;
+                    } else if (schemaTypeStr == "Event") {
+                        schemaType = InputEvent::SchemaItem::SchemaType::Event;
+                    } else /* if (schemaTypeStr == "EventArray") */ {
+                        schemaType =
+                            InputEvent::SchemaItem::SchemaType::EventArray;
+                    }
+
+                    res.push_back(
+                        {child.first.substr(1), schemaType, description});
+                } catch (std::exception &e) {
+                    std::stringstream ss;
+                    ss << e.what();
+                    ss << "\nUnable to parse schema item from ptree item \"" +
+                              child.first + "\"\n";
+                    boost::property_tree::write_json(ss, child.second);
+                    ss << boost::stacktrace::stacktrace();
+                    BOOST_LOG_TRIVIAL(error) << ss.str();
                 }
-
-                res.push_back({child.first.substr(1), schemaType, description});
             }
 
             auto childSchema = createSchema(child.second);
@@ -78,9 +91,22 @@ public:
                 res.add_child(child.first,
                               createTree(child.second, replacementTree));
             } else {
-                auto replacementName =
-                    child.second.get<std::string>("replacement name");
-                res.add_child(replacementName, findIt->second);
+                try {
+                    auto replacementName =
+                        child.second.get<std::string>("replacement name");
+                    res.add_child(replacementName, findIt->second);
+                } catch (std::exception &e) {
+                    std::stringstream ss;
+                    ss << e.what();
+                    ss << "\nUnable to find replacement name for template item "
+                          "\"" +
+                              child.first + "\"\n";
+                    boost::property_tree::write_json(ss, child.second);
+                    ss << "With template tree:\n";
+                    boost::property_tree::write_json(ss, replacementTree);
+                    ss << boost::stacktrace::stacktrace();
+                    BOOST_LOG_TRIVIAL(error) << ss.str();
+                }
             }
         }
         return res;

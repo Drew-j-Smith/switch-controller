@@ -5,6 +5,9 @@
 
 #include "InputEvent/InputEvent.h"
 
+#include <boost/log/trivial.hpp>
+#include <boost/stacktrace.hpp>
+
 class InputEventCollection : public InputEvent {
 public:
     enum Operators { And, Or, Not, Xor };
@@ -17,22 +20,29 @@ public:
     InputEventCollection(){};
     InputEventCollection(const boost::property_tree::ptree &tree,
                          InputEventFactory &factory) {
-        boost::property_tree::ptree childTree = tree.get_child("events");
-        for (auto event : childTree) {
-            inputEvents.push_back(factory.create(event.second));
-        }
-        std::string opStr = tree.get<std::string>("operator");
-        if (opStr == "and") {
-            op = Operators::And;
-        }
-        if (opStr == "or") {
-            op = Operators::Or;
-        }
-        if (opStr == "not") {
-            op = Operators::Not;
-        }
-        if (opStr == "xor") {
-            op = Operators::Xor;
+        try {
+            boost::property_tree::ptree childTree = tree.get_child("events");
+            for (auto event : childTree) {
+                inputEvents.push_back(factory.create(event.second));
+            }
+            std::string opStr = tree.get<std::string>("operator");
+            if (opStr == "and") {
+                op = Operators::And;
+            } else if (opStr == "or") {
+                op = Operators::Or;
+            } else if (opStr == "not") {
+                op = Operators::Not;
+            } else /* if (opStr == "xor") */ {
+                op = Operators::Xor;
+            }
+        } catch (std::exception &e) {
+            std::stringstream ss;
+            ss << e.what();
+            ss << "\nUnable to parse input event collection from ptree:\n";
+            boost::property_tree::write_json(ss, tree);
+            ss << boost::stacktrace::stacktrace();
+            BOOST_LOG_TRIVIAL(error) << ss.str();
+            inputEvents.clear();
         }
     }
 
