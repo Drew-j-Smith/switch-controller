@@ -6,9 +6,6 @@
 #include "ConstantInputEvent.h"
 #include "InputEvent/InputEvent.h"
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
 class InputEventTemplate : public InputEvent {
 private:
     /**

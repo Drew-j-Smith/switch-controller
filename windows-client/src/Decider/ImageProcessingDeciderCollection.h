@@ -3,8 +3,6 @@
 
 #include "pch.h"
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "DeciderCollectionBase.h"
 #include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/VideoFrameSink.h"

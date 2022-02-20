@@ -3,8 +3,6 @@
 
 #include "pch.h"
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "InputEvent/InputEvent.h"
 #include "Macro.h"
 #include <boost/date_time/posix_time/posix_time.hpp>

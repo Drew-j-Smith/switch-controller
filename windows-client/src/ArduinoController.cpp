@@ -4,8 +4,6 @@
 #include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/VideoFrameSink.h"
 #include "Utility/SerialPort.h"
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include "InputEvent/InputEvent.h"
 #include "InputEvent/InputEventTypes.h"

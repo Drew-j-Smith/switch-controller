@@ -3,8 +3,6 @@
 
 #include "pch.h"
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "Decider/Decider.h"
 #include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
 #include "InputEvent/InputEvent.h"

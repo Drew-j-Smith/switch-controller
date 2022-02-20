@@ -12,8 +12,6 @@
  */
 #include "pch.h"
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "InputEvent/InputEvent.h"
 #include "InputEventFactory.h"
 

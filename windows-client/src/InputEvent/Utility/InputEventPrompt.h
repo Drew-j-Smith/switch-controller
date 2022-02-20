@@ -5,8 +5,6 @@
 
 #include "InputEvent/InputEvent.h"
 
-#include <boost/property_tree/ptree.hpp>
-
 boost::property_tree::ptree promptForInputEvent(
     const std::string name, const std::vector<InputEvent::SchemaItem> &schema,
     const std::map<std::string, std::vector<InputEvent::SchemaItem>>

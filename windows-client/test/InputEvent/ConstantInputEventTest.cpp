@@ -3,7 +3,6 @@
 #include "pch.h"
 
 #include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
-#include <boost/property_tree/json_parser.hpp>
 
 BOOST_AUTO_TEST_SUITE(ConstantInputEventTest);
 BOOST_AUTO_TEST_CASE(TestDefaultConstructor) {

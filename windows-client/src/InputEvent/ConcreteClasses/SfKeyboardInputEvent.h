@@ -5,8 +5,6 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "InputEvent/InputEvent.h"
 
 class SfKeyboardInputEvent : public InputEvent {

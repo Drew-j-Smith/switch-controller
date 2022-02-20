@@ -3,8 +3,6 @@
 
 #include "pch.h"
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "DeciderCollectionBase.h"
 
 class DeciderCollection : public DeciderCollectionBase {

@@ -5,8 +5,6 @@
 
 #include <SFML/Window/Joystick.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "InputEvent/InputEvent.h"
 
 class SfJoystickInputEvent : public InputEvent {
