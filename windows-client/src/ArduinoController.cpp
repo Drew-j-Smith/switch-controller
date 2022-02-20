@@ -70,14 +70,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             try {
                 boost::property_tree::ptree tree;
                 boost::property_tree::read_json(configFilename, tree);
+                boost::asio::io_service io;
                 auto port = initializeSerialPort(
-                    tree.get<std::string>("serial port"), 57600);
+                    tree.get<std::string>("serial port"), 57600, &io);
 
                 // sending a nuetral signal
                 unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
                 unsigned char recieve[1];
 
-                testSerialPort(port, 8, send, 1, recieve);
+                testSerialPort(port, 8, send, 1, recieve, &io);
             } catch (std::exception &e) {
                 std::cerr << "Failure connecting via serial port.\n";
                 std::cerr << e.what() << '\n';
