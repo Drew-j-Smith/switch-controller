@@ -24,7 +24,7 @@ foreach(TEST_FILE ${CMAKE_TEST_FILES})
         foreach(TEST ${FOUND_TESTS})
             string(REGEX REPLACE ".*\\([ \t]*([^\\) \t]+)" "\\1" 
                 TEST_NAME ${TEST})
-            add_test(NAME "${TEST_EXECUTABLE_NAME}.${TEST_NAME}" 
+            add_test(NAME "${TEST_SUITE}.${TEST_NAME}" 
                         COMMAND ${TEST_EXECUTABLE_NAME}
                         --run_test=${TEST_SUITE}/${TEST_NAME} --detect_memory_leaks=0)
         endforeach()
