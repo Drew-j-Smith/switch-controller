@@ -1,10 +1,10 @@
+#include "Utility/SerialPort.h"
+
 #include "pch.h"
 
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/VideoFrameSink.h"
-#include "Utility/SerialPort.h"
-
 #include "InputEvent/InputEvent.h"
 #include "InputEvent/InputEventTypes.h"
 

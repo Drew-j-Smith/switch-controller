@@ -1,4 +1,5 @@
 #include "FFmpegRecorder.h"
+#include "ErrorTypes/FFmpegError.h"
 
 #include "pch.h"
 
@@ -25,11 +26,11 @@ FFmpegRecorder::FFmpegRecorder(
         }
     }
     if (overlap) {
-        throw std::runtime_error(
+        throw std::invalid_argument(
             "Only one frame sink of each type may be used");
     }
     if (sinks.size() == 0) {
-        throw std::runtime_error("The sink size must be greater than 0");
+        throw std::invalid_argument("The sink size must be greater than 0");
     }
 
     this->inputFormatStr = inputFormat;
@@ -54,13 +55,13 @@ void FFmpegRecorder::openStream() {
     // open input file, and allocate format context
     if (avformat_open_input(&formatContext, deviceNameStr.c_str(), inputFormat,
                             &optionsDic) < 0) {
-        throw std::runtime_error("Could not open stream " + deviceNameStr);
+        throw FFmpegInitError("Could not open stream " + deviceNameStr);
     }
 
     // retrieve stream information
     if (avformat_find_stream_info(formatContext, nullptr) < 0) {
-        throw std::runtime_error("Could not find stream information for " +
-                                 deviceNameStr);
+        throw FFmpegInitError("Could not find stream information for " +
+                              deviceNameStr);
     }
 
     // open stream ctx for each frame sink
@@ -71,8 +72,7 @@ void FFmpegRecorder::openStream() {
     }
 
     if (decoders.size() == 0) {
-        throw std::runtime_error(
-            "No frame sinks were loaded in FFmpegRecorder");
+        throw FFmpegInitError("No frame sinks were loaded in FFmpegRecorder");
     }
 
     // print stream info
@@ -89,7 +89,7 @@ void FFmpegRecorder::start() {
             AVPacket pkt;
             frame = av_frame_alloc();
             if (!frame) {
-                throw std::runtime_error("Could not allocate frame");
+                throw FFmpegRuntimeError("Could not allocate frame");
             }
             // read until there are no more frames or canceled
             while (recording.load() &&

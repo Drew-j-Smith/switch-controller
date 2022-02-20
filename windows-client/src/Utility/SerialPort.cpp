@@ -1,5 +1,6 @@
 
 #include "SerialPort.h"
+#include "ErrorTypes/SerialError.h"
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
@@ -19,7 +20,7 @@ initializeSerialPort(std::string serialPort, unsigned int baud,
         std::cerr << "Fatal error opening serial port.\n";
         std::cerr << "\tError: \"" << e.what() << "\"\n";
         std::cerr << "\tDoes the port exist?" << std::endl;
-        throw;
+        throw SerialError(e.what());
     }
 }
 
@@ -50,7 +51,7 @@ void testSerialPort(std::unique_ptr<boost::asio::serial_port> &serialPort,
     serialPort->cancel();
     if (writeRes <= 0 || readRes <= 0) {
         std::cerr << "Unable to establish serial connection.\n";
-        throw std::runtime_error("Unable to establish serial connection.\n");
+        throw SerialError("Unable to establish serial connection.\n");
     }
     std::cout << "Serial communication established.\n";
 }
