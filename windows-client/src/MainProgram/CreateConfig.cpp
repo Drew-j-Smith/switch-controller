@@ -1,4 +1,6 @@
 
+#include "MainProgram.h"
+
 #include "pch.h"
 
 #include "InputEvent/Utility/InputEventPrompt.h"

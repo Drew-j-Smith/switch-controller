@@ -1,3 +1,4 @@
+#include "MainProgram.h"
 
 #include "pch.h"
 

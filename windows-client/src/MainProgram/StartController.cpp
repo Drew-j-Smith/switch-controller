@@ -7,6 +7,8 @@
 
 #include "pch.h"
 
+#include "MainProgram.h"
+
 #include "Decider/DeciderCollection.h"
 #include "InputEvent/ConcreteClasses/InputEventToggle.h"
 #include "InputEvent/Utility/InputManager.h"

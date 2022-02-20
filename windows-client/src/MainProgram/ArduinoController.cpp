@@ -7,14 +7,10 @@
 #include "FFmpeg/VideoFrameSink.h"
 #include "InputEvent/InputEvent.h"
 #include "InputEvent/InputEventTypes.h"
+#include "MainProgram.h"
+#include "SFML/SFMLRenderer.h"
 
-#include "opencv2/core/utils/logger.hpp"
-
-#include <SFML/SFMLRenderer.h>
-
-void CreateConfig(); // TODO create header files
-void EditConfig(std::string &configFilename);
-void StartController(std::string &configFilename);
+#include <opencv2/core/utils/logger.hpp>
 
 const std::string options =
     R"(Select one of the following options:

@@ -14,7 +14,7 @@ else()
   target_compile_options(SRC_LIB PUBLIC -Wall -Wextra -Wpedantic -Werror)
 endif()
 
-add_executable(ArduinoController ArduinoController.cpp)
+add_executable(ArduinoController MainProgram/ArduinoController.cpp)
 target_link_libraries(ArduinoController ${CMAKE_LIBS})
 
 add_custom_command(TARGET ArduinoController POST_BUILD
