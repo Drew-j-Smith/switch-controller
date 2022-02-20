@@ -1,6 +1,8 @@
 #include "FFmpegRecorder.h"
 #include "ErrorTypes/FFmpegError.h"
 
+#include <boost/log/trivial.hpp>
+
 #include "pch.h"
 
 extern "C" {
@@ -114,7 +116,10 @@ void FFmpegRecorder::start() {
             av_frame_free(&frame);
 
         } catch (std::exception &e) {
-            std::cerr << e.what() << '\n';
+            // TODO log at point of error
+            BOOST_LOG_TRIVIAL(fatal)
+                << "Uncaught exception in FFmpeg Recorder: " +
+                       std::string(e.what()) + "\n";
             throw;
         }
     });

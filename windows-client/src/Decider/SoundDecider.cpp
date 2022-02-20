@@ -1,5 +1,8 @@
 #include "SoundDecider.h"
 
+#include <boost/log/trivial.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
+
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
 
@@ -79,10 +82,15 @@ SoundDecider::SoundDecider(const boost::property_tree::ptree &tree) {
         filename = tree.get<std::string>("filename");
         matchThreshold = tree.get<double>("match threshold");
     } catch (boost::property_tree::ptree_error &e) {
-        std::cerr << "Error loading SoundDecider.\n";
-        std::cerr << "\tError: \"" << e.what() << "\"\n";
-        std::cerr << "\tAre fields [\"name\", \"filename\", \"match "
-                     "threshold\"] missing?\n";
+        BOOST_LOG_TRIVIAL(error)
+            << "Error loading SoundDecider.\n"
+               "\tError: \"" +
+                   std::string(e.what()) +
+                   "\"\n"
+                   "\tAre fields [\"name\", \"filename\", \"match "
+                   "threshold\"] missing?\n" +
+                   boost::stacktrace::to_string(
+                       boost::stacktrace::stacktrace());
         throw;
     }
 

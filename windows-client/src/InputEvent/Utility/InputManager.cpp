@@ -1,5 +1,8 @@
 #include "InputManager.h"
 
+#include <boost/log/trivial.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
+
 #include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
 
 InputManager::InputManager(const boost::property_tree::ptree &tree,
@@ -70,9 +73,11 @@ void InputManager::loadInputEvent(
     }
 
     // if a button could not be matched
-    std::cerr << "Unknown button type \"" << it.first
-              << "\" loaded into input manager.\n";
-    std::cerr << "Consult InputManager.cpp for a list of valid buttons.\n";
+    BOOST_LOG_TRIVIAL(warning)
+        << "Unknown button type \"" + it.first +
+               "\" loaded into input manager.\n"
+               "Consult InputManager.cpp for a list of valid buttons.\n" +
+               boost::stacktrace::to_string(boost::stacktrace::stacktrace());
 }
 
 int InputManager::testInMap(const std::map<std::string, int> &map,

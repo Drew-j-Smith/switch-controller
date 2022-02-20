@@ -1,5 +1,8 @@
 #include "ImageProcessingDecider.h"
 
+#include <boost/log/trivial.hpp>
+#include <boost/stacktrace.hpp>
+
 #define AC_DISPLAY_IMAGE_MATCH 0
 
 ImageProcessingDecider::ImageProcessingDecider(
@@ -54,8 +57,11 @@ ImageProcessingDecider::ImageProcessingDecider(
         else if (it.first == "max y")
             maxY = it.second.get_value<int>();
         else if (it.first != "type") {
-            std::cerr << "Unrecognized field \"" << it.first
-                      << "\" when loading ImageProcessingDecider\n";
+            BOOST_LOG_TRIVIAL(warning)
+                << "Unrecognized field \"" + it.first +
+                       "\" when loading ImageProcessingDecider\n" +
+                       boost::stacktrace::to_string(
+                           boost::stacktrace::stacktrace());
         }
     }
     matchPointX.store(0);

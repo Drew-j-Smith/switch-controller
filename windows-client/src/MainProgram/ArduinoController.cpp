@@ -10,6 +10,7 @@
 #include "MainProgram.h"
 #include "SFML/SFMLRenderer.h"
 
+#include <boost/log/trivial.hpp>
 #include <opencv2/core/utils/logger.hpp>
 
 const std::string options =
@@ -57,7 +58,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             try {
                 StartController(configFilename);
             } catch (std::exception &e) {
-                std::cerr << e.what() << '\n';
+                BOOST_LOG_TRIVIAL(error)
+                    << "Uncaught exception in StartController: " +
+                           std::string(e.what()) + "\n";
             }
         } break;
         case 5: {
@@ -74,8 +77,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
                 testSerialPort(port, 8, send, 1, recieve, &io);
             } catch (std::exception &e) {
-                std::cerr << "Failure connecting via serial port.\n";
-                std::cerr << e.what() << '\n';
+                BOOST_LOG_TRIVIAL(error)
+                    << "Failure connecting via serial port.\n" +
+                           std::string(e.what()) + "\n";
             }
         } break;
         case 6: {

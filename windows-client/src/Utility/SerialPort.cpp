@@ -5,6 +5,7 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/bind.hpp>
+#include <boost/log/trivial.hpp>
 
 std::unique_ptr<boost::asio::serial_port>
 initializeSerialPort(std::string serialPort, unsigned int baud,
@@ -17,9 +18,9 @@ initializeSerialPort(std::string serialPort, unsigned int baud,
         std::cout << "Serial communication intialized.\n";
         return port;
     } catch (const std::exception &e) {
-        std::cerr << "Fatal error opening serial port.\n";
-        std::cerr << "\tError: \"" << e.what() << "\"\n";
-        std::cerr << "\tDoes the port exist?" << std::endl;
+        BOOST_LOG_TRIVIAL(error)
+            << "Fatal error opening serial port.\n\tError: \"" +
+                   std::string(e.what()) + "\"\n\tDoes the port exist?\n";
         throw SerialError(e.what());
     }
 }
@@ -50,7 +51,7 @@ void testSerialPort(std::unique_ptr<boost::asio::serial_port> &serialPort,
     io->run_for(std::chrono::milliseconds(1000));
     serialPort->cancel();
     if (writeRes <= 0 || readRes <= 0) {
-        std::cerr << "Unable to establish serial connection.\n";
+        BOOST_LOG_TRIVIAL(error) << "Unable to establish serial connection.\n";
         throw SerialError("Unable to establish serial connection.\n");
     }
     std::cout << "Serial communication established.\n";

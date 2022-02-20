@@ -4,6 +4,8 @@
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
 
 #include "pch.h"
 
@@ -27,8 +29,10 @@ void StartController(std::string &configFilename) {
     try {
         boost::property_tree::read_json(configFilename, tree);
     } catch (boost::property_tree::json_parser::json_parser_error &e) {
-        std::cerr << "Error parsing config file\n";
-        std::cerr << e.what() << '\n';
+        BOOST_LOG_TRIVIAL(error) << "Error parsing config file\n" +
+                                        std::string(e.what()) + "\n" +
+                                        boost::stacktrace::to_string(
+                                            boost::stacktrace::stacktrace());
         return;
     }
 
@@ -61,8 +65,8 @@ void StartController(std::string &configFilename) {
 
         testSerialPort(port, 8, send.data(), 1, recieve, &io);
     } catch (std::exception &e) {
-        std::cerr << "Failure connecting via serial port.\n";
-        std::cerr << e.what() << "\n";
+        BOOST_LOG_TRIVIAL(error) << "Failure connecting via serial port.\n" +
+                                        std::string(e.what()) + "\n";
         return;
     }
 
@@ -70,6 +74,7 @@ void StartController(std::string &configFilename) {
         sf::Joystick::update();
         InputEventToggle::updateAll();
 
+        // code used to time an iteration
         // auto begin = std::chrono::steady_clock::now();
 
         send = inputManager.getData();
@@ -85,12 +90,9 @@ void StartController(std::string &configFilename) {
         }
 
         boost::asio::write(*port, boost::asio::buffer(send, 8));
-        if (!boost::asio::read(*port, boost::asio::buffer(recieve, 1))) {
-            std::cerr << "Error reading from serial port";
-        }
-        // if ((int)(recieve[0]) != 85)
-        //     std::cout << (int)(recieve[0]) << std::endl;
+        boost::asio::read(*port, boost::asio::buffer(recieve, 1));
 
+        // code used to time an iteration
         // auto end = std::chrono::steady_clock::now();
         // std::cout <<
         // std::chrono::duration_cast<std::chrono::milliseconds>(end -

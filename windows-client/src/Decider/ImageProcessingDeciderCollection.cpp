@@ -1,5 +1,8 @@
 #include "ImageProcessingDeciderCollection.h"
 
+#include <boost/log/trivial.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
+
 static void matchImage(std::shared_ptr<ImageProcessingDecider> decider,
                        const cv::Mat &screenshot) {
     decider->update(screenshot);
@@ -39,7 +42,10 @@ ImageProcessingDeciderCollection::ImageProcessingDeciderCollection(
     const boost::property_tree::ptree &tree) {
     auto imageTree = tree.find("image deciders");
     if (imageTree == tree.not_found()) {
-        std::cerr << "The image tree was loaded but not found in the config.\n";
+        BOOST_LOG_TRIVIAL(error)
+            << "The image tree was loaded but not found in the config.\n" +
+                   boost::stacktrace::to_string(
+                       boost::stacktrace::stacktrace());
         return;
     }
 

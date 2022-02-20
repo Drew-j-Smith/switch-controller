@@ -1,5 +1,8 @@
 #include "SoundDeciderCollection.h"
 
+#include <boost/log/trivial.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
+
 static void matchSound(std::shared_ptr<SoundDecider> decider,
                        const std::vector<float> &soundData) {
     decider->update(soundData);
@@ -11,7 +14,10 @@ SoundDeciderCollection::SoundDeciderCollection(
 
     auto soundTree = tree.find("sound deciders");
     if (soundTree == tree.not_found()) {
-        std::cerr << "The sound tree was load but not found in config.\n";
+        BOOST_LOG_TRIVIAL(error)
+            << "The sound tree was load but not found in config.\n" +
+                   boost::stacktrace::to_string(
+                       boost::stacktrace::stacktrace());
         return;
     }
 
