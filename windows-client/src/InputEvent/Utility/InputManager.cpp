@@ -114,7 +114,6 @@ bool InputManager::isInDeadzone(int stick) const {
            stickData < 128 + JOYSTICK_DEADZONE;
 }
 
-// TODO make readable
 uint8_t InputManager::getControlStickData(int stick) const {
     if (controlStickEvents[stick * 2]->isDigital()) {
         return (uint8_t)(128 +
@@ -122,8 +121,8 @@ uint8_t InputManager::getControlStickData(int stick) const {
                          controlStickEvents[stick * 2 + 1]->getInputValue() *
                              128);
     } else {
-        if (isInDeadzone(stick >= 2 ? 0 : 2) &&
-            isInDeadzone(stick >= 2 ? 1 : 3)) {
+        if (isInDeadzone(stick < 2 ? 0 : 2) &&
+            isInDeadzone(stick < 2 ? 1 : 3)) {
             return 128;
         } else
             return (uint8_t)controlStickEvents[stick * 2]->getInputValue();

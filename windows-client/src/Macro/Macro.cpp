@@ -7,6 +7,7 @@
 Macro::Macro(const boost::property_tree::ptree &tree,
              const std::map<std::string, std::shared_ptr<Decider>> &deciderList,
              InputEventFactory &factory) {
+    // TODO handle/log error
     name = tree.get("name", "");
     std::string filename = tree.get("filename", "");
     loadData(filename);
