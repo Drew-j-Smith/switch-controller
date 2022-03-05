@@ -59,6 +59,14 @@ public:
             {"inputValue", SchemaItem::Integer,
              "inputValue determines what the constant value is."}};
     }
+
+    bool operator==(const InputEvent &other) const override {
+        if (typeid(*this) != typeid(other))
+            return false;
+        auto localOther = dynamic_cast<const ConstantInputEvent &>(other);
+        return inputValue == localOther.inputValue &&
+               digital == localOther.digital;
+    }
 };
 
 #endif

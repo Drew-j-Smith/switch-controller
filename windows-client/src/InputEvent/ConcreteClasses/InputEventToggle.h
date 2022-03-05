@@ -72,6 +72,13 @@ public:
                 {"event", SchemaItem::Event,
                  "event is the event used to toggle the state"}};
     }
+
+    bool operator==(const InputEvent &other) const override {
+        if (typeid(*this) != typeid(other))
+            return false;
+        auto localOther = dynamic_cast<const InputEventToggle &>(other);
+        return cooldown == localOther.cooldown && event == localOther.event;
+    }
 };
 
 #endif

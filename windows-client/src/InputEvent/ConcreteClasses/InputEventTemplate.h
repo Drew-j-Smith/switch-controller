@@ -130,6 +130,13 @@ public:
     void update() override {}
 
     std::vector<SchemaItem> getSchema() const override { return schema; }
+
+    bool operator==(const InputEvent &other) const override {
+        if (typeid(*this) != typeid(other))
+            return false;
+        auto localOther = dynamic_cast<const InputEventTemplate &>(other);
+        return event == localOther.event;
+    }
 };
 
 #endif

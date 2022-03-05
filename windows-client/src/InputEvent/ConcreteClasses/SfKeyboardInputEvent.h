@@ -47,6 +47,13 @@ public:
                  "classsf_1_1Keyboard.php) or a letter a-z that will be "
                  "converted to that letter key code"}};
     }
+
+    bool operator==(const InputEvent &other) const override {
+        if (typeid(*this) != typeid(other))
+            return false;
+        auto localOther = dynamic_cast<const SfKeyboardInputEvent &>(other);
+        return key == localOther.key;
+    }
 };
 
 #endif

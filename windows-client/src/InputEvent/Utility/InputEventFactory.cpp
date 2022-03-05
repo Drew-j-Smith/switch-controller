@@ -27,3 +27,19 @@ InputEventFactory::InputEventFactory(
     }
     addClasses<AC_INPUT_EVENT_TYPES>(names, this, this->factories);
 }
+
+std::shared_ptr<InputEvent>
+InputEventFactory::create(const boost::property_tree::ptree &tree) {
+    std::string name = tree.get<std::string>("type");
+    auto event = factories[name](tree);
+    auto it = std::find_if(createdEvents.begin(), createdEvents.end(),
+                           [&](std::shared_ptr<InputEvent> inputEvent) {
+                               return *event == *inputEvent;
+                           });
+    if (it == createdEvents.end()) {
+        createdEvents.insert(event);
+        return event;
+    } else {
+        return *it;
+    }
+}

@@ -19,14 +19,7 @@ public:
     InputEventFactory(const std::map<std::string, boost::property_tree::ptree>
                           &inputEventTemplates);
 
-    std::shared_ptr<InputEvent>
-    create(const boost::property_tree::ptree &tree) {
-        // TODO test if events are the same
-        std::string name = tree.get<std::string>("type");
-        auto event = factories[name](tree);
-        createdEvents.insert(event);
-        return event;
-    }
+    std::shared_ptr<InputEvent> create(const boost::property_tree::ptree &tree);
 };
 
 #endif

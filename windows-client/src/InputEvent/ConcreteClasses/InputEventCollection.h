@@ -80,6 +80,22 @@ public:
                 {"operator", InputEvent::SchemaItem::String,
                  "The operator to use between events"}};
     }
+
+    bool operator==(const InputEvent &other) const override {
+        if (typeid(*this) != typeid(other))
+            return false;
+        auto localOther = dynamic_cast<const InputEventCollection &>(other);
+        if (op != localOther.op ||
+            inputEvents.size() != localOther.inputEvents.size()) {
+            return false;
+        }
+        for (int i = 0; i < inputEvents.size(); i++) {
+            if (!(*inputEvents[i] == *localOther.inputEvents[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
 };
 
 #endif

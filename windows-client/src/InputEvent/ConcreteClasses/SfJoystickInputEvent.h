@@ -89,6 +89,16 @@ public:
             {"joystick index", SchemaItem::Integer,
              "joystick index is the index of the joystick"}};
     }
+
+    bool operator==(const InputEvent &other) const override {
+        if (typeid(*this) != typeid(other))
+            return false;
+        auto localOther = dynamic_cast<const SfJoystickInputEvent &>(other);
+        return isStick == localOther.isStick &&
+               joystickIndex == localOther.joystickIndex &&
+               (isStick ? axis == localOther.axis
+                        : button == localOther.button);
+    }
 };
 
 #endif
