@@ -108,10 +108,10 @@ SoundDecider::SoundDecider(const boost::property_tree::ptree &tree) {
     ffmpegRecorder.join();
     ffmpegRecorder.stop();
 
-    std::vector<uint8_t> rawData;
+    std::vector<uint8_t> *rawData;
     audioSink->getData(rawData);
-    matchAudio = std::vector<float>((float *)rawData.data(),
-                                    (float *)(rawData.data() + rawData.size()));
+    matchAudio = std::vector<float>(
+        (float *)rawData->data(), (float *)(rawData->data() + rawData->size()));
 
     fftwSize = (int)matchAudio.size();
     fftwIn.resize(fftwSize);

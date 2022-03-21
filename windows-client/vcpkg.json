@@ -13,6 +13,7 @@
     "boost-functional",
     "boost-log",
     "boost-stacktrace",
+    "boost-lockfree",
     "fftw3",
     "ffmpeg"
   ]

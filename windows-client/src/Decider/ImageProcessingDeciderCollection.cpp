@@ -13,14 +13,15 @@ void ImageProcessingDeciderCollection::startImageProcessingThread() {
     imageProcessingThread = std::thread([&]() {
         std::vector<std::future<void>> futures;
         this->videoFrameSink->waitForInit();
-        std::vector<uint8_t> data;
+        std::vector<uint8_t> *data;
         long long lastFrame = this->videoFrameSink->getData(data);
-        cv::Mat screenshot =
-            cv::Mat(this->videoFrameSink->getHeight(),
-                    this->videoFrameSink->getWidth(), CV_8UC3, data.data());
 
         while (imageProcessing.load()) {
+            videoFrameSink->returnPointer(data);
             lastFrame = this->videoFrameSink->getNextData(data, lastFrame);
+            cv::Mat screenshot = cv::Mat(this->videoFrameSink->getHeight(),
+                                         this->videoFrameSink->getWidth(),
+                                         CV_8UC3, data->data());
             for (auto &decider : deciders) {
                 futures.push_back(std::async(std::launch::async, matchImage,
                                              decider, screenshot));

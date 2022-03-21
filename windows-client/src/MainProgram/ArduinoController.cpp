@@ -99,10 +99,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             recorder.start();
 
             videoSink->waitForInit();
-            std::vector<uint8_t> data;
+            std::vector<uint8_t> *data;
             long long lastFrame = videoSink->getData(data);
-            cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(),
-                                  CV_8UC3, data.data());
 
             std::atomic<bool> running = true;
             std::string title = std::to_string(
@@ -110,7 +108,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
             std::thread t([&]() {
                 while (running.load()) {
+                    videoSink->returnPointer(data);
                     lastFrame = videoSink->getNextData(data, lastFrame);
+                    cv::Mat mat =
+                        cv::Mat(videoSink->getHeight(), videoSink->getWidth(),
+                                CV_8UC3, data->data());
                     cv::imshow(title, mat);
                     cv::waitKey(1);
                 }
@@ -171,7 +173,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             }
 
             recorder.stop();
-            std::vector<uint8_t> data;
+            std::vector<uint8_t> *data;
             audioSink->getData(data);
 
             std::cout << "Enter the output filename:\n";
@@ -181,7 +183,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
             std::ofstream outfile(audioFilename,
                                   std::ios::out | std::ios::binary);
-            outfile.write((const char *)data.data(), data.size());
+            outfile.write((const char *)data->data(), data->size());
         } break;
         case 8:
             break;

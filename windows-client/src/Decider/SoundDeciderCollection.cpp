@@ -44,12 +44,13 @@ SoundDeciderCollection::SoundDeciderCollection(
     audioSink->waitForInit();
 
     updateThread = std::thread([&]() {
-        std::vector<uint8_t> data;
+        std::vector<uint8_t> *data;
         std::vector<std::future<void>> futures;
         long long lastFrame = audioSink->getData(data);
-        std::vector<float> soundData((float *)data.data(),
-                                     (float *)(data.data() + data.size()));
+        std::vector<float> soundData((float *)data->data(),
+                                     (float *)(data->data() + data->size()));
         while (continueUpdating.load()) {
+            audioSink->returnPointer(data);
             lastFrame = audioSink->getNextData(data, lastFrame);
             for (auto decider : deciders) {
                 futures.push_back(std::async(std::launch::async, matchSound,
