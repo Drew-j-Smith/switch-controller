@@ -51,7 +51,6 @@ void testSerialPort(std::unique_ptr<boost::asio::serial_port> &serialPort,
     io->run_for(std::chrono::milliseconds(1000));
     serialPort->cancel();
     if (writeRes <= 0 || readRes <= 0) {
-        BOOST_LOG_TRIVIAL(error) << "Unable to establish serial connection.\n";
         throw SerialError("Unable to establish serial connection.\n");
     }
     std::cout << "Serial communication established.\n";

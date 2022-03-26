@@ -18,33 +18,9 @@ private:
 
 public:
     InputEventCollection(){};
-    InputEventCollection(const boost::property_tree::ptree &tree,
-                         InputEventFactory &factory) {
-        try {
-            boost::property_tree::ptree childTree = tree.get_child("events");
-            for (auto event : childTree) {
-                inputEvents.push_back(factory.create(event.second));
-            }
-            std::string opStr = tree.get<std::string>("operator");
-            if (opStr == "and") {
-                op = Operators::And;
-            } else if (opStr == "or") {
-                op = Operators::Or;
-            } else if (opStr == "not") {
-                op = Operators::Not;
-            } else /* if (opStr == "xor") */ {
-                op = Operators::Xor;
-            }
-        } catch (std::exception &e) {
-            std::stringstream ss;
-            ss << e.what();
-            ss << "\nUnable to parse input event collection from ptree:\n";
-            boost::property_tree::write_json(ss, tree);
-            ss << boost::stacktrace::stacktrace();
-            BOOST_LOG_TRIVIAL(error) << ss.str();
-            inputEvents.clear();
-        }
-    }
+    InputEventCollection(std::vector<std::shared_ptr<InputEvent>> inputEvents,
+                         Operators op)
+        : inputEvents(inputEvents), op(op){};
 
     int getInputValue() const override {
         int res = 0;
@@ -73,29 +49,6 @@ public:
     bool isDigital() const override { return true; }
 
     virtual void update() override {}
-
-    std::vector<SchemaItem> getSchema() const override {
-        return {{"events", InputEvent::SchemaItem::EventArray,
-                 "The list of events to use"},
-                {"operator", InputEvent::SchemaItem::String,
-                 "The operator to use between events"}};
-    }
-
-    bool operator==(const InputEvent &other) const override {
-        if (typeid(*this) != typeid(other))
-            return false;
-        auto localOther = dynamic_cast<const InputEventCollection &>(other);
-        if (op != localOther.op ||
-            inputEvents.size() != localOther.inputEvents.size()) {
-            return false;
-        }
-        for (int i = 0; i < inputEvents.size(); i++) {
-            if (!(*inputEvents[i] == *localOther.inputEvents[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
 };
 
 #endif

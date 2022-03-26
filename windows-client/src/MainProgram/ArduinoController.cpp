@@ -6,7 +6,6 @@
 #include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/VideoFrameSink.h"
 #include "InputEvent/InputEvent.h"
-#include "InputEvent/InputEventTypes.h"
 #include "MainProgram.h"
 #include "SFML/SFMLRenderer.h"
 
@@ -15,9 +14,9 @@
 
 const std::string options =
     R"(Select one of the following options:
-    1. Set config file
-    2. Create config file
-    3. Edit config File
+    1. X
+    2. X
+    3. X
     4. Run
     5. Test serial communication
     6. Test FFmpeg video capture
@@ -25,7 +24,7 @@ const std::string options =
     8. Exit
 )";
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
+int main() {
 
     // SFMLRenderer renderer;
     // renderer.start();
@@ -34,29 +33,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
         cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
 
     int option = 0;
-    std::string configFilename = "data/config.json";
 
     while (option != 8) {
         std::cout << options;
-        std::cout << "The current config file is: \"" << configFilename
-                  << "\"\n";
         std::cin >> option;
         std::string tempstr;
         std::getline(std::cin, tempstr);
         switch (option) {
-        case 1:
-            std::cout << "Enter the config filename: ";
-            std::getline(std::cin, configFilename);
-            break;
-        case 2:
-            CreateConfig();
-            break;
-        case 3:
-            EditConfig(configFilename);
-            break;
         case 4: {
             try {
-                StartController(configFilename);
+                StartController();
             } catch (std::exception &e) {
                 BOOST_LOG_TRIVIAL(error)
                     << "Uncaught exception in StartController: " +
@@ -64,12 +50,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
             }
         } break;
         case 5: {
+            std::cout << "Enter the port name:\n";
+            std::string portName;
+            std::getline(std::cin, portName);
             try {
-                boost::property_tree::ptree tree;
-                boost::property_tree::read_json(configFilename, tree);
                 boost::asio::io_service io;
-                auto port = initializeSerialPort(
-                    tree.get<std::string>("serial port"), 57600, &io);
+                auto port = initializeSerialPort(portName, 57600, &io);
 
                 // sending a nuetral signal
                 unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};

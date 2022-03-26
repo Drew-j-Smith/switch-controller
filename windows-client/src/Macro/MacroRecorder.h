@@ -20,12 +20,10 @@ private:
     bool recording = false;
 
 public:
-    MacroRecorder(const boost::property_tree::ptree &tree,
-                  InputEventFactory &factory) {
-        // TODO handle/log errors
-        lastRecordedMacro->setInputEvent(
-            factory.create(tree.find("playLastRecorded")->second));
-        record = factory.create(tree.find("record")->second);
+    MacroRecorder(std::shared_ptr<InputEvent> recordEvent,
+                  std::shared_ptr<InputEvent> playEvent) {
+        lastRecordedMacro->setInputEvent(playEvent);
+        record = recordEvent;
     }
 
     void update(const std::array<uint8_t, 8> &data) {

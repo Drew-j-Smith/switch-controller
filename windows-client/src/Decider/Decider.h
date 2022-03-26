@@ -23,21 +23,22 @@ public:
     virtual ~Decider() {}
 
     /**
-     * @brief Get the name of the object.
-     *
-     * @return const std::string
-     */
-    const std::string getName() const { return name; }
-
-    /**
      * @brief Returns the index of the list to be activated
      *
      * @return int
      */
     virtual int nextListIndex() const = 0;
 
-protected:
-    std::string name;
+    void enable() { useCount++; }
+
+    void disable() { useCount--; }
+
+    bool shouldUpdate() { return useCount > 0; }
+
+    virtual void update() = 0;
+
+private:
+    int useCount;
 };
 
 /**
@@ -47,10 +48,10 @@ protected:
  */
 class DefaultDecider : public Decider {
 public:
-    DefaultDecider() { name = "default"; }
-    DefaultDecider(const std::string &name) { this->name = name; }
+    DefaultDecider() {}
 
-    int nextListIndex() const override { return 0; };
+    int nextListIndex() const override { return 0; }
+    void update() override {}
 };
 
 #endif

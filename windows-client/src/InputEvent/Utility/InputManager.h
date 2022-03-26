@@ -13,7 +13,6 @@
 #include "pch.h"
 
 #include "InputEvent/InputEvent.h"
-#include "InputEventFactory.h"
 
 /**
  * @brief This class takes inputs and converts them into a character array which
@@ -40,29 +39,13 @@ private:
     std::shared_ptr<InputEvent> dpadEvents[4];
 
 public:
-    /**
-     * @brief Construct a new Input Manager object
-     *
-     * @param tree A dictionary of an input name to an InputEvent (see
-     * InputEvent instances for a detailed desciption)
-     * @param factory The factory used to construct InputEvents from the tree
-     */
-    InputManager(const boost::property_tree::ptree &tree,
-                 InputEventFactory &factory);
+    InputManager(const std::map<std::string, std::shared_ptr<InputEvent>> map);
 
     /**
      * @brief Gets the user's inputs in the form of a uint8_t array
      *
      */
     std::array<uint8_t, 8> getData() const;
-
-    /**
-     * @brief Get the Schema of the InputManager.
-     *
-     * @return std::vector<InputEvent::SchemaItem> the Schema of the
-     * InputManager.
-     */
-    static std::vector<InputEvent::SchemaItem> getSchema();
 
 private:
     /**
@@ -71,8 +54,7 @@ private:
      * @param it the iterator containing a name of the input and an InputEvent
      */
     void loadInputEvent(
-        const std::pair<const std::string, boost::property_tree::ptree> &it,
-        InputEventFactory &factory);
+        const std::pair<const std::string, std::shared_ptr<InputEvent>> &it);
 
     /**
      * @brief Tests if a key is in a map and returns its index else -1

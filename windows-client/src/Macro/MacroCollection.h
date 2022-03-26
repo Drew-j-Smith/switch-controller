@@ -3,7 +3,6 @@
 
 #include "pch.h"
 
-#include "Decider/DeciderCollectionBase.h"
 #include "Macro.h"
 
 class MacroCollection {
@@ -11,14 +10,10 @@ private:
     std::vector<std::shared_ptr<Macro>> macros;
     std::map<std::shared_ptr<Macro>, std::chrono::steady_clock::time_point>
         activeMacros;
-    std::shared_ptr<DeciderCollectionBase> deciders;
 
 public:
-    MacroCollection(const std::vector<std::shared_ptr<Macro>> &macros,
-                    const std::shared_ptr<DeciderCollectionBase> &deciders);
-    MacroCollection(const boost::property_tree::ptree &tree,
-                    const std::shared_ptr<DeciderCollectionBase> &deciders,
-                    InputEventFactory &factory);
+    MacroCollection(const std::vector<std::shared_ptr<Macro>> &macros)
+        : macros(macros){};
 
     std::array<uint8_t, 8> getData(const std::array<uint8_t, 8> &dataToMerge);
     void activateMacros();

@@ -18,37 +18,24 @@
 #include "Macro/MacroRecorder.h"
 #include "Utility/SerialPort.h"
 
-void StartController(std::string &configFilename) {
+void StartController() {
     std::cout << "Initializing...\n";
     std::cout << "Loading config files.\n";
 
     // Updating joysticks to see if they are connected
     sf::Joystick::update();
 
-    boost::property_tree::ptree tree;
-    try {
-        boost::property_tree::read_json(configFilename, tree);
-    } catch (boost::property_tree::json_parser::json_parser_error &e) {
-        BOOST_LOG_TRIVIAL(error) << "Error parsing config file\n" +
-                                        std::string(e.what()) + "\n" +
-                                        boost::stacktrace::to_string(
-                                            boost::stacktrace::stacktrace());
-        return;
-    }
+    InputManager inputManager({}); // TODO
 
-    InputEventFactory factory({});
-    InputManager inputManager(tree.find("controls")->second, factory);
+    DeciderCollection deciders({});      // TODO
+    MacroCollection macroCollection({}); // TODO
 
-    auto deciders =
-        std::make_shared<DeciderCollection>(tree.find("deciders")->second);
-    MacroCollection macroCollection(tree.find("macros")->second, deciders,
-                                    factory);
-
-    MacroRecorder recorder(tree.find("controls")->second, factory);
+    MacroRecorder recorder(std::make_shared<ConstantInputEvent>(),
+                           std::make_shared<ConstantInputEvent>()); // TODO
     macroCollection.pushBackMacro(recorder.getLastRecordedMacro());
 
-    std::shared_ptr<InputEvent> stopMacrosEvent = factory.create(
-        tree.find("controls")->second.find("stopMacros")->second);
+    std::shared_ptr<InputEvent> stopMacrosEvent =
+        std::make_shared<ConstantInputEvent>(); // TODO
 
     std::cout << "Config files loaded.\n";
 
@@ -60,8 +47,7 @@ void StartController(std::string &configFilename) {
     unsigned char recieve[1];
 
     try {
-        port = initializeSerialPort(tree.get<std::string>("serial port"), 57600,
-                                    &io);
+        port = initializeSerialPort("COM3", 57600, &io); // TODO
 
         testSerialPort(port, 8, send.data(), 1, recieve, &io);
     } catch (std::exception &e) {

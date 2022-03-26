@@ -24,24 +24,6 @@ public:
         this->event = event;
         toggles.insert(this);
     }
-    InputEventToggle(const boost::property_tree::ptree &tree,
-                     InputEventFactory &factory) {
-        try {
-            cooldown = tree.get<int>("button cooldown");
-            boost::property_tree::ptree childTree = tree.get_child("event");
-            event = factory.create(childTree);
-        } catch (std::exception &e) {
-            std::stringstream ss;
-            ss << e.what();
-            ss << "\nUnable to parse input event toggle from ptree:\n";
-            boost::property_tree::write_json(ss, tree);
-            ss << boost::stacktrace::stacktrace();
-            BOOST_LOG_TRIVIAL(error) << ss.str();
-            cooldown = 0;
-            event = std::make_shared<ConstantInputEvent>();
-        }
-        toggles.insert(this);
-    }
 
     ~InputEventToggle() { toggles.erase(this); }
 
@@ -64,21 +46,6 @@ public:
     int getInputValue() const override { return active; };
 
     bool isDigital() const override { return true; }
-
-    std::vector<SchemaItem> getSchema() const override {
-        return {{"button cooldown", SchemaItem::Integer,
-                 "button cooldown is the minimum amount of time before the "
-                 "state will toggle."},
-                {"event", SchemaItem::Event,
-                 "event is the event used to toggle the state"}};
-    }
-
-    bool operator==(const InputEvent &other) const override {
-        if (typeid(*this) != typeid(other))
-            return false;
-        auto localOther = dynamic_cast<const InputEventToggle &>(other);
-        return cooldown == localOther.cooldown && event == localOther.event;
-    }
 };
 
 #endif

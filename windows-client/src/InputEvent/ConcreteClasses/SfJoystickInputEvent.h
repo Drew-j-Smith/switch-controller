@@ -22,27 +22,12 @@ private:
 
 public:
     SfJoystickInputEvent(){};
-    SfJoystickInputEvent(const boost::property_tree::ptree &tree,
-                         [[maybe_unused]] const InputEventFactory &factory) {
-        try {
-            isStick = tree.get<int>("isStick");
-            joystickIndex = tree.get<int>("joystick index");
-            if (isStick) {
-                axis = (sf::Joystick::Axis)tree.get<int>("axis/button");
-            } else {
-                button = tree.get<int>("axis/button");
-            }
-        } catch (std::exception &e) {
-            std::stringstream ss;
-            ss << e.what();
-            ss << "\nUnable to parse SF joystick input event from ptree:\n";
-            boost::property_tree::write_json(ss, tree);
-            ss << boost::stacktrace::stacktrace();
-            BOOST_LOG_TRIVIAL(error) << ss.str();
-            isStick = false;
-            joystickIndex = 0;
-            button = 0;
-        }
+    SfJoystickInputEvent(unsigned int joystickIndex, sf::Joystick::Axis axis)
+        : isStick(true), joystickIndex(joystickIndex), axis(axis) {
+        assertConnected();
+    }
+    SfJoystickInputEvent(unsigned int joystickIndex, unsigned int button)
+        : isStick(false), joystickIndex(joystickIndex), button(button) {
         assertConnected();
     }
     void assertConnected() {
@@ -78,27 +63,6 @@ public:
     bool isDigital() const override { return !isStick; }
 
     void update() override {}
-
-    std::vector<SchemaItem> getSchema() const override {
-        return {
-            {"isStick", SchemaItem::Integer,
-             "isDigital determines if the input event is a stick or a button."},
-            {"axis/button", SchemaItem::Integer,
-             "axis/button is the axis or button used, depending on the value "
-             "of isStick"},
-            {"joystick index", SchemaItem::Integer,
-             "joystick index is the index of the joystick"}};
-    }
-
-    bool operator==(const InputEvent &other) const override {
-        if (typeid(*this) != typeid(other))
-            return false;
-        auto localOther = dynamic_cast<const SfJoystickInputEvent &>(other);
-        return isStick == localOther.isStick &&
-               joystickIndex == localOther.joystickIndex &&
-               (isStick ? axis == localOther.axis
-                        : button == localOther.button);
-    }
 };
 
 #endif

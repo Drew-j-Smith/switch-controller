@@ -6,11 +6,9 @@
 #define AC_DISPLAY_IMAGE_MATCH 0
 
 ImageProcessingDecider::ImageProcessingDecider(
-    const std::string &name, cv::Mat &templatePic, const cv::Mat &maskPic,
-    const int matchMethod, const double matchThreshold, const int minX,
-    const int minY, const int maxX, const int maxY) {
-
-    this->name = name;
+    cv::Mat &templatePic, const cv::Mat &maskPic, const int matchMethod,
+    const double matchThreshold, const int minX, const int minY, const int maxX,
+    const int maxY, const std::shared_ptr<VideoFrameSink> &videoFrameSink) {
 
     this->templatePic = templatePic;
     this->maskPic = maskPic;
@@ -21,49 +19,8 @@ ImageProcessingDecider::ImageProcessingDecider(
     this->maxX = maxX;
     this->maxY = maxY;
 
-    matchPointX.store(0);
-    matchPointY.store(0);
-    critalMatchVal.store(0);
-}
+    this->videoFrameSink = videoFrameSink;
 
-ImageProcessingDecider::ImageProcessingDecider(
-    const boost::property_tree::ptree &tree) {
-    name = "";
-    templatePic = cv::Mat();
-    maskPic = cv::Mat();
-    matchMethod = 0;
-    matchThreshold = 0;
-    minX = 0;
-    minY = 0;
-    maxX = 0;
-    maxY = 0;
-    for (auto it : tree) {
-        if (it.first == "name")
-            name = it.second.get_value<std::string>();
-        else if (it.first == "template pic filename")
-            templatePic = cv::imread(it.second.get_value<std::string>());
-        else if (it.first == "mask pic filename")
-            maskPic = cv::imread(it.second.get_value<std::string>());
-        else if (it.first == "match method")
-            matchMethod = it.second.get_value<int>();
-        else if (it.first == "match threshold")
-            matchThreshold = it.second.get_value<double>();
-        else if (it.first == "min x")
-            minX = it.second.get_value<int>();
-        else if (it.first == "min y")
-            minY = it.second.get_value<int>();
-        else if (it.first == "max x")
-            maxX = it.second.get_value<int>();
-        else if (it.first == "max y")
-            maxY = it.second.get_value<int>();
-        else if (it.first != "type") {
-            BOOST_LOG_TRIVIAL(warning)
-                << "Unrecognized field \"" + it.first +
-                       "\" when loading ImageProcessingDecider\n" +
-                       boost::stacktrace::to_string(
-                           boost::stacktrace::stacktrace());
-        }
-    }
     matchPointX.store(0);
     matchPointY.store(0);
     critalMatchVal.store(0);
@@ -81,7 +38,17 @@ int ImageProcessingDecider::nextListIndex() const {
     }
 }
 
-void ImageProcessingDecider::update(const cv::Mat &screenshot) {
+void ImageProcessingDecider::update() {
+
+    this->videoFrameSink->waitForInit();
+    std::vector<uint8_t> *data;
+    long long lastFrame = this->videoFrameSink->getData(data);
+
+    lastFrame = this->videoFrameSink->getNextData(data, lastFrame);
+    cv::Mat screenshot =
+        cv::Mat(this->videoFrameSink->getHeight(),
+                this->videoFrameSink->getWidth(), CV_8UC3, data->data());
+
     cv::Rect rectCrop = cv::Rect(minX, minY, maxX - minX, maxY - minY);
     cv::Mat submat = cv::Mat(screenshot, rectCrop);
 
@@ -128,4 +95,6 @@ void ImageProcessingDecider::update(const cv::Mat &screenshot) {
 
     matchPointX.store(matchPoint.x + minX);
     matchPointY.store(matchPoint.y + minY);
+
+    videoFrameSink->returnPointer(data);
 }

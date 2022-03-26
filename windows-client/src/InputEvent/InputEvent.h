@@ -12,8 +12,6 @@
 
 #include "pch.h"
 
-#include "Utility/InputEventFactory.h"
-
 /**
  * @brief The InputEvent class is used to abstract various digital
  * and analog input methods.
@@ -41,31 +39,6 @@ public:
     virtual bool isDigital() const = 0;
 
     virtual void update() = 0;
-
-    /**
-     * @brief A SchemaItem is field expected to be present in the ptree
-     * constructor. Additionally there must be a field of "type" which is the
-     * name of the class (this will NOT be returned in the schema).
-     */
-    struct SchemaItem {
-        // The name of the SchemaItem as it appears in a ptree.
-        std::string name;
-        // Potential types of a SchemaItem.
-        enum SchemaType { String, Integer, Event, EventArray };
-        // Children of a SchemaItem as it appears in a ptree.
-        SchemaType type;
-        // In depth explanation of the SchemaItem.
-        std::string description;
-    };
-
-    /**
-     * @brief Get the Schema of the input event.
-     *
-     * @return std::vector<SchemaItem> the Schema of the input event
-     */
-    virtual std::vector<SchemaItem> getSchema() const = 0;
-
-    virtual bool operator==(const InputEvent &other) const = 0;
 };
 
 #endif

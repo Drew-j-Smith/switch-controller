@@ -13,25 +13,7 @@ private:
 
 public:
     SfKeyboardInputEvent(){};
-    SfKeyboardInputEvent(const boost::property_tree::ptree &tree,
-                         [[maybe_unused]] const InputEventFactory &factory) {
-        try {
-            std::string keycode = tree.get<std::string>("key");
-            if (isalpha(keycode.at(0))) {
-                key = (sf::Keyboard::Key)(tolower(keycode.at(0)) - 'a');
-                return;
-            }
-            key = (sf::Keyboard::Key)stoi(keycode);
-        } catch (std::exception &e) {
-            std::stringstream ss;
-            ss << e.what();
-            ss << "\nUnable to parse SF keyboard input event from ptree:\n";
-            boost::property_tree::write_json(ss, tree);
-            ss << boost::stacktrace::stacktrace();
-            BOOST_LOG_TRIVIAL(error) << ss.str();
-            key = sf::Keyboard::Unknown;
-        }
-    }
+    SfKeyboardInputEvent(sf::Keyboard::Key key) : key(key){};
 
     int getInputValue() const override {
         return sf::Keyboard::isKeyPressed(key);
@@ -39,21 +21,6 @@ public:
     bool isDigital() const override { return true; }
 
     void update() override {}
-
-    std::vector<SchemaItem> getSchema() const override {
-        return {{"key", SchemaItem::String,
-                 "Its an integer key code used by SFML (see "
-                 "https://www.sfml-dev.org/documentation/2.5.1/"
-                 "classsf_1_1Keyboard.php) or a letter a-z that will be "
-                 "converted to that letter key code"}};
-    }
-
-    bool operator==(const InputEvent &other) const override {
-        if (typeid(*this) != typeid(other))
-            return false;
-        auto localOther = dynamic_cast<const SfKeyboardInputEvent &>(other);
-        return key == localOther.key;
-    }
 };
 
 #endif

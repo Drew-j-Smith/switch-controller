@@ -8,19 +8,21 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "../FFmpeg/VideoFrameSink.h"
+
 #include "Decider.h"
 
 class ImageProcessingDecider : public Decider {
 public:
-    ImageProcessingDecider(const std::string &name, cv::Mat &templatePic,
-                           const cv::Mat &maskPic, const int matchMethod,
-                           const double matchThreshold, const int minX,
-                           const int minY, const int maxX, const int maxY);
-    ImageProcessingDecider(const boost::property_tree::ptree &tree);
+    ImageProcessingDecider(
+        cv::Mat &templatePic, const cv::Mat &maskPic, const int matchMethod,
+        const double matchThreshold, const int minX, const int minY,
+        const int maxX, const int maxY,
+        const std::shared_ptr<VideoFrameSink> &videoFrameSink);
 
     int nextListIndex() const override;
 
-    void update(const cv::Mat &screenshot);
+    void update() override;
 
 private:
     cv::Mat templatePic;
@@ -31,6 +33,8 @@ private:
     int minY;
     int maxX;
     int maxY;
+
+    std::shared_ptr<VideoFrameSink> videoFrameSink;
 
     std::atomic<double> matchPointX;
     std::atomic<double> matchPointY;

@@ -5,13 +5,15 @@
 
 #include "Decider.h"
 
-extern "C" {
+#include "../FFmpeg/AudioFrameSink.h"
+
 #include <fftw3.h>
-}
 
 class SoundDecider : public Decider {
 private:
     std::vector<float> matchAudio;
+
+    std::shared_ptr<AudioFrameSink> audioFrameSink;
 
     // fftw
     std::vector<float> fftwIn;
@@ -26,12 +28,12 @@ private:
     std::vector<float> findFrequencies(const std::vector<float> &samples);
 
 public:
-    SoundDecider(
-        const boost::property_tree::ptree &tree); // dont forget to set name
+    SoundDecider(const std::string &filename, double matchThreshold,
+                 std::shared_ptr<AudioFrameSink> audioFrameSink);
 
     ~SoundDecider() override { fftwf_destroy_plan(fftwPlan); }
 
-    void update(std::vector<float> soundData);
+    void update() override;
 
     const std::vector<float> *getMatchAudio() const { return &matchAudio; }
 

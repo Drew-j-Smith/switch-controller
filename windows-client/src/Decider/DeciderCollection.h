@@ -3,17 +3,29 @@
 
 #include "pch.h"
 
-#include "DeciderCollectionBase.h"
+#include "Decider.h"
 
-class DeciderCollection : public DeciderCollectionBase {
+class DeciderCollection {
 private:
-    std::vector<std::shared_ptr<DeciderCollectionBase>> deciderCollections;
+    std::vector<std::shared_ptr<Decider>> deciders;
+    std::vector<std::future<void>> updateList;
 
 public:
-    DeciderCollection(const boost::property_tree::ptree &tree);
+    DeciderCollection(const std::vector<std::shared_ptr<Decider>> &deciders)
+        : deciders(deciders) {
+        updateList.resize(deciders.size());
+    };
 
-    std::map<std::string, std::shared_ptr<Decider>>
-    generateMap() const override;
+    void update() {
+        for (unsigned int i = 0; i < deciders.size(); i++) {
+            if (updateList[i].wait_for(std::chrono::nanoseconds::zero()) ==
+                    std::future_status::ready &&
+                deciders[i]->shouldUpdate()) {
+                updateList[i] = std::async(std::launch::async,
+                                           [&]() { deciders[i]->update(); });
+            }
+        }
+    }
 };
 
 #endif

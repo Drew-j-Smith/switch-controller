@@ -17,20 +17,19 @@ public:
     enum InputMergeMode { blockInput, macroPriority, inputPriority };
 
     Macro(){};
-    Macro(const boost::property_tree::ptree &tree,
-          const std::map<std::string, std::shared_ptr<Decider>> &deciderList,
-          InputEventFactory &factory);
+    Macro(const std::vector<MacroData> &data,
+          std::shared_ptr<InputEvent> inputEvent,
+          std::shared_ptr<Decider> decider, InputMergeMode mode,
+          std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists)
+        : data(data), inputEvent(inputEvent), decider(decider), mode(mode),
+          nextMacroLists(nextMacroLists){};
 
-    void setNextMacroLists(
-        const boost::property_tree::ptree &tree,
-        const std::map<std::string, std::shared_ptr<Macro>> &macroMap);
     void setNextMacroLists(const std::vector<std::vector<std::weak_ptr<Macro>>>
                                &newNextMacroLists) {
         this->nextMacroLists = newNextMacroLists;
     }
 
 private:
-    std::string name = "";
     std::vector<MacroData> data;
     std::shared_ptr<InputEvent> inputEvent =
         std::make_shared<ConstantInputEvent>();
@@ -40,21 +39,13 @@ private:
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
 
 public:
-    const std::string &getName() const { return name; }
-    void setName(const std::string &newName) { this->name = newName; }
     const std::shared_ptr<InputEvent> getInputEvent() const {
         return inputEvent;
     }
     void setInputEvent(const std::shared_ptr<InputEvent> newInputEvent) {
         this->inputEvent = newInputEvent;
     }
-    const std::shared_ptr<Decider> getMacroDecider() const { return decider; }
-    void setMacroDecider(const std::shared_ptr<Decider> &newDecider) {
-        this->decider = newDecider;
-    }
     std::shared_ptr<Macro> getNextMacro();
-    InputMergeMode getMode() { return mode; }
-    void setMode(const InputMergeMode newMode) { this->mode = newMode; }
 
     void saveData(std::string filename) const;
     void loadData(std::string filename);

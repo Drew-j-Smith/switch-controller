@@ -4,25 +4,6 @@
 #include <boost/log/trivial.hpp>
 #include <boost/stacktrace/stacktrace.hpp>
 
-Macro::Macro(const boost::property_tree::ptree &tree,
-             const std::map<std::string, std::shared_ptr<Decider>> &deciderList,
-             InputEventFactory &factory) {
-    // TODO handle/log error
-    name = tree.get("name", "");
-    std::string filename = tree.get("filename", "");
-    loadData(filename);
-
-    auto inputIt = tree.find("input");
-    if (inputIt != tree.not_found())
-        inputEvent = factory.create(inputIt->second);
-
-    auto deciderIt = deciderList.find(tree.get("decider", ""));
-    if (deciderIt != deciderList.end())
-        decider = deciderIt->second;
-
-    mode = strToInputMergeMode(tree.get("input merge mode", ""));
-}
-
 Macro::InputMergeMode Macro::strToInputMergeMode(const std::string &str) {
     if (str == "block input")
         return blockInput;
@@ -32,28 +13,9 @@ Macro::InputMergeMode Macro::strToInputMergeMode(const std::string &str) {
         return macroPriority;
 
     BOOST_LOG_TRIVIAL(warning)
-        << "Unrecognized input merge mode \"" + str + "\" in macro \"" + name +
-               "\"\n" +
+        << "Unrecognized input merge mode \"" + str + "\n" +
                boost::stacktrace::to_string(boost::stacktrace::stacktrace());
     return inputPriority;
-}
-
-void Macro::setNextMacroLists(
-    const boost::property_tree::ptree &tree,
-    const std::map<std::string, std::shared_ptr<Macro>> &macroMap) {
-    boost::property_tree::ptree nextMacroTree;
-    for (auto macroTree : tree) {
-        if (macroTree.second.get("name", "") == name) {
-            nextMacroTree = macroTree.second.find("next macro list")->second;
-        }
-    }
-    for (auto macroListTree : nextMacroTree) {
-        std::vector<std::weak_ptr<Macro>> macroList;
-        for (auto macroTree : macroListTree.second) {
-            macroList.push_back(macroMap.at(macroTree.second.get("", "")));
-        }
-        nextMacroLists.push_back(macroList);
-    }
 }
 
 std::array<uint8_t, 8>

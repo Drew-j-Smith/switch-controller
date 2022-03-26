@@ -5,8 +5,8 @@
 
 #include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
 
-InputManager::InputManager(const boost::property_tree::ptree &tree,
-                           InputEventFactory &factory) {
+InputManager::InputManager(
+    const std::map<std::string, std::shared_ptr<InputEvent>> map) {
     // set all inputs to be a default input
     std::shared_ptr<InputEvent> defaultInput =
         std::make_shared<ConstantInputEvent>();
@@ -21,8 +21,8 @@ InputManager::InputManager(const boost::property_tree::ptree &tree,
     }
 
     // go througth the entire list and try to load inputs
-    for (auto &it : tree) {
-        loadInputEvent(it, factory);
+    for (auto &it : map) {
+        loadInputEvent(it);
     }
 }
 
@@ -45,8 +45,7 @@ static const std::map<std::string, int> dpadMap = {
     {"dpadLeft", 3}, {"dpadX", 0},     {"dpadY", 2}};
 
 void InputManager::loadInputEvent(
-    const std::pair<const std::string, boost::property_tree::ptree> &it,
-    InputEventFactory &factory) {
+    const std::pair<const std::string, std::shared_ptr<InputEvent>> &it) {
     // trys to match the name to a button
     // once a match is found, the button is loaded and the function returns
 
@@ -56,19 +55,19 @@ void InputManager::loadInputEvent(
 
     int index = testInMap(buttonMap, it.first);
     if (index >= 0) {
-        buttonEvents[index] = factory.create(it.second);
+        buttonEvents[index] = it.second;
         return;
     }
 
     index = testInMap(controlStickMap, it.first);
     if (index >= 0) {
-        controlStickEvents[index] = factory.create(it.second);
+        controlStickEvents[index] = it.second;
         return;
     }
 
     index = testInMap(dpadMap, it.first);
     if (index >= 0) {
-        dpadEvents[index] = factory.create(it.second);
+        dpadEvents[index] = it.second;
         return;
     }
 
@@ -169,53 +168,4 @@ unsigned char InputManager::getDpadData(bool up, bool right, bool down,
             result = 7; // up left
     }
     return result;
-}
-
-std::vector<InputEvent::SchemaItem> InputManager::getSchema() {
-    return {
-        {"y", InputEvent::SchemaItem::Event, "The y button"},
-        {"b", InputEvent::SchemaItem::Event, "The b button"},
-        {"a", InputEvent::SchemaItem::Event, "The a button"},
-        {"x", InputEvent::SchemaItem::Event, "The x button"},
-        {"l", InputEvent::SchemaItem::Event, "The l button"},
-        {"r", InputEvent::SchemaItem::Event, "The r button"},
-        {"xl", InputEvent::SchemaItem::Event, "The xl button"},
-        {"xr", InputEvent::SchemaItem::Event, "The xr button"},
-        {"select", InputEvent::SchemaItem::Event, "The select button"},
-        {"start", InputEvent::SchemaItem::Event, "The start button"},
-        {"lClick", InputEvent::SchemaItem::Event, "The left stick button"},
-        {"rClick", InputEvent::SchemaItem::Event, "The right stick button"},
-        {"home", InputEvent::SchemaItem::Event, "The home button"},
-        {"capture", InputEvent::SchemaItem::Event,
-         "The capture button (on the switch)"},
-        {"leftStickXplus", InputEvent::SchemaItem::Event,
-         "The left stick X plus (digital)"},
-        {"leftStickXminus", InputEvent::SchemaItem::Event,
-         "The left stick X minus (digital)"},
-        {"leftStickYplus", InputEvent::SchemaItem::Event,
-         "The left stick Y plus (digital)"},
-        {"leftStickYminus", InputEvent::SchemaItem::Event,
-         "The left stick Y minus (digital)"},
-        {"rightStickXplus", InputEvent::SchemaItem::Event,
-         "The right stick X plus (digital)"},
-        {"rightStickXminus", InputEvent::SchemaItem::Event,
-         "The right stick X minus (digital)"},
-        {"rightStickYplus", InputEvent::SchemaItem::Event,
-         "The right stick Y plus (digital)"},
-        {"rightStickYminus", InputEvent::SchemaItem::Event,
-         "The right stick Y minus (digital)"},
-        {"leftStickX", InputEvent::SchemaItem::Event,
-         "The left Stick X button (Analog)"},
-        {"leftStickY", InputEvent::SchemaItem::Event,
-         "The left Stick Y button (Analog)"},
-        {"rightStickX", InputEvent::SchemaItem::Event,
-         "The right Stick X button (Analog)"},
-        {"rightStickY", InputEvent::SchemaItem::Event,
-         "The right Stick Y button (Analog)"},
-        {"dpadUp", InputEvent::SchemaItem::Event, "The dpad up button"},
-        {"dpadRight", InputEvent::SchemaItem::Event, "The dpad right button"},
-        {"dpadDown", InputEvent::SchemaItem::Event, "The dpad down button"},
-        {"dpadLeft", InputEvent::SchemaItem::Event, "The dpad left button"},
-        {"dpadX", InputEvent::SchemaItem::Event, "The dpadX button (analog)"},
-        {"dpadY", InputEvent::SchemaItem::Event, "The dpadY button (analog)"}};
 }

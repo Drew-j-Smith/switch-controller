@@ -1,30 +1,5 @@
 #include "MacroCollection.h"
 
-MacroCollection::MacroCollection(
-    const std::vector<std::shared_ptr<Macro>> &macros,
-    const std::shared_ptr<DeciderCollectionBase> &deciders) {
-    this->macros = macros;
-    this->deciders = deciders;
-}
-
-MacroCollection::MacroCollection(
-    const boost::property_tree::ptree &tree,
-    const std::shared_ptr<DeciderCollectionBase> &deciders,
-    InputEventFactory &factory) {
-    this->deciders = deciders;
-    std::map<std::string, std::shared_ptr<Macro>> macroMap;
-    auto deciderMap = deciders->generateMap();
-
-    for (auto macro : tree) {
-        macros.push_back(
-            std::make_shared<Macro>(macro.second, deciderMap, factory));
-        macroMap.insert({macros.back()->getName(), macros.back()});
-    }
-    for (auto macro : macros) {
-        macro->setNextMacroLists(tree, macroMap);
-    }
-}
-
 std::array<uint8_t, 8>
 MacroCollection::getData(const std::array<uint8_t, 8> &dataToMerge) {
     std::array<uint8_t, 8> res = dataToMerge;

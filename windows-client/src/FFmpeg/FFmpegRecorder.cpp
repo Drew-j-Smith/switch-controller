@@ -116,7 +116,6 @@ void FFmpegRecorder::start() {
             av_frame_free(&frame);
 
         } catch (std::exception &e) {
-            // TODO log at point of error
             BOOST_LOG_TRIVIAL(fatal)
                 << "Uncaught exception in FFmpeg Recorder: " +
                        std::string(e.what()) + "\n";

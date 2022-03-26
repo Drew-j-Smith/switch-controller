@@ -75,24 +75,10 @@ SoundDecider::findFrequencies(const std::vector<float> &samples) {
     return frequencies;
 }
 
-SoundDecider::SoundDecider(const boost::property_tree::ptree &tree) {
-    std::string filename;
-    try {
-        name = tree.get<std::string>("name");
-        filename = tree.get<std::string>("filename");
-        matchThreshold = tree.get<double>("match threshold");
-    } catch (boost::property_tree::ptree_error &e) {
-        BOOST_LOG_TRIVIAL(error)
-            << "Error loading SoundDecider.\n"
-               "\tError: \"" +
-                   std::string(e.what()) +
-                   "\"\n"
-                   "\tAre fields [\"name\", \"filename\", \"match "
-                   "threshold\"] missing?\n" +
-                   boost::stacktrace::to_string(
-                       boost::stacktrace::stacktrace());
-        throw;
-    }
+SoundDecider::SoundDecider(const std::string &filename, double matchThreshold,
+                           std::shared_ptr<AudioFrameSink> audioFrameSink) {
+    this->matchThreshold = matchThreshold;
+    this->audioFrameSink = audioFrameSink;
 
     std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
     std::shared_ptr<AudioFrameSink> audioSink =
@@ -122,7 +108,13 @@ SoundDecider::SoundDecider(const boost::property_tree::ptree &tree) {
     matchValue.store(0);
 }
 
-void SoundDecider::update(std::vector<float> soundData) {
+void SoundDecider::update() {
+
+    std::vector<uint8_t> *data;
+    audioFrameSink->getData(data);
+    std::vector<float> soundData((float *)data->data(),
+                                 (float *)(data->data() + data->size()));
+
     auto testFrequencies = findFrequencies(soundData);
 
     // least square approx.
@@ -140,6 +132,8 @@ void SoundDecider::update(std::vector<float> soundData) {
     matchValue.store(error);
     // std::cout << "Least Square Approx.: " << vectorScale << " * original
     // vector" << std::endl; std::cout << "R Squared: " << error << std::endl;
+
+    audioFrameSink->returnPointer(data);
 }
 
 int SoundDecider::nextListIndex() const {
