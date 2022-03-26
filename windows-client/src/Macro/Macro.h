@@ -17,12 +17,12 @@ public:
     enum InputMergeMode { blockInput, macroPriority, inputPriority };
 
     Macro(){};
-    Macro(const std::vector<MacroData> &data,
+    Macro(const std::string &dataFilename,
           std::shared_ptr<InputEvent> inputEvent,
-          std::shared_ptr<Decider> decider, InputMergeMode mode,
-          std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists)
-        : data(data), inputEvent(inputEvent), decider(decider), mode(mode),
-          nextMacroLists(nextMacroLists){};
+          std::shared_ptr<Decider> decider, InputMergeMode mode)
+        : inputEvent(inputEvent), decider(decider), mode(mode) {
+        loadData(dataFilename);
+    };
 
     void setNextMacroLists(const std::vector<std::vector<std::weak_ptr<Macro>>>
                                &newNextMacroLists) {

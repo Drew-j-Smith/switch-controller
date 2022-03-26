@@ -18,7 +18,8 @@ public:
 
     void update() {
         for (unsigned int i = 0; i < deciders.size(); i++) {
-            if (updateList[i].wait_for(std::chrono::nanoseconds::zero()) ==
+            if (updateList[i].valid() &&
+                updateList[i].wait_for(std::chrono::nanoseconds::zero()) ==
                     std::future_status::ready &&
                 deciders[i]->shouldUpdate()) {
                 updateList[i] = std::async(std::launch::async,

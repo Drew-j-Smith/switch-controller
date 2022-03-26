@@ -14,23 +14,12 @@ private:
     std::chrono::steady_clock::time_point lastActivation =
         std::chrono::steady_clock::now();
 
-    static std::set<InputEventToggle *> toggles;
-
 public:
-    InputEventToggle() { toggles.insert(this); }
+    InputEventToggle() {}
     InputEventToggle(const int cooldown,
                      const std::shared_ptr<InputEvent> event) {
         this->cooldown = cooldown;
         this->event = event;
-        toggles.insert(this);
-    }
-
-    ~InputEventToggle() { toggles.erase(this); }
-
-    static void updateAll() {
-        for (auto event : toggles) {
-            event->update();
-        }
     }
 
     void update() override {

@@ -13,10 +13,26 @@
 
 #include "Decider/DeciderCollection.h"
 #include "InputEvent/ConcreteClasses/InputEventToggle.h"
-#include "InputEvent/Utility/InputManager.h"
+#include "InputEvent/Utility/InputCollection.h"
 #include "Macro/MacroCollection.h"
 #include "Macro/MacroRecorder.h"
 #include "Utility/SerialPort.h"
+
+#include "FFmpeg/AudioFrameSink.h"
+#include "FFmpeg/FFmpegRecorder.h"
+#include "FFmpeg/VideoFrameSink.h"
+
+void initializeGameCapture(std::shared_ptr<FFmpegRecorder> &recorder,
+                           std::shared_ptr<VideoFrameSink> &videoSink,
+                           std::shared_ptr<AudioFrameSink> &audioSink);
+
+void getConfig(std::string &serialPortName,
+               std::map<std::string, std::shared_ptr<InputEvent>> &events,
+               std::vector<std::shared_ptr<InputEvent>> &createdEvents,
+               std::vector<std::shared_ptr<Decider>> &deciders,
+               std::vector<std::shared_ptr<Macro>> &macros,
+               std::shared_ptr<VideoFrameSink> videoSink,
+               std::shared_ptr<AudioFrameSink> audioSink);
 
 void StartController() {
     std::cout << "Initializing...\n";
@@ -25,19 +41,28 @@ void StartController() {
     // Updating joysticks to see if they are connected
     sf::Joystick::update();
 
-    InputManager inputManager({}); // TODO
+    std::shared_ptr<FFmpegRecorder> recorder;
+    std::shared_ptr<VideoFrameSink> videoSink;
+    std::shared_ptr<AudioFrameSink> audioSink;
+    initializeGameCapture(recorder, videoSink, audioSink);
 
-    DeciderCollection deciders({});      // TODO
-    MacroCollection macroCollection({}); // TODO
+    std::string serialPortName;
+    std::map<std::string, std::shared_ptr<InputEvent>> events;
+    std::vector<std::shared_ptr<InputEvent>> createdEvents;
+    std::vector<std::shared_ptr<Decider>> deciders;
+    std::vector<std::shared_ptr<Macro>> macros;
+    getConfig(serialPortName, events, createdEvents, deciders, macros,
+              videoSink, audioSink);
 
-    MacroRecorder recorder(std::make_shared<ConstantInputEvent>(),
-                           std::make_shared<ConstantInputEvent>()); // TODO
-    macroCollection.pushBackMacro(recorder.getLastRecordedMacro());
+    InputCollection inputCollection(events, createdEvents);
 
-    std::shared_ptr<InputEvent> stopMacrosEvent =
-        std::make_shared<ConstantInputEvent>(); // TODO
+    DeciderCollection deciderCollection(deciders);
+    MacroCollection macroCollection(macros);
 
-    std::cout << "Config files loaded.\n";
+    macroCollection.pushBackMacro(
+        inputCollection.getRecorder()->getLastRecordedMacro());
+
+    std::cout << "Config loaded.\n";
 
     std::unique_ptr<boost::asio::serial_port> port;
     boost::asio::io_service io;
@@ -46,29 +71,23 @@ void StartController() {
     std::array<uint8_t, 8> send = {85, 0, 0, 128, 128, 128, 128, 8};
     unsigned char recieve[1];
 
-    try {
-        port = initializeSerialPort("COM3", 57600, &io); // TODO
-
-        testSerialPort(port, 8, send.data(), 1, recieve, &io);
-    } catch (std::exception &e) {
-        BOOST_LOG_TRIVIAL(error) << "Failure connecting via serial port.\n" +
-                                        std::string(e.what()) + "\n";
-        return;
-    }
+    port = initializeSerialPort(serialPortName, 57600, &io);
+    testSerialPort(port, 8, send.data(), 1, recieve, &io);
 
     while (true) {
         sf::Joystick::update();
-        InputEventToggle::updateAll();
+
+        inputCollection.update();
+        deciderCollection.update();
 
         // code used to time an iteration
         // auto begin = std::chrono::steady_clock::now();
 
-        send = inputManager.getData();
-        recorder.update(send);
+        send = inputCollection.getData();
 
         macroCollection.activateMacros();
         if (macroCollection.isMacroActive() &&
-            stopMacrosEvent->getInputValue()) {
+            inputCollection.getStopEventValue()) {
             macroCollection.deactivateMacros();
         }
         if (macroCollection.isMacroActive()) {

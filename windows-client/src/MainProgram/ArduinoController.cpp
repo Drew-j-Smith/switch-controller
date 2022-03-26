@@ -41,13 +41,13 @@ int main() {
         std::getline(std::cin, tempstr);
         switch (option) {
         case 4: {
-            try {
-                StartController();
-            } catch (std::exception &e) {
-                BOOST_LOG_TRIVIAL(error)
-                    << "Uncaught exception in StartController: " +
-                           std::string(e.what()) + "\n";
-            }
+            // try {
+            StartController();
+            // } catch (std::exception &e) {
+            //     BOOST_LOG_TRIVIAL(error)
+            //         << "Uncaught exception in StartController: " +
+            //                std::string(e.what()) + "\n";
+            // }
         } break;
         case 5: {
             std::cout << "Enter the port name:\n";

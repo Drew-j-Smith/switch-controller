@@ -6,7 +6,7 @@
 #define AC_DISPLAY_IMAGE_MATCH 0
 
 ImageProcessingDecider::ImageProcessingDecider(
-    cv::Mat &templatePic, const cv::Mat &maskPic, const int matchMethod,
+    const cv::Mat &templatePic, const cv::Mat &maskPic, const int matchMethod,
     const double matchThreshold, const int minX, const int minY, const int maxX,
     const int maxY, const std::shared_ptr<VideoFrameSink> &videoFrameSink) {
 

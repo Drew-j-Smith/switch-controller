@@ -28,6 +28,8 @@ public:
         for (int i = 0; i < (int)inputEvents.size(); i++) {
             switch (op) {
             case Operators::And:
+                if (i == 0)
+                    res = 1;
                 res = res && inputEvents[i]->getInputValue();
                 break;
             case Operators::Or:
@@ -35,9 +37,11 @@ public:
                 break;
             case Operators::Not:
                 res = !inputEvents[i]->getInputValue();
+                break;
             case Operators::Xor:
                 res = (res && inputEvents[i]->getInputValue()) ||
                       (!res && !inputEvents[i]->getInputValue());
+                break;
             default:
                 break;
             }
