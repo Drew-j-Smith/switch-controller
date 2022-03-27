@@ -5,7 +5,6 @@
 
 #include "InputEvent/InputEvent.h"
 #include "Macro.h"
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 class MacroRecorder {
 private:
@@ -35,10 +34,9 @@ public:
                     .count() > RECORDING_BUTTON_COOLDOWN) {
             activationTime = now;
             if (recording) {
-                auto ptime = boost::date_time::second_clock<
-                    boost::posix_time::ptime>::local_time();
+                auto time = std::chrono::steady_clock::now();
                 std::string str =
-                    boost::posix_time::to_iso_string(ptime) + ".hex";
+                    std::to_string(time.time_since_epoch().count()) + ".hex";
                 std::cout << "Saved recording to \"RecordedMacros/" << str
                           << "\"" << std::endl;
 

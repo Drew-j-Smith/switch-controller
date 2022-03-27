@@ -60,7 +60,6 @@ public:
     static std::array<uint8_t, 8>
     mergeData(const std::array<uint8_t, 8> &priortyData,
               const std::array<uint8_t, 8> &dataToMerge);
-    InputMergeMode strToInputMergeMode(const std::string &str);
 };
 
 #endif

@@ -1,11 +1,9 @@
 
 #include "SerialPort.h"
-#include "ErrorTypes/SerialError.h"
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/bind.hpp>
-#include <boost/log/trivial.hpp>
 
 std::unique_ptr<boost::asio::serial_port>
 initializeSerialPort(std::string serialPort, unsigned int baud,
@@ -18,10 +16,9 @@ initializeSerialPort(std::string serialPort, unsigned int baud,
         std::cout << "Serial communication intialized.\n";
         return port;
     } catch (const std::exception &e) {
-        BOOST_LOG_TRIVIAL(error)
-            << "Fatal error opening serial port.\n\tError: \"" +
-                   std::string(e.what()) + "\"\n\tDoes the port exist?\n";
-        throw SerialError(e.what());
+        throw std::runtime_error(
+            "Fatal error opening serial port.\n\tError: \"" +
+            std::string(e.what()) + "\"\n\tDoes the port exist?\n");
     }
 }
 
@@ -44,14 +41,16 @@ void testSerialPort(std::unique_ptr<boost::asio::serial_port> &serialPort,
     int readRes = 0;
     boost::asio::async_write(*serialPort,
                              boost::asio::buffer(writeData, writeLen),
-                             boost::bind(&asyncHandler, _1, _2, &writeRes));
+                             boost::bind(&asyncHandler, boost::placeholders::_1,
+                                         boost::placeholders::_2, &writeRes));
     boost::asio::async_read(*serialPort, boost::asio::buffer(readData, readLen),
-                            boost::bind(&asyncHandler, _1, _2, &readRes));
+                            boost::bind(&asyncHandler, boost::placeholders::_1,
+                                        boost::placeholders::_2, &readRes));
 
     io->run_for(std::chrono::milliseconds(1000));
     serialPort->cancel();
     if (writeRes <= 0 || readRes <= 0) {
-        throw SerialError("Unable to establish serial connection.\n");
+        throw std::runtime_error("Unable to establish serial connection.\n");
     }
     std::cout << "Serial communication established.\n";
 }

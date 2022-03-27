@@ -4,18 +4,14 @@
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace/stacktrace.hpp>
 
 #include "pch.h"
 
 #include "MainProgram.h"
 
 #include "Decider/DeciderCollection.h"
-#include "InputEvent/ConcreteClasses/InputEventToggle.h"
 #include "InputEvent/Utility/InputCollection.h"
 #include "Macro/MacroCollection.h"
-#include "Macro/MacroRecorder.h"
 #include "Utility/SerialPort.h"
 
 #include "FFmpeg/AudioFrameSink.h"

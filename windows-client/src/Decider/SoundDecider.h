@@ -35,8 +35,6 @@ public:
 
     void update() override;
 
-    const std::vector<float> *getMatchAudio() const { return &matchAudio; }
-
     int nextListIndex() const override;
 };
 

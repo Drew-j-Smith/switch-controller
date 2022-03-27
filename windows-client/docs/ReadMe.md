@@ -8,7 +8,7 @@ is not easily put into code documentation.
 
 ## Dependencies
 
-- [Boost](https://www.boost.org/) : used for serial, json parsing, date-time calculation, endian and circular buffer
+- [Boost](https://www.boost.org/) : used for serial, endian circular buffer and lockfree queue
 
 - [OpenCV](https://opencv.org/) : used for image processing
 

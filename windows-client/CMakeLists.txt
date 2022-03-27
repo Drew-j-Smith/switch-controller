@@ -9,15 +9,9 @@ project(ArduinoController)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*")
-
-# needed for boost json parser to not give a warning
-add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
-
-
 find_package(OpenCV REQUIRED)
 find_package(SFML 2 COMPONENTS window graphics REQUIRED)
-find_package(Boost COMPONENTS system thread unit_test_framework log REQUIRED)
+find_package(Boost REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
 find_package(FFMPEG REQUIRED)
 
@@ -38,11 +32,7 @@ ${SFML_INCLUDE_DIRS}
 ${Boost_INCLUDE_DIRS}
 ${FFTW3_INCLUDE_DIRS}
 ${FFMPEG_INCLUDE_DIRS}
-${FFMPEG_LIBRARY_DIRS}
 )
 
 
 add_subdirectory(src)
-
-enable_testing()
-add_subdirectory(test)

@@ -1,30 +1,15 @@
 #include "ImageProcessingDecider.h"
 
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace.hpp>
-
 #define AC_DISPLAY_IMAGE_MATCH 0
 
 ImageProcessingDecider::ImageProcessingDecider(
     const cv::Mat &templatePic, const cv::Mat &maskPic, const int matchMethod,
     const double matchThreshold, const int minX, const int minY, const int maxX,
-    const int maxY, const std::shared_ptr<VideoFrameSink> &videoFrameSink) {
-
-    this->templatePic = templatePic;
-    this->maskPic = maskPic;
-    this->matchMethod = matchMethod;
-    this->matchThreshold = matchThreshold;
-    this->minX = minX;
-    this->minY = minY;
-    this->maxX = maxX;
-    this->maxY = maxY;
-
-    this->videoFrameSink = videoFrameSink;
-
-    matchPointX.store(0);
-    matchPointY.store(0);
-    critalMatchVal.store(0);
-}
+    const int maxY, const std::shared_ptr<VideoFrameSink> &videoFrameSink)
+    : templatePic(templatePic), maskPic(maskPic), matchMethod(matchMethod),
+      matchThreshold(matchThreshold), minX(minX), minY(minY), maxX(maxX),
+      maxY(maxY), videoFrameSink(videoFrameSink), matchPointX(0),
+      matchPointY(0), critalMatchVal(0) {}
 
 int ImageProcessingDecider::nextListIndex() const {
     double matchX = matchPointX.load();

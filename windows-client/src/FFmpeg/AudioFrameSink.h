@@ -1,7 +1,6 @@
 #ifndef AUDIO_FRAME_SINK_H
 #define AUDIO_FRAME_SINK_H
 
-#include "ErrorTypes/FFmpegError.h"
 #include "FFmpegFrameSink.h"
 
 #include <boost/circular_buffer.hpp>
@@ -46,8 +45,8 @@ private:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            throw FFmpegInitError("Error Initializing AudioFrameSink " +
-                                  std::string(error));
+            throw std::runtime_error("Error Initializing AudioFrameSink " +
+                                     std::string(error));
         }
     }
 
@@ -76,7 +75,7 @@ private:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            throw FFmpegRuntimeError(
+            throw std::runtime_error(
                 "Error converting audio in AudioFrameSink: " +
                 std::string(error));
         }

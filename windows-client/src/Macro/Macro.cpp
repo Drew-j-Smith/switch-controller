@@ -1,22 +1,6 @@
 #include "Macro.h"
 
 #include <boost/endian/conversion.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace/stacktrace.hpp>
-
-Macro::InputMergeMode Macro::strToInputMergeMode(const std::string &str) {
-    if (str == "block input")
-        return blockInput;
-    if (str == "input priority")
-        return inputPriority;
-    if (str == "macro priority")
-        return macroPriority;
-
-    BOOST_LOG_TRIVIAL(warning)
-        << "Unrecognized input merge mode \"" + str + "\n" +
-               boost::stacktrace::to_string(boost::stacktrace::stacktrace());
-    return inputPriority;
-}
 
 std::array<uint8_t, 8>
 Macro::getDataframe(uint64_t time,
@@ -81,7 +65,7 @@ Macro::mergeData(const std::array<uint8_t, 8> &priortyData,
 void Macro::saveData(std::string filename) const {
     std::ofstream outfile(filename, std::ios::binary);
     if (!outfile.is_open()) {
-        BOOST_LOG_TRIVIAL(error) << "Could not open file " + filename + "\n";
+        std::cerr << "Could not open file " + filename + "\n";
         return;
     }
     for (auto macroData : data) {
@@ -93,7 +77,7 @@ void Macro::loadData(std::string filename) {
     data.clear();
     std::ifstream infile(filename, std::ios::binary);
     if (!infile.is_open()) {
-        BOOST_LOG_TRIVIAL(error) << "Could not open file " + filename + "\n";
+        std::cerr << "Could not open file " + filename + "\n";
         return;
     }
     while (!infile.eof()) {

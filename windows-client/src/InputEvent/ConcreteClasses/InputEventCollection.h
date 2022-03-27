@@ -5,9 +5,6 @@
 
 #include "InputEvent/InputEvent.h"
 
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace.hpp>
-
 class InputEventCollection : public InputEvent {
 public:
     enum Operators { And, Or, Not, Xor };

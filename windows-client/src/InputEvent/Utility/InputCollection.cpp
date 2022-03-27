@@ -1,8 +1,5 @@
 #include "InputCollection.h"
 
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace/stacktrace.hpp>
-
 #include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
 
 InputCollection::InputCollection(

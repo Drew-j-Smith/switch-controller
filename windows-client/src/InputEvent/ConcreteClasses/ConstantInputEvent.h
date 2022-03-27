@@ -14,9 +14,6 @@
 
 #include "InputEvent/InputEvent.h"
 
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace.hpp>
-
 /**
  * @brief The ConstantInputEvent is a basic implementation of InputEvent
  * which returns a constant value.

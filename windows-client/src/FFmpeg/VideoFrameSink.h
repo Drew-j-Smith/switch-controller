@@ -1,7 +1,6 @@
 #ifndef VIDEO_FRAME_SINK_H
 #define VIDEO_FRAME_SINK_H
 
-#include "ErrorTypes/FFmpegError.h"
 #include "FFmpegFrameSink.h"
 
 #include "pch.h"
@@ -42,8 +41,9 @@ private:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            throw FFmpegInitError("Error getting linesize in VideoFrameSink: " +
-                                  std::string(error));
+            throw std::runtime_error(
+                "Error getting linesize in VideoFrameSink: " +
+                std::string(error));
         }
 
         res = av_image_get_buffer_size(outputPixelFormat, outputWidth,
@@ -51,7 +51,7 @@ private:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            throw FFmpegInitError(
+            throw std::runtime_error(
                 "Error getting plane size in VideoFrameSink: " +
                 std::string(error));
         }
@@ -65,7 +65,8 @@ private:
     void getDataVirtual(AVFrame *frame, std::vector<uint8_t> &data) override {
         if (frame->width != width || frame->height != height ||
             frame->format != pixelFormat) {
-            throw FFmpegRuntimeError("Cannot support changing input format");
+            throw std::runtime_error(
+                "Cannot support changing input format in VideoFrameSink");
         }
 
         data.resize(vectorSize);
@@ -75,7 +76,7 @@ private:
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
             av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, res);
-            throw FFmpegRuntimeError(
+            throw std::runtime_error(
                 "Error converting image in VideoFrameSink: " +
                 std::string(error));
         }

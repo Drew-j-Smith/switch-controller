@@ -1,15 +1,14 @@
-#include "Utility/SerialPort.h"
+#include "MainProgram.h"
 
 #include "pch.h"
 
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/VideoFrameSink.h"
-#include "InputEvent/InputEvent.h"
-#include "MainProgram.h"
-#include "SFML/SFMLRenderer.h"
 
-#include <boost/log/trivial.hpp>
+#include "SFML/SFMLRenderer.h"
+#include "Utility/SerialPort.h"
+
 #include <opencv2/core/utils/logger.hpp>
 
 const std::string options =
@@ -41,13 +40,12 @@ int main() {
         std::getline(std::cin, tempstr);
         switch (option) {
         case 4: {
-            // try {
-            StartController();
-            // } catch (std::exception &e) {
-            //     BOOST_LOG_TRIVIAL(error)
-            //         << "Uncaught exception in StartController: " +
-            //                std::string(e.what()) + "\n";
-            // }
+            try {
+                StartController();
+            } catch (std::exception &e) {
+                std::cerr << "Uncaught exception in StartController: " +
+                                 std::string(e.what()) + "\n";
+            }
         } break;
         case 5: {
             std::cout << "Enter the port name:\n";
@@ -63,9 +61,8 @@ int main() {
 
                 testSerialPort(port, 8, send, 1, recieve, &io);
             } catch (std::exception &e) {
-                BOOST_LOG_TRIVIAL(error)
-                    << "Failure connecting via serial port.\n" +
-                           std::string(e.what()) + "\n";
+                std::cerr << "Failure connecting via serial port.\n" +
+                                 std::string(e.what()) + "\n";
             }
         } break;
         case 6: {

@@ -5,9 +5,6 @@
 
 #include <SFML/Window/Joystick.hpp>
 
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace/stacktrace.hpp>
-
 #include "InputEvent/InputEvent.h"
 
 class SfJoystickInputEvent : public InputEvent {
@@ -32,11 +29,8 @@ public:
     }
     void assertConnected() {
         if (!sf::Joystick::isConnected(joystickIndex)) {
-            BOOST_LOG_TRIVIAL(warning)
-                << "Joystick " + std::to_string(joystickIndex) +
-                       " was requested but is not connected.\n" +
-                       boost::stacktrace::to_string(
-                           boost::stacktrace::stacktrace());
+            std::cerr << "Joystick " + std::to_string(joystickIndex) +
+                             " was requested but is not connected.\n";
         }
     }
 

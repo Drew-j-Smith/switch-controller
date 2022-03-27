@@ -4,15 +4,9 @@
   "dependencies": [
     "opencv",
     "sfml",
-    "boost-property-tree",
     "boost-asio",
-    "boost-test",
-    "boost-date-time",
     "boost-endian",
     "boost-circular-buffer",
-    "boost-functional",
-    "boost-log",
-    "boost-stacktrace",
     "boost-lockfree",
     "fftw3",
     "ffmpeg"

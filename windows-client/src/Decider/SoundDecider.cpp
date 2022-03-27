@@ -1,8 +1,5 @@
 #include "SoundDecider.h"
 
-#include <boost/log/trivial.hpp>
-#include <boost/stacktrace/stacktrace.hpp>
-
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
 
