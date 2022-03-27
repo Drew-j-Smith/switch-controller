@@ -1,10 +1,10 @@
-#ifndef CONSTANT_INPUT_EVENT_H
-#define CONSTANT_INPUT_EVENT_H
+#ifndef CONSTANT_EVENT_H
+#define CONSTANT_EVENT_H
 
 /**
- * @file ConstantInputEvent.h
+ * @file ConstantEvent.h
  * @author Drew Smith
- * @brief The ConstantInputEvent is a basic implementation of InputEvent
+ * @brief The ConstantEvent is a basic implementation of Event
  * which returns a constant value.
  * @date 2021-10-17
  *
@@ -12,21 +12,21 @@
 
 #include "pch.h"
 
-#include "InputEvent/InputEvent.h"
+#include "Event/Event.h"
 
 /**
- * @brief The ConstantInputEvent is a basic implementation of InputEvent
+ * @brief The ConstantEvent is a basic implementation of Event
  * which returns a constant value.
  *
  */
-class ConstantInputEvent : public InputEvent {
+class ConstantEvent : public Event {
 private:
     int inputValue = 0;
     bool digital = true;
 
 public:
-    ConstantInputEvent(){};
-    ConstantInputEvent(int inputValue, bool isDigital)
+    ConstantEvent(){};
+    ConstantEvent(int inputValue, bool isDigital)
         : inputValue(inputValue), digital(isDigital){};
 
     int getInputValue() const override { return inputValue; }

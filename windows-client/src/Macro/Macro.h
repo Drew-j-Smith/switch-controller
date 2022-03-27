@@ -4,8 +4,8 @@
 #include "pch.h"
 
 #include "Decider/Decider.h"
-#include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
-#include "InputEvent/InputEvent.h"
+#include "Event/ConcreteClasses/ConstantEvent.h"
+#include "Event/Event.h"
 
 class Macro {
 public:
@@ -17,8 +17,7 @@ public:
     enum InputMergeMode { blockInput, macroPriority, inputPriority };
 
     Macro(){};
-    Macro(const std::string &dataFilename,
-          std::shared_ptr<InputEvent> inputEvent,
+    Macro(const std::string &dataFilename, std::shared_ptr<Event> inputEvent,
           std::shared_ptr<Decider> decider, InputMergeMode mode)
         : inputEvent(inputEvent), decider(decider), mode(mode) {
         loadData(dataFilename);
@@ -31,18 +30,15 @@ public:
 
 private:
     std::vector<MacroData> data;
-    std::shared_ptr<InputEvent> inputEvent =
-        std::make_shared<ConstantInputEvent>();
+    std::shared_ptr<Event> inputEvent = std::make_shared<ConstantEvent>();
     std::shared_ptr<Decider> decider = std::make_shared<DefaultDecider>();
     InputMergeMode mode = inputPriority;
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
 
 public:
-    const std::shared_ptr<InputEvent> getInputEvent() const {
-        return inputEvent;
-    }
-    void setInputEvent(const std::shared_ptr<InputEvent> newInputEvent) {
+    const std::shared_ptr<Event> getInputEvent() const { return inputEvent; }
+    void setInputEvent(const std::shared_ptr<Event> newInputEvent) {
         this->inputEvent = newInputEvent;
     }
     std::shared_ptr<Macro> getNextMacro();

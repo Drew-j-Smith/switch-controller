@@ -1,13 +1,13 @@
-#ifndef SF_JOYSTICK_DIGITAL_INPUT_EVENT_H
-#define SF_JOYSTICK_DIGITAL_INPUT_EVENT_H
+#ifndef SF_JOYSTICK_DIGITAL_EVENT_H
+#define SF_JOYSTICK_DIGITAL_EVENT_H
 
 #include "pch.h"
 
 #include <SFML/Window/Joystick.hpp>
 
-#include "InputEvent/InputEvent.h"
+#include "Event/Event.h"
 
-class SfJoystickInputEvent : public InputEvent {
+class SfJoystickEvent : public Event {
 private:
     bool isStick = false;
     unsigned int joystickIndex = 0;
@@ -18,12 +18,12 @@ private:
     static constexpr double SCALING = 1.4;
 
 public:
-    SfJoystickInputEvent(){};
-    SfJoystickInputEvent(unsigned int joystickIndex, sf::Joystick::Axis axis)
+    SfJoystickEvent(){};
+    SfJoystickEvent(unsigned int joystickIndex, sf::Joystick::Axis axis)
         : isStick(true), joystickIndex(joystickIndex), axis(axis) {
         assertConnected();
     }
-    SfJoystickInputEvent(unsigned int joystickIndex, unsigned int button)
+    SfJoystickEvent(unsigned int joystickIndex, unsigned int button)
         : isStick(false), joystickIndex(joystickIndex), button(button) {
         assertConnected();
     }

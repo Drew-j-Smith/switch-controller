@@ -10,7 +10,7 @@
 #include "MainProgram.h"
 
 #include "Decider/DeciderCollection.h"
-#include "InputEvent/Utility/InputCollection.h"
+#include "Event/Utility/InputCollection.h"
 #include "Macro/MacroCollection.h"
 #include "Utility/SerialPort.h"
 
@@ -23,8 +23,8 @@ void initializeGameCapture(std::shared_ptr<FFmpegRecorder> &recorder,
                            std::shared_ptr<AudioFrameSink> &audioSink);
 
 void getConfig(std::string &serialPortName,
-               std::map<std::string, std::shared_ptr<InputEvent>> &events,
-               std::vector<std::shared_ptr<InputEvent>> &createdEvents,
+               std::map<std::string, std::shared_ptr<Event>> &events,
+               std::vector<std::shared_ptr<Event>> &createdEvents,
                std::vector<std::shared_ptr<Decider>> &deciders,
                std::vector<std::shared_ptr<Macro>> &macros,
                std::shared_ptr<VideoFrameSink> videoSink,
@@ -43,8 +43,8 @@ void StartController() {
     initializeGameCapture(recorder, videoSink, audioSink);
 
     std::string serialPortName;
-    std::map<std::string, std::shared_ptr<InputEvent>> events;
-    std::vector<std::shared_ptr<InputEvent>> createdEvents;
+    std::map<std::string, std::shared_ptr<Event>> events;
+    std::vector<std::shared_ptr<Event>> createdEvents;
     std::vector<std::shared_ptr<Decider>> deciders;
     std::vector<std::shared_ptr<Macro>> macros;
     getConfig(serialPortName, events, createdEvents, deciders, macros,

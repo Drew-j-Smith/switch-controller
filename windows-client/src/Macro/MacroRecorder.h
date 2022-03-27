@@ -3,7 +3,7 @@
 
 #include "pch.h"
 
-#include "InputEvent/InputEvent.h"
+#include "Event/Event.h"
 #include "Macro.h"
 
 class MacroRecorder {
@@ -12,15 +12,15 @@ private:
 
     std::shared_ptr<Macro> currentRecordingMacro = std::make_shared<Macro>();
     std::shared_ptr<Macro> lastRecordedMacro = std::make_shared<Macro>();
-    std::shared_ptr<InputEvent> record;
+    std::shared_ptr<Event> record;
 
     std::chrono::steady_clock::time_point activationTime =
         std::chrono::steady_clock::now();
     bool recording = false;
 
 public:
-    MacroRecorder(std::shared_ptr<InputEvent> recordEvent,
-                  std::shared_ptr<InputEvent> playEvent) {
+    MacroRecorder(std::shared_ptr<Event> recordEvent,
+                  std::shared_ptr<Event> playEvent) {
         lastRecordedMacro->setInputEvent(playEvent);
         record = recordEvent;
     }

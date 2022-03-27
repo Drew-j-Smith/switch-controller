@@ -12,7 +12,7 @@
  */
 #include "pch.h"
 
-#include "InputEvent/InputEvent.h"
+#include "Event/Event.h"
 #include "Macro/MacroRecorder.h"
 
 /**
@@ -31,14 +31,13 @@ private:
      */
     const int JOYSTICK_DEADZONE = 30;
 
-    std::map<std::string, std::shared_ptr<InputEvent>> map;
-    std::vector<std::shared_ptr<InputEvent>> events;
+    std::map<std::string, std::shared_ptr<Event>> map;
+    std::vector<std::shared_ptr<Event>> events;
     std::shared_ptr<MacroRecorder> recorder;
 
 public:
-    InputCollection(
-        const std::map<std::string, std::shared_ptr<InputEvent>> &map,
-        const std::vector<std::shared_ptr<InputEvent>> &events);
+    InputCollection(const std::map<std::string, std::shared_ptr<Event>> &map,
+                    const std::vector<std::shared_ptr<Event>> &events);
 
     void update();
 

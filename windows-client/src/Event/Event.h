@@ -1,10 +1,10 @@
-#ifndef INPUT_EVENT_H
-#define INPUT_EVENT_H
+#ifndef EVENT_H
+#define EVENT_H
 
 /**
- * @file InputEvent.h
+ * @file Event.h
  * @author Drew Smith
- * @brief The InputEvent class is used to abstract various digital
+ * @brief The Event class is used to abstract various digital
  * and analog input methods.
  * @date 2021-04-21
  *
@@ -13,13 +13,13 @@
 #include "pch.h"
 
 /**
- * @brief The InputEvent class is used to abstract various digital
+ * @brief The Event class is used to abstract various digital
  * and analog input methods.
  *
  */
-class InputEvent {
+class Event {
 public:
-    virtual ~InputEvent() {}
+    virtual ~Event() {}
 
     /**
      * @brief Gets the input value from the object.

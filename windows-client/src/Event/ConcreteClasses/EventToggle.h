@@ -1,23 +1,22 @@
-#ifndef INPUT_EVENT_TOGGLE_H
-#define INPUT_EVENT_TOGGLE_H
+#ifndef EVENT_TOGGLE_H
+#define EVENT_TOGGLE_H
 
 #include "pch.h"
 
-#include "ConstantInputEvent.h"
-#include "InputEvent/InputEvent.h"
+#include "ConstantEvent.h"
+#include "Event/Event.h"
 
-class InputEventToggle : public InputEvent {
+class EventToggle : public Event {
 private:
     int cooldown = 0;
     bool active = false;
-    std::shared_ptr<InputEvent> event = std::make_shared<ConstantInputEvent>();
+    std::shared_ptr<Event> event = std::make_shared<ConstantEvent>();
     std::chrono::steady_clock::time_point lastActivation =
         std::chrono::steady_clock::now();
 
 public:
-    InputEventToggle() {}
-    InputEventToggle(const int cooldown,
-                     const std::shared_ptr<InputEvent> event) {
+    EventToggle() {}
+    EventToggle(const int cooldown, const std::shared_ptr<Event> event) {
         this->cooldown = cooldown;
         this->event = event;
     }

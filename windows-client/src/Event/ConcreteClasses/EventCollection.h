@@ -1,22 +1,22 @@
-#ifndef INPUT_EVENT_COLLECTION_H
-#define INPUT_EVENT_COLLECTION_H
+#ifndef EVENT_COLLECTION_H
+#define EVENT_COLLECTION_H
 
 #include "pch.h"
 
-#include "InputEvent/InputEvent.h"
+#include "Event/Event.h"
 
-class InputEventCollection : public InputEvent {
+class EventCollection : public Event {
 public:
     enum Operators { And, Or, Not, Xor };
 
 private:
-    std::vector<std::shared_ptr<InputEvent>> inputEvents;
+    std::vector<std::shared_ptr<Event>> inputEvents;
     Operators op = Operators::And;
 
 public:
-    InputEventCollection(){};
-    InputEventCollection(std::vector<std::shared_ptr<InputEvent>> inputEvents,
-                         Operators op)
+    EventCollection(){};
+    EventCollection(std::vector<std::shared_ptr<Event>> inputEvents,
+                    Operators op)
         : inputEvents(inputEvents), op(op){};
 
     int getInputValue() const override {

@@ -2,12 +2,12 @@
 #include "pch.h"
 
 #include "Decider/Decider.h"
-#include "InputEvent/InputEvent.h"
+#include "Event/Event.h"
 #include "Macro/Macro.h"
 
-#include "InputEvent/ConcreteClasses/InputEventCollection.h"
-#include "InputEvent/ConcreteClasses/SfJoystickInputEvent.h"
-#include "InputEvent/ConcreteClasses/SfKeyboardInputEvent.h"
+#include "Event/ConcreteClasses/EventCollection.h"
+#include "Event/ConcreteClasses/SfJoystickEvent.h"
+#include "Event/ConcreteClasses/SfKeyboardEvent.h"
 
 #include "Decider/ImageProcessingDecider.h"
 #include "Decider/SoundDecider.h"
@@ -22,13 +22,11 @@ using std::string;
 
 #define AC_ADD_INPUT_EVENT_BUTTON(button, name)                                \
     {                                                                          \
-        shared_ptr<InputEvent> joystickTemp =                                  \
-            make_shared<SfJoystickInputEvent>(0, button);                      \
-        shared_ptr<InputEvent> collectionTemp =                                \
-            make_shared<InputEventCollection>(                                 \
-                std::vector<shared_ptr<InputEvent>>{invertedToggle,            \
-                                                    joystickTemp},             \
-                InputEventCollection::And);                                    \
+        shared_ptr<Event> joystickTemp =                                       \
+            make_shared<SfJoystickEvent>(0, button);                           \
+        shared_ptr<Event> collectionTemp = make_shared<EventCollection>(       \
+            std::vector<shared_ptr<Event>>{invertedToggle, joystickTemp},      \
+            EventCollection::And);                                             \
         createdEvents.push_back(joystickTemp);                                 \
         createdEvents.push_back(collectionTemp);                               \
         eventMap.insert({name, collectionTemp});                               \
@@ -36,8 +34,8 @@ using std::string;
 
 #define AC_ADD_INPUT_EVENT_STICK(stick, name)                                  \
     {                                                                          \
-        shared_ptr<InputEvent> joystickTemp =                                  \
-            make_shared<SfJoystickInputEvent>(0, (sf::Joystick::Axis)stick);   \
+        shared_ptr<Event> joystickTemp =                                       \
+            make_shared<SfJoystickEvent>(0, (sf::Joystick::Axis)stick);        \
         createdEvents.push_back(joystickTemp);                                 \
         eventMap.insert({name, joystickTemp});                                 \
     }
@@ -65,8 +63,8 @@ void initializeGameCapture(shared_ptr<FFmpegRecorder> &recorder,
 }
 
 void getConfig(std::string &serialPortName,
-               std::map<std::string, std::shared_ptr<InputEvent>> &eventMap,
-               std::vector<std::shared_ptr<InputEvent>> &createdEvents,
+               std::map<std::string, std::shared_ptr<Event>> &eventMap,
+               std::vector<std::shared_ptr<Event>> &createdEvents,
                std::vector<std::shared_ptr<Decider>> &deciders,
                std::vector<std::shared_ptr<Macro>> &macros,
                shared_ptr<VideoFrameSink> videoSink,
@@ -81,13 +79,11 @@ void getConfig(std::string &serialPortName,
     // controller on windows
 
     // capture button
-    shared_ptr<InputEvent> toggle = make_shared<SfJoystickInputEvent>(0, 13);
+    shared_ptr<Event> toggle = make_shared<SfJoystickEvent>(0, 13);
     createdEvents.push_back(toggle);
 
-    shared_ptr<InputEvent> invertedToggle =
-        std::make_shared<InputEventCollection>(
-            std::vector<std::shared_ptr<InputEvent>>{toggle},
-            InputEventCollection::Not);
+    shared_ptr<Event> invertedToggle = std::make_shared<EventCollection>(
+        std::vector<std::shared_ptr<Event>>{toggle}, EventCollection::Not);
     createdEvents.push_back(invertedToggle);
 
     AC_ADD_INPUT_EVENT_BUTTON(1, "a");
@@ -132,12 +128,12 @@ void getConfig(std::string &serialPortName,
     // TODO
     // Macros
     // clang-format off
-    // auto macro1Event = make_shared<SfKeyboardInputEvent>(sf::Keyboard::B);
+    // auto macro1Event = make_shared<SfKeyboardEvent>(sf::Keyboard::B);
     // auto macro1 =
     //     make_shared<Macro>("data/test6.txt", macro1Event, animalCrossingDecider,
     //                        Macro::inputPriority);
     // auto macro2 =
-    //     make_shared<Macro>("data/test5.txt", make_shared<ConstantInputEvent>(),
+    //     make_shared<Macro>("data/test5.txt", make_shared<ConstantEvent>(),
     //                        make_shared<DefaultDecider>(), Macro::inputPriority);
 
     // macro1->setNextMacroLists(

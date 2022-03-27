@@ -1,21 +1,19 @@
 #include "InputCollection.h"
 
-#include "InputEvent/ConcreteClasses/ConstantInputEvent.h"
+#include "Event/ConcreteClasses/ConstantEvent.h"
 
 InputCollection::InputCollection(
-    const std::map<std::string, std::shared_ptr<InputEvent>> &map,
-    const std::vector<std::shared_ptr<InputEvent>> &events)
+    const std::map<std::string, std::shared_ptr<Event>> &map,
+    const std::vector<std::shared_ptr<Event>> &events)
     : map(map), events(events) {
 
     auto recordEventIt = map.find("record");
-    std::shared_ptr<InputEvent> recordEvent =
-        std::make_shared<ConstantInputEvent>();
+    std::shared_ptr<Event> recordEvent = std::make_shared<ConstantEvent>();
     if (recordEventIt != map.end()) {
         recordEvent = recordEventIt->second;
     }
     auto playEventIt = map.find("playLastRecorded");
-    std::shared_ptr<InputEvent> playEvent =
-        std::make_shared<ConstantInputEvent>();
+    std::shared_ptr<Event> playEvent = std::make_shared<ConstantEvent>();
     if (playEventIt != map.end()) {
         playEvent = playEventIt->second;
     }
