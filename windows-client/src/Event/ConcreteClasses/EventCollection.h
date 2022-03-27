@@ -1,6 +1,14 @@
 #ifndef EVENT_COLLECTION_H
 #define EVENT_COLLECTION_H
 
+/**
+ * @file EventCollection.h
+ * @brief The EventCollection contains a list of Events and performs operation
+ * on them to get its event
+ * @date 2022-03-27
+ *
+ */
+
 #include "pch.h"
 
 #include "Event/Event.h"
@@ -10,34 +18,33 @@ public:
     enum Operators { And, Or, Not, Xor };
 
 private:
-    std::vector<std::shared_ptr<Event>> inputEvents;
+    std::vector<std::shared_ptr<Event>> events;
     Operators op = Operators::And;
 
 public:
     EventCollection(){};
-    EventCollection(std::vector<std::shared_ptr<Event>> inputEvents,
-                    Operators op)
-        : inputEvents(inputEvents), op(op){};
+    EventCollection(std::vector<std::shared_ptr<Event>> events, Operators op)
+        : events(events), op(op){};
 
-    int getInputValue() const override {
-        int res = 0;
+    uint8_t getEventValue() const override {
+        uint8_t res = 0;
 
-        for (int i = 0; i < (int)inputEvents.size(); i++) {
+        for (unsigned int i = 0; i < events.size(); i++) {
             switch (op) {
             case Operators::And:
                 if (i == 0)
                     res = 1;
-                res = res && inputEvents[i]->getInputValue();
+                res = res && events[i]->getEventValue();
                 break;
             case Operators::Or:
-                res = res || inputEvents[i]->getInputValue();
+                res = res || events[i]->getEventValue();
                 break;
             case Operators::Not:
-                res = !inputEvents[i]->getInputValue();
+                res = !events[i]->getEventValue();
                 break;
             case Operators::Xor:
-                res = (res && inputEvents[i]->getInputValue()) ||
-                      (!res && !inputEvents[i]->getInputValue());
+                res = (res && events[i]->getEventValue()) ||
+                      (!res && !events[i]->getEventValue());
                 break;
             default:
                 break;

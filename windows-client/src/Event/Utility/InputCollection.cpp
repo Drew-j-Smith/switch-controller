@@ -49,15 +49,15 @@ std::array<uint8_t, 8> InputCollection::getData() const {
     return res;
 }
 
-void InputCollection::setStickValue(uint8_t &xres, uint8_t &yres, int xvalue,
-                                    int yvalue) const {
+void InputCollection::setStickValue(uint8_t &xres, uint8_t &yres,
+                                    uint8_t xvalue, uint8_t yvalue) const {
     if (xvalue > 128 - JOYSTICK_DEADZONE && xvalue < 128 + JOYSTICK_DEADZONE &&
         yvalue > 128 - JOYSTICK_DEADZONE && yvalue < 128 + JOYSTICK_DEADZONE) {
         xres = 128;
         yres = 128;
     } else {
-        xres = (uint8_t)xvalue;
-        yres = (uint8_t)yvalue;
+        xres = xvalue;
+        yres = yvalue;
     }
 }
 

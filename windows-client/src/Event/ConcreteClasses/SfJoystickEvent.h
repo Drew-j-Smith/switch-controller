@@ -1,6 +1,13 @@
 #ifndef SF_JOYSTICK_DIGITAL_EVENT_H
 #define SF_JOYSTICK_DIGITAL_EVENT_H
 
+/**
+ * @file SfJoystickEvent.h
+ * @brief the SfJoystickEvent is used to capture joystick events from SFML
+ * @date 2022-03-27
+ *
+ */
+
 #include "pch.h"
 
 #include <SFML/Window/Joystick.hpp>
@@ -34,7 +41,7 @@ public:
         }
     }
 
-    int getInputValue() const override {
+    uint8_t getEventValue() const override {
         if (!sf::Joystick::isConnected(joystickIndex) ||
             (!isStick &&
              sf::Joystick::getButtonCount(joystickIndex) < button) ||
@@ -48,7 +55,7 @@ public:
                                           joystickIndex, axis) *
                                           SCALING) /
                                200.0 * 255.0);
-            return std::clamp(scaled, 0, 255);
+            return (uint8_t)std::clamp(scaled, 0, 255);
         } else {
             return sf::Joystick::isButtonPressed(joystickIndex, button);
         }

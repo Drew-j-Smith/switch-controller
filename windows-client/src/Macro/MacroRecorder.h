@@ -21,14 +21,14 @@ private:
 public:
     MacroRecorder(std::shared_ptr<Event> recordEvent,
                   std::shared_ptr<Event> playEvent) {
-        lastRecordedMacro->setInputEvent(playEvent);
+        lastRecordedMacro->setActivateEvent(playEvent);
         record = recordEvent;
     }
 
     void update(const std::array<uint8_t, 8> &data) {
         auto now = std::chrono::steady_clock::now();
 
-        if (record->getInputValue() &&
+        if (record->getEventValue() &&
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 now - activationTime)
                     .count() > RECORDING_BUTTON_COOLDOWN) {

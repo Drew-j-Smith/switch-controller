@@ -53,29 +53,16 @@ public:
 private:
     uint8_t getInputValue(const std::string &key) const {
         if (map.find(key) != map.end()) {
-            return (uint8_t)map.at(key)->getInputValue();
+            return (uint8_t)map.at(key)->getEventValue();
         }
         return 0;
     }
 
-    void setStickValue(uint8_t &xres, uint8_t &yres, int xvalue,
-                       int yvalue) const;
+    void setStickValue(uint8_t &xres, uint8_t &yres, uint8_t xvalue,
+                       uint8_t yvalue) const;
 
-    /**
-     * @brief Gets the Dpad data from the inputs array
-     *
-     * @return unsigned char The Dpad value
-     */
     unsigned char getDpadData() const;
-    /**
-     * @brief Get the Dpad data from the provided arguments
-     *
-     * @param up if up is pressed
-     * @param right if right is pressed
-     * @param down if down is pressed
-     * @param left if left is pressed
-     * @return unsigned char The Dpad value
-     */
+
     unsigned char getDpadData(bool up, bool right, bool down, bool left) const;
 };
 

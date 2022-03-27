@@ -20,7 +20,7 @@ using std::make_shared;
 using std::shared_ptr;
 using std::string;
 
-#define AC_ADD_INPUT_EVENT_BUTTON(button, name)                                \
+#define AC_ADD_EVENT_BUTTON(button, name)                                      \
     {                                                                          \
         shared_ptr<Event> joystickTemp =                                       \
             make_shared<SfJoystickEvent>(0, button);                           \
@@ -32,7 +32,7 @@ using std::string;
         eventMap.insert({name, collectionTemp});                               \
     }
 
-#define AC_ADD_INPUT_EVENT_STICK(stick, name)                                  \
+#define AC_ADD_EVENT_STICK(stick, name)                                        \
     {                                                                          \
         shared_ptr<Event> joystickTemp =                                       \
             make_shared<SfJoystickEvent>(0, (sf::Joystick::Axis)stick);        \
@@ -86,36 +86,36 @@ void getConfig(std::string &serialPortName,
         std::vector<std::shared_ptr<Event>>{toggle}, EventCollection::Not);
     createdEvents.push_back(invertedToggle);
 
-    AC_ADD_INPUT_EVENT_BUTTON(1, "a");
-    AC_ADD_INPUT_EVENT_BUTTON(0, "b");
-    AC_ADD_INPUT_EVENT_BUTTON(3, "x");
-    AC_ADD_INPUT_EVENT_BUTTON(2, "y");
-    AC_ADD_INPUT_EVENT_BUTTON(4, "l");
-    AC_ADD_INPUT_EVENT_BUTTON(5, "r");
-    AC_ADD_INPUT_EVENT_BUTTON(6, "xl");
-    AC_ADD_INPUT_EVENT_BUTTON(7, "xr");
-    AC_ADD_INPUT_EVENT_BUTTON(8, "select");
-    AC_ADD_INPUT_EVENT_BUTTON(9, "start");
-    AC_ADD_INPUT_EVENT_BUTTON(10, "lClick");
-    AC_ADD_INPUT_EVENT_BUTTON(11, "rClick");
-    AC_ADD_INPUT_EVENT_BUTTON(12, "home");
+    AC_ADD_EVENT_BUTTON(1, "a");
+    AC_ADD_EVENT_BUTTON(0, "b");
+    AC_ADD_EVENT_BUTTON(3, "x");
+    AC_ADD_EVENT_BUTTON(2, "y");
+    AC_ADD_EVENT_BUTTON(4, "l");
+    AC_ADD_EVENT_BUTTON(5, "r");
+    AC_ADD_EVENT_BUTTON(6, "xl");
+    AC_ADD_EVENT_BUTTON(7, "xr");
+    AC_ADD_EVENT_BUTTON(8, "select");
+    AC_ADD_EVENT_BUTTON(9, "start");
+    AC_ADD_EVENT_BUTTON(10, "lClick");
+    AC_ADD_EVENT_BUTTON(11, "rClick");
+    AC_ADD_EVENT_BUTTON(12, "home");
 
-    AC_ADD_INPUT_EVENT_STICK(0, "leftStickX");
-    AC_ADD_INPUT_EVENT_STICK(1, "leftStickY");
-    AC_ADD_INPUT_EVENT_STICK(4, "rightStickX");
-    AC_ADD_INPUT_EVENT_STICK(5, "rightStickY");
-    AC_ADD_INPUT_EVENT_STICK(6, "dpadX");
-    AC_ADD_INPUT_EVENT_STICK(7, "dpadY");
+    AC_ADD_EVENT_STICK(0, "leftStickX");
+    AC_ADD_EVENT_STICK(1, "leftStickY");
+    AC_ADD_EVENT_STICK(4, "rightStickX");
+    AC_ADD_EVENT_STICK(5, "rightStickY");
+    AC_ADD_EVENT_STICK(6, "dpadX");
+    AC_ADD_EVENT_STICK(7, "dpadY");
 
-    // These inputs use the opposite of the toggle
+    // These events use the opposite of the toggle
     invertedToggle = toggle;
 
-    AC_ADD_INPUT_EVENT_BUTTON(1, "record");
-    AC_ADD_INPUT_EVENT_BUTTON(0, "playLastRecorded");
-    AC_ADD_INPUT_EVENT_BUTTON(3, "stopMacros");
+    AC_ADD_EVENT_BUTTON(1, "record");
+    AC_ADD_EVENT_BUTTON(0, "playLastRecorded");
+    AC_ADD_EVENT_BUTTON(3, "stopMacros");
 
     // TODO
-    // AC_ADD_INPUT_EVENT_BUTTON(2, "turboButtonToggle");
+    // AC_ADD_EVENT_BUTTON(2, "turboButtonToggle");
 
     // Deciders
     auto haanitDecider = make_shared<ImageProcessingDecider>(

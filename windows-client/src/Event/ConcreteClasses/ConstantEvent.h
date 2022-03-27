@@ -14,22 +14,17 @@
 
 #include "Event/Event.h"
 
-/**
- * @brief The ConstantEvent is a basic implementation of Event
- * which returns a constant value.
- *
- */
 class ConstantEvent : public Event {
 private:
-    int inputValue = 0;
+    uint8_t eventValue = 0;
     bool digital = true;
 
 public:
     ConstantEvent(){};
-    ConstantEvent(int inputValue, bool isDigital)
-        : inputValue(inputValue), digital(isDigital){};
+    ConstantEvent(uint8_t eventValue, bool isDigital)
+        : eventValue(eventValue), digital(isDigital){};
 
-    int getInputValue() const override { return inputValue; }
+    uint8_t getEventValue() const override { return eventValue; }
     bool isDigital() const override { return digital; }
 
     void update() override {}

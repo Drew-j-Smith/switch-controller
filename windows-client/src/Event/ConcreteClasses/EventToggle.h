@@ -1,6 +1,14 @@
 #ifndef EVENT_TOGGLE_H
 #define EVENT_TOGGLE_H
 
+/**
+ * @file EventToggle.h
+ * @brief The Event Toggle class will take an event, and while it is active,
+ * toggle between 0 and 1 with an specified interval
+ * @date 2022-03-27
+ *
+ */
+
 #include "pch.h"
 
 #include "ConstantEvent.h"
@@ -22,7 +30,7 @@ public:
     }
 
     void update() override {
-        if (event->getInputValue() &&
+        if (event->getEventValue() &&
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - lastActivation)
                     .count() > cooldown) {
@@ -31,7 +39,7 @@ public:
         }
     }
 
-    int getInputValue() const override { return active; };
+    uint8_t getEventValue() const override { return active; };
 
     bool isDigital() const override { return true; }
 };

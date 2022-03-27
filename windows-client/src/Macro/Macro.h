@@ -17,9 +17,9 @@ public:
     enum InputMergeMode { blockInput, macroPriority, inputPriority };
 
     Macro(){};
-    Macro(const std::string &dataFilename, std::shared_ptr<Event> inputEvent,
+    Macro(const std::string &dataFilename, std::shared_ptr<Event> activateEvent,
           std::shared_ptr<Decider> decider, InputMergeMode mode)
-        : inputEvent(inputEvent), decider(decider), mode(mode) {
+        : activateEvent(activateEvent), decider(decider), mode(mode) {
         loadData(dataFilename);
     };
 
@@ -30,16 +30,18 @@ public:
 
 private:
     std::vector<MacroData> data;
-    std::shared_ptr<Event> inputEvent = std::make_shared<ConstantEvent>();
+    std::shared_ptr<Event> activateEvent = std::make_shared<ConstantEvent>();
     std::shared_ptr<Decider> decider = std::make_shared<DefaultDecider>();
     InputMergeMode mode = inputPriority;
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
 
 public:
-    const std::shared_ptr<Event> getInputEvent() const { return inputEvent; }
-    void setInputEvent(const std::shared_ptr<Event> newInputEvent) {
-        this->inputEvent = newInputEvent;
+    const std::shared_ptr<Event> getActivateEvent() const {
+        return activateEvent;
+    }
+    void setActivateEvent(const std::shared_ptr<Event> event) {
+        this->activateEvent = event;
     }
     std::shared_ptr<Macro> getNextMacro();
 

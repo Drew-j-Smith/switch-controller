@@ -34,7 +34,7 @@ MacroCollection::getData(const std::array<uint8_t, 8> &dataToMerge) {
 void MacroCollection::activateMacros() {
     for (auto m : macros) {
         if (activeMacros.find(m) == activeMacros.end() &&
-            m->getInputEvent()->getInputValue()) {
+            m->getActivateEvent()->getEventValue()) {
             activeMacros.insert({m, std::chrono::steady_clock::now()});
         }
     }
