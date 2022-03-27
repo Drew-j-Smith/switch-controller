@@ -5,7 +5,7 @@
 
 #include "Decider.h"
 
-#include "../FFmpeg/AudioFrameSink.h"
+#include "FFmpeg/AudioFrameSink.h"
 
 #include <fftw3.h>
 

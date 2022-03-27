@@ -8,7 +8,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "../FFmpeg/VideoFrameSink.h"
+#include "FFmpeg/VideoFrameSink.h"
 
 #include "Decider.h"
 
