@@ -13,14 +13,11 @@
 
 const std::string options =
     R"(Select one of the following options:
-    1. X
-    2. X
-    3. X
-    4. Run
-    5. Test serial communication
-    6. Test FFmpeg video capture
-    7. Test FFmpeg audio capture
-    8. Exit
+    1. Run
+    2. Test serial communication
+    3. Test FFmpeg video capture
+    4. Test FFmpeg audio capture
+    5. Exit
 )";
 
 int main() {
@@ -33,13 +30,13 @@ int main() {
 
     int option = 0;
 
-    while (option != 8) {
+    while (option != 5) {
         std::cout << options;
         std::cin >> option;
         std::string tempstr;
         std::getline(std::cin, tempstr);
         switch (option) {
-        case 4: {
+        case 1: {
             try {
                 StartController();
             } catch (std::exception &e) {
@@ -47,7 +44,7 @@ int main() {
                                  std::string(e.what()) + "\n";
             }
         } break;
-        case 5: {
+        case 2: {
             std::cout << "Enter the port name:\n";
             std::string portName;
             std::getline(std::cin, portName);
@@ -65,7 +62,7 @@ int main() {
                                  std::string(e.what()) + "\n";
             }
         } break;
-        case 6: {
+        case 3: {
             std::string inputFormat = "dshow";
             std::string deviceName = "video=Game Capture HD60 S";
             std::map<std::string, std::string> ffmpegOptions = {
@@ -106,7 +103,7 @@ int main() {
             running.store(false);
             t.join();
         } break;
-        case 7: {
+        case 4: {
             std::string inputFormat;
             std::string deviceName;
             std::string recordTimeStr;
@@ -168,7 +165,7 @@ int main() {
                                   std::ios::out | std::ios::binary);
             outfile.write((const char *)data->data(), data->size());
         } break;
-        case 8:
+        case 5:
             break;
         default:
             std::cout << "Unkown option: " << option << "\n";
