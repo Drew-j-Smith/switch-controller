@@ -43,23 +43,34 @@ public:
     }
 
     uint8_t value() const override {
-        if (!sf::Joystick::isConnected(joystickIndex) ||
-            (type == Stick &&
-             sf::Joystick::getButtonCount(joystickIndex) < button) ||
-            (type == Button && !sf::Joystick::hasAxis(joystickIndex, axis)))
-            return type == Stick ? 128 : 0;
+        uint8_t res = type == Stick ? 128 : 0;
 
-        if (type == Stick) {
+        if (!sf::Joystick::isConnected(joystickIndex))
+            return res;
+
+        switch (type) {
+        case Stick: {
+            if (sf::Joystick::hasAxis(joystickIndex, axis))
+                break;
             // SFML works on a [-100, 100] scale
             // this scales it to [0, 255] scale
             int scaled = (int)((100 + sf::Joystick::getAxisPosition(
                                           joystickIndex, axis) *
                                           SCALING) /
                                200.0 * 255.0);
-            return (uint8_t)std::clamp(scaled, 0, 255);
-        } else {
-            return sf::Joystick::isButtonPressed(joystickIndex, button);
+
+            res = (uint8_t)std::clamp(scaled, 0, 255);
+            break;
         }
+        case Button: {
+            if (sf::Joystick::getButtonCount(joystickIndex) < button)
+                break;
+
+            res = sf::Joystick::isButtonPressed(joystickIndex, button);
+            break;
+        }
+        }
+        return res;
     }
 
     void update() override {}
