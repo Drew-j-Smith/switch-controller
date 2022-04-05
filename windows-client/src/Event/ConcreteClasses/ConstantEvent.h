@@ -19,8 +19,7 @@ private:
     uint8_t eventValue;
 
 public:
-    ConstantEvent(uint8_t eventValue = 0, Type t = Digital)
-        : Event(t), eventValue(eventValue){};
+    ConstantEvent(uint8_t eventValue = 0) : eventValue(eventValue){};
 
     uint8_t value() const override { return eventValue; }
 

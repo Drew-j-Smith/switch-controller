@@ -24,7 +24,7 @@ private:
 public:
     EventCollection(std::vector<std::shared_ptr<Event>> events = {},
                     Operators op = And)
-        : Event(Digital), events(events), op(op){};
+        : events(events), op(op){};
 
     uint8_t value() const override {
         uint8_t res = 0;

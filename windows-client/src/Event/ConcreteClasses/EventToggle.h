@@ -25,7 +25,7 @@ private:
 public:
     EventToggle(const int cooldown = 0, const std::shared_ptr<Event> event =
                                             std::make_shared<ConstantEvent>())
-        : Event(event->type()), cooldown(cooldown), event(event) {}
+        : cooldown(cooldown), event(event) {}
 
     void update() override {
         if (event->value() &&

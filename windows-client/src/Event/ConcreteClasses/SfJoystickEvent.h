@@ -16,6 +16,8 @@
 
 class SfJoystickEvent : public Event {
 private:
+    enum Type { Button, Stick };
+    Type type;
     unsigned int joystickIndex;
     union {
         unsigned int button;
@@ -26,11 +28,11 @@ private:
 public:
     SfJoystickEvent(unsigned int joystickIndex = 0,
                     sf::Joystick::Axis axis = sf::Joystick::Axis::X)
-        : Event(Analog), joystickIndex(joystickIndex), axis(axis) {
+        : type(Stick), joystickIndex(joystickIndex), axis(axis) {
         assertConnected();
     }
     SfJoystickEvent(unsigned int joystickIndex, unsigned int button = 0)
-        : Event(Digital), joystickIndex(joystickIndex), button(button) {
+        : type(Button), joystickIndex(joystickIndex), button(button) {
         assertConnected();
     }
     void assertConnected() {
@@ -42,12 +44,12 @@ public:
 
     uint8_t value() const override {
         if (!sf::Joystick::isConnected(joystickIndex) ||
-            (m_type == Digital &&
+            (type == Stick &&
              sf::Joystick::getButtonCount(joystickIndex) < button) ||
-            (m_type == Analog && !sf::Joystick::hasAxis(joystickIndex, axis)))
-            return m_type == Analog ? 128 : 0;
+            (type == Button && !sf::Joystick::hasAxis(joystickIndex, axis)))
+            return type == Stick ? 128 : 0;
 
-        if (m_type == Analog) {
+        if (type == Stick) {
             // SFML works on a [-100, 100] scale
             // this scales it to [0, 255] scale
             int scaled = (int)((100 + sf::Joystick::getAxisPosition(
