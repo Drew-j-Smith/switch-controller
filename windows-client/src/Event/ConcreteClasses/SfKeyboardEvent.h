@@ -16,16 +16,13 @@
 
 class SfKeyboardEvent : public Event {
 private:
-    sf::Keyboard::Key key = sf::Keyboard::Unknown;
+    sf::Keyboard::Key key;
 
 public:
-    SfKeyboardEvent(){};
-    SfKeyboardEvent(sf::Keyboard::Key key) : key(key){};
+    SfKeyboardEvent(sf::Keyboard::Key key = sf::Keyboard::Unknown)
+        : Event(Digital), key(key){};
 
-    uint8_t getEventValue() const override {
-        return sf::Keyboard::isKeyPressed(key);
-    }
-    bool isDigital() const override { return true; }
+    uint8_t value() const override { return sf::Keyboard::isKeyPressed(key); }
 
     void update() override {}
 };

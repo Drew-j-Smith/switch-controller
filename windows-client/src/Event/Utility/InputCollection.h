@@ -53,7 +53,7 @@ public:
 private:
     uint8_t getInputValue(const std::string &key) const {
         if (map.find(key) != map.end()) {
-            return (uint8_t)map.at(key)->getEventValue();
+            return (uint8_t)map.at(key)->value();
         }
         return 0;
     }

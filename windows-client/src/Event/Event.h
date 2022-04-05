@@ -14,19 +14,21 @@
 
 class Event {
 public:
+    enum Type {
+        Analog,  // value() is an element of [0, 255]
+        Digital, // value() is an element of [0, 1]
+    };
+
     virtual ~Event() {}
 
-    /**
-     * @brief
-     * if digital the result will be [0, 1]
-     * if analog the result will be [0, 255]
-     */
-    virtual uint8_t getEventValue() const = 0;
+protected:
+    Type m_type;
+    Event(Type type) : m_type(type) {}
 
-    /**
-     * @brief true if digital/false is analog
-     */
-    virtual bool isDigital() const = 0;
+public:
+    virtual uint8_t value() const = 0;
+
+    Type type() const { return m_type; }
 
     virtual void update() = 0;
 };

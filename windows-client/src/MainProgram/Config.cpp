@@ -6,6 +6,7 @@
 #include "Macro/Macro.h"
 
 #include "Event/ConcreteClasses/EventCollection.h"
+#include "Event/ConcreteClasses/EventToggle.h"
 #include "Event/ConcreteClasses/SfJoystickEvent.h"
 #include "Event/ConcreteClasses/SfKeyboardEvent.h"
 

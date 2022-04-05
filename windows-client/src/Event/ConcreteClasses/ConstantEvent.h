@@ -16,16 +16,13 @@
 
 class ConstantEvent : public Event {
 private:
-    uint8_t eventValue = 0;
-    bool digital = true;
+    uint8_t eventValue;
 
 public:
-    ConstantEvent(){};
-    ConstantEvent(uint8_t eventValue, bool isDigital)
-        : eventValue(eventValue), digital(isDigital){};
+    ConstantEvent(uint8_t eventValue = 0, Type t = Digital)
+        : Event(t), eventValue(eventValue){};
 
-    uint8_t getEventValue() const override { return eventValue; }
-    bool isDigital() const override { return digital; }
+    uint8_t value() const override { return eventValue; }
 
     void update() override {}
 };

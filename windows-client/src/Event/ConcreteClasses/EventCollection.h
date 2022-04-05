@@ -19,14 +19,14 @@ public:
 
 private:
     std::vector<std::shared_ptr<Event>> events;
-    Operators op = Operators::And;
+    Operators op;
 
 public:
-    EventCollection(){};
-    EventCollection(std::vector<std::shared_ptr<Event>> events, Operators op)
-        : events(events), op(op){};
+    EventCollection(std::vector<std::shared_ptr<Event>> events = {},
+                    Operators op = And)
+        : Event(Digital), events(events), op(op){};
 
-    uint8_t getEventValue() const override {
+    uint8_t value() const override {
         uint8_t res = 0;
 
         for (unsigned int i = 0; i < events.size(); i++) {
@@ -34,17 +34,17 @@ public:
             case Operators::And:
                 if (i == 0)
                     res = 1;
-                res = res && events[i]->getEventValue();
+                res = res && events[i]->value();
                 break;
             case Operators::Or:
-                res = res || events[i]->getEventValue();
+                res = res || events[i]->value();
                 break;
             case Operators::Not:
-                res = !events[i]->getEventValue();
+                res = !events[i]->value();
                 break;
             case Operators::Xor:
-                res = (res && events[i]->getEventValue()) ||
-                      (!res && !events[i]->getEventValue());
+                res = (res && events[i]->value()) ||
+                      (!res && !events[i]->value());
                 break;
             default:
                 break;
@@ -53,8 +53,6 @@ public:
 
         return res;
     };
-
-    bool isDigital() const override { return true; }
 
     virtual void update() override {}
 };

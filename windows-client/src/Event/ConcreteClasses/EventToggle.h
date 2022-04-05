@@ -16,21 +16,19 @@
 
 class EventToggle : public Event {
 private:
-    int cooldown = 0;
+    int cooldown;
     bool active = false;
-    std::shared_ptr<Event> event = std::make_shared<ConstantEvent>();
+    std::shared_ptr<Event> event;
     std::chrono::steady_clock::time_point lastActivation =
         std::chrono::steady_clock::now();
 
 public:
-    EventToggle() {}
-    EventToggle(const int cooldown, const std::shared_ptr<Event> event) {
-        this->cooldown = cooldown;
-        this->event = event;
-    }
+    EventToggle(const int cooldown = 0, const std::shared_ptr<Event> event =
+                                            std::make_shared<ConstantEvent>())
+        : Event(event->type()), cooldown(cooldown), event(event) {}
 
     void update() override {
-        if (event->getEventValue() &&
+        if (event->value() &&
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - lastActivation)
                     .count() > cooldown) {
@@ -39,9 +37,7 @@ public:
         }
     }
 
-    uint8_t getEventValue() const override { return active; };
-
-    bool isDigital() const override { return true; }
+    uint8_t value() const override { return active; };
 };
 
 #endif
