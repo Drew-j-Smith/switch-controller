@@ -28,10 +28,10 @@ void Macro::appendData(const MacroData &inData) {
 }
 
 std::shared_ptr<Macro> Macro::getNextMacro() {
-    int macroIndex = decider->nextListIndex();
+    int macroIndex = decider->value(); // TODO
     if (nextMacroLists.size() == 0)
         return nullptr;
-    if (nextMacroLists[macroIndex].size() == 0)
+    if (nextMacroLists[macroIndex].size() == 0) // TODO index check
         return nullptr;
     if (nextMacroLists[macroIndex].size() != 1)
         std::rotate(nextMacroLists[macroIndex].begin(),

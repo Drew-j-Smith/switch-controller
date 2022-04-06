@@ -3,7 +3,6 @@
 
 #include "pch.h"
 
-#include "Decider/Decider.h"
 #include "Event/ConcreteClasses/ConstantEvent.h"
 #include "Event/Event.h"
 
@@ -18,7 +17,7 @@ public:
 
     Macro(){};
     Macro(const std::string &dataFilename, std::shared_ptr<Event> activateEvent,
-          std::shared_ptr<Decider> decider, InputMergeMode mode)
+          std::shared_ptr<Event> decider, InputMergeMode mode)
         : activateEvent(activateEvent), decider(decider), mode(mode) {
         loadData(dataFilename);
     };
@@ -31,7 +30,7 @@ public:
 private:
     std::vector<MacroData> data;
     std::shared_ptr<Event> activateEvent = std::make_shared<ConstantEvent>();
-    std::shared_ptr<Decider> decider = std::make_shared<DefaultDecider>();
+    std::shared_ptr<Event> decider = std::make_shared<ConstantEvent>();
     InputMergeMode mode = inputPriority;
 
     std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;

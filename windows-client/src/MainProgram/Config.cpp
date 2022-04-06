@@ -1,17 +1,15 @@
 
 #include "pch.h"
 
-#include "Decider/Decider.h"
 #include "Event/Event.h"
 #include "Macro/Macro.h"
 
 #include "Event/ConcreteClasses/EventCollection.h"
 #include "Event/ConcreteClasses/EventToggle.h"
+#include "Event/ConcreteClasses/ImageEvent.h"
 #include "Event/ConcreteClasses/SfJoystickEvent.h"
 #include "Event/ConcreteClasses/SfKeyboardEvent.h"
-
-#include "Decider/ImageProcessingDecider.h"
-#include "Decider/SoundDecider.h"
+#include "Event/ConcreteClasses/SoundEvent.h"
 
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
@@ -66,7 +64,6 @@ void initializeGameCapture(shared_ptr<FFmpegRecorder> &recorder,
 void getConfig(std::string &serialPortName,
                std::map<std::string, std::shared_ptr<Event>> &eventMap,
                std::vector<std::shared_ptr<Event>> &createdEvents,
-               std::vector<std::shared_ptr<Decider>> &deciders,
                std::vector<std::shared_ptr<Macro>> &macros,
                shared_ptr<VideoFrameSink> videoSink,
                shared_ptr<AudioFrameSink> audioSink) {
@@ -119,12 +116,13 @@ void getConfig(std::string &serialPortName,
     // AC_ADD_EVENT_BUTTON(2, "turboButtonToggle");
 
     // Deciders
-    auto haanitDecider = make_shared<ImageProcessingDecider>(
+    auto haanitDecider = make_shared<ImageEvent>(
         cv::imread("data/haanit.png"), cv::imread("data/haanit mask.png"), 3,
         .97, 0, 0, 500, 500, videoSink);
+    createdEvents.push_back(haanitDecider);
     auto animalCrossingDecider =
-        make_shared<SoundDecider>("data/test3.wav", .5, audioSink);
-    deciders = {haanitDecider, animalCrossingDecider};
+        make_shared<SoundEvent>("data/test3.wav", .5, audioSink);
+    createdEvents.push_back(animalCrossingDecider);
 
     // TODO
     // Macros

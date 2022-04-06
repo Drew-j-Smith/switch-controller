@@ -1,35 +1,22 @@
-#include "ImageProcessingDecider.h"
+#include "ImageEvent.h"
 
 #define AC_DISPLAY_IMAGE_MATCH 0
 
-ImageProcessingDecider::ImageProcessingDecider(
-    const cv::Mat &templatePic, const cv::Mat &maskPic, const int matchMethod,
-    const double matchThreshold, const int minX, const int minY, const int maxX,
-    const int maxY, const std::shared_ptr<VideoFrameSink> &videoFrameSink)
+ImageEvent::ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
+                       const int matchMethod, const double matchThreshold,
+                       const int minX, const int minY, const int maxX,
+                       const int maxY,
+                       const std::shared_ptr<VideoFrameSink> &videoFrameSink)
     : templatePic(templatePic), maskPic(maskPic), matchMethod(matchMethod),
       matchThreshold(matchThreshold), minX(minX), minY(minY), maxX(maxX),
-      maxY(maxY), videoFrameSink(videoFrameSink), matchPointX(0),
-      matchPointY(0), critalMatchVal(0) {}
+      maxY(maxY), videoFrameSink(videoFrameSink) {}
 
-int ImageProcessingDecider::nextListIndex() const {
-    double matchX = matchPointX.load();
-    double matchY = matchPointY.load();
-    if (matchMethod == cv::TM_SQDIFF || matchMethod == cv::TM_SQDIFF_NORMED) {
-        return critalMatchVal.load() < matchThreshold && matchX >= minX &&
-               matchY >= minY && matchX <= maxX && matchY <= maxY;
-    } else {
-        return matchThreshold < critalMatchVal.load() && matchX >= minX &&
-               matchY >= minY && matchX <= maxX && matchY <= maxY;
-    }
-}
-
-void ImageProcessingDecider::update() {
+uint8_t ImageEvent::value() const {
 
     this->videoFrameSink->waitForInit();
     std::vector<uint8_t> *data;
-    long long lastFrame = this->videoFrameSink->getData(data);
+    this->videoFrameSink->getData(data);
 
-    lastFrame = this->videoFrameSink->getNextData(data, lastFrame);
     cv::Mat screenshot =
         cv::Mat(this->videoFrameSink->getHeight(),
                 this->videoFrameSink->getWidth(), CV_8UC3, data->data());
@@ -49,16 +36,17 @@ void ImageProcessingDecider::update() {
 
     double minVal;
     double maxVal;
+    double critalMatchVal;
     cv::Point minLoc;
     cv::Point maxLoc;
     cv::Point matchPoint;
     minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
     if (matchMethod == cv::TM_SQDIFF || matchMethod == cv::TM_SQDIFF_NORMED) {
         matchPoint = minLoc;
-        critalMatchVal.store(minVal);
+        critalMatchVal = minVal;
     } else {
         matchPoint = maxLoc;
-        critalMatchVal.store(maxVal);
+        critalMatchVal = maxVal;
     }
 #if AC_DISPLAY_IMAGE_MATCH == 1
     rectangle(submat, matchPoint,
@@ -78,8 +66,11 @@ void ImageProcessingDecider::update() {
     cv::waitKey(1);
 #endif
 
-    matchPointX.store(matchPoint.x + minX);
-    matchPointY.store(matchPoint.y + minY);
-
     videoFrameSink->returnPointer(data);
+
+    if (matchMethod == cv::TM_SQDIFF || matchMethod == cv::TM_SQDIFF_NORMED) {
+        return critalMatchVal < matchThreshold;
+    } else {
+        return matchThreshold < critalMatchVal;
+    }
 }

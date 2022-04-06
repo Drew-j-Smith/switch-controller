@@ -1,4 +1,4 @@
-#include "SoundDecider.h"
+#include "SoundEvent.h"
 
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
@@ -57,7 +57,7 @@ static double vectorMean(const std::vector<float> &v) {
 }
 
 std::vector<float>
-SoundDecider::findFrequencies(const std::vector<float> &samples) {
+SoundEvent::findFrequencies(const std::vector<float> &samples) const {
     for (long long i = 0; i < fftwSize; i++) {
         fftwIn[i] = samples[i];
     }
@@ -72,8 +72,8 @@ SoundDecider::findFrequencies(const std::vector<float> &samples) {
     return frequencies;
 }
 
-SoundDecider::SoundDecider(const std::string &filename, double matchThreshold,
-                           std::shared_ptr<AudioFrameSink> audioFrameSink) {
+SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
+                       std::shared_ptr<AudioFrameSink> audioFrameSink) {
     this->matchThreshold = matchThreshold;
     this->audioFrameSink = audioFrameSink;
 
@@ -105,7 +105,7 @@ SoundDecider::SoundDecider(const std::string &filename, double matchThreshold,
     matchValue.store(0);
 }
 
-void SoundDecider::update() {
+uint8_t SoundEvent::value() const {
 
     std::vector<uint8_t> *data;
     audioFrameSink->getData(data);
@@ -126,13 +126,9 @@ void SoundDecider::update() {
         1 - dotProduct(vectorSubtraction(testFrequencies, expected)) /
                 dotProduct(vectorSubtraction(testFrequencies, mean));
 
-    matchValue.store(error);
+    audioFrameSink->returnPointer(data);
+
+    return error > matchThreshold;
     // std::cout << "Least Square Approx.: " << vectorScale << " * original
     // vector" << std::endl; std::cout << "R Squared: " << error << std::endl;
-
-    audioFrameSink->returnPointer(data);
-}
-
-int SoundDecider::nextListIndex() const {
-    return matchValue.load() > matchThreshold;
 }
