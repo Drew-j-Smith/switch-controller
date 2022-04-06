@@ -19,11 +19,6 @@ public:
     void activateMacros();
     bool isMacroActive() const { return activeMacros.size(); }
     void deactivateMacros() { activeMacros.clear(); }
-    const std::vector<std::shared_ptr<Macro>> getMacros() const {
-        return macros;
-    }
-    const std::shared_ptr<Macro> lastMacro() const { return macros.back(); }
-    void popLastMacro() { macros.pop_back(); }
     void pushBackMacro(std::shared_ptr<Macro> macro) {
         macros.push_back(macro);
     }
