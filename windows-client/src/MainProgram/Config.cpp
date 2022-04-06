@@ -102,9 +102,10 @@ void getConfig(std::string &serialPortName,
     // AC_ADD_EVENT_BUTTON(2, "turboButtonToggle");
 
     // Deciders
+    cv::Rect rectCrop(0, 0, 500, 500);
     auto haanitDecider = make_shared<ImageEvent>(
         cv::imread("data/haanit.png"), cv::imread("data/haanit mask.png"), 3,
-        .97, 0, 0, 500, 500, videoSink);
+        .97, rectCrop, videoSink);
     auto animalCrossingDecider =
         make_shared<SoundEvent>("data/test3.wav", .5, audioSink);
 

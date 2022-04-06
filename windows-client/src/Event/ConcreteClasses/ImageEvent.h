@@ -16,20 +16,17 @@ class ImageEvent : public Event {
 public:
     ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
                const int matchMethod, const double matchThreshold,
-               const int minX, const int minY, const int maxX, const int maxY,
+               const cv::Rect imageCrop,
                const std::shared_ptr<VideoFrameSink> &videoFrameSink);
 
     uint8_t value() const override;
 
 private:
-    cv::Mat templatePic;
-    cv::Mat maskPic;
-    int matchMethod;
-    double matchThreshold;
-    int minX;
-    int minY;
-    int maxX;
-    int maxY;
+    const cv::Mat templatePic;
+    const cv::Mat maskPic;
+    const int matchMethod;
+    const double matchThreshold;
+    const cv::Rect imageCrop;
 
     std::shared_ptr<VideoFrameSink> videoFrameSink;
     mutable std::vector<uint8_t> videoData;
