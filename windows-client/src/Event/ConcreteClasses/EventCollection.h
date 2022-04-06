@@ -2,11 +2,8 @@
 #define EVENT_COLLECTION_H
 
 /**
- * @file EventCollection.h
  * @brief The EventCollection contains a list of Events and performs operation
  * on them to get its event
- * @date 2022-03-27
- *
  */
 
 #include "pch.h"

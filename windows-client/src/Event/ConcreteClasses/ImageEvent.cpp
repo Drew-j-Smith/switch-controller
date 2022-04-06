@@ -4,12 +4,11 @@
 
 ImageEvent::ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
                        const int matchMethod, const double matchThreshold,
-                       const int minX, const int minY, const int maxX,
-                       const int maxY,
+                       const cv::Rect imageCrop,
                        const std::shared_ptr<VideoFrameSink> &videoFrameSink)
     : templatePic(templatePic), maskPic(maskPic), matchMethod(matchMethod),
-      matchThreshold(matchThreshold), minX(minX), minY(minY), maxX(maxX),
-      maxY(maxY), videoFrameSink(videoFrameSink) {}
+      matchThreshold(matchThreshold), imageCrop(imageCrop),
+      videoFrameSink(videoFrameSink) {}
 
 uint8_t ImageEvent::value() const {
 
@@ -20,8 +19,7 @@ uint8_t ImageEvent::value() const {
         cv::Mat(this->videoFrameSink->getHeight(),
                 this->videoFrameSink->getWidth(), CV_8UC3, videoData.data());
 
-    cv::Rect rectCrop = cv::Rect(minX, minY, maxX - minX, maxY - minY);
-    cv::Mat submat = cv::Mat(screenshot, rectCrop);
+    cv::Mat submat = cv::Mat(screenshot, imageCrop);
 
     int result_cols = submat.cols - templatePic.cols + 1;
     int result_rows = submat.rows - templatePic.rows + 1;

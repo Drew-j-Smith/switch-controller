@@ -2,12 +2,8 @@
 #define CONSTANT_EVENT_H
 
 /**
- * @file ConstantEvent.h
- * @author Drew Smith
  * @brief The ConstantEvent is a basic implementation of Event
  * which returns a constant value.
- * @date 2021-10-17
- *
  */
 
 #include "pch.h"

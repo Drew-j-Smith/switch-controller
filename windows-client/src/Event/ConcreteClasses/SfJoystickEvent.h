@@ -2,10 +2,7 @@
 #define SF_JOYSTICK_DIGITAL_EVENT_H
 
 /**
- * @file SfJoystickEvent.h
  * @brief the SfJoystickEvent is used to capture joystick events from SFML
- * @date 2022-03-27
- *
  */
 
 #include "pch.h"
