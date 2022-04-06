@@ -1,7 +1,6 @@
 #include "MainProgram.h"
 
 #include "SFML/SFMLRenderer.h"
-#include "Utility/SerialPort.h"
 
 #include <opencv2/core/utils/logger.hpp>
 

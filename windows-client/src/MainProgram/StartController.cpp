@@ -2,16 +2,13 @@
 #include <SFML/Window/Joystick.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
+#include "MainProgram.h"
+
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
-#include "pch.h"
-
-#include "MainProgram.h"
-
 #include "Event/Utility/InputCollection.h"
 #include "Macro/MacroCollection.h"
-#include "Utility/SerialPort.h"
 
 void StartController() {
     std::cout << "Initializing...\n";
@@ -50,6 +47,8 @@ void StartController() {
 
     port = initializeSerialPort(serialPortName, 57600, &io);
     testSerialPort(port, 8, send.data(), 1, recieve, &io);
+
+    std::cout << "Ready.\n";
 
     while (true) {
         sf::Joystick::update();
