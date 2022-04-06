@@ -6,19 +6,23 @@ std::array<uint8_t, 8>
 Macro::getDataframe(uint64_t time,
                     const std::array<uint8_t, 8> &dataToMerge) const {
     MacroData searchData = {time, {}};
-    auto res = std::upper_bound(data.begin(), data.end(), searchData,
-                                [](const MacroData &a, const MacroData &b) {
-                                    return a.time < b.time;
-                                }) -
-               1;
+    auto predicate = [](const MacroData &a, const MacroData &b) {
+        return a.time < b.time;
+    };
+    auto res =
+        std::upper_bound(data.begin(), data.end(), searchData, predicate) - 1;
     // subtract one to round down instead of up
 
-    if (mode == macroPriority)
+    switch (mode) {
+    case macroPriority:
         return mergeData(res->data, dataToMerge);
-    else if (mode == inputPriority)
+    case inputPriority:
         return mergeData(dataToMerge, res->data);
-    else // mode == blockInput
+    case blockInput:
         return res->data;
+    default:
+        return res->data;
+    }
 }
 
 void Macro::appendData(const MacroData &inData) {
@@ -33,13 +37,12 @@ std::shared_ptr<Macro> Macro::getNextMacro() {
         return nullptr;
     if (macroIndex < 0 || macroIndex >= nextMacroLists.size())
         return nullptr;
-    if (nextMacroLists[macroIndex].size() == 0)
+    auto &curr = nextMacroLists[macroIndex];
+    if (curr.size() == 0)
         return nullptr;
-    if (nextMacroLists[macroIndex].size() != 1)
-        std::rotate(nextMacroLists[macroIndex].begin(),
-                    nextMacroLists[macroIndex].begin() + 1,
-                    nextMacroLists[macroIndex].end());
-    return nextMacroLists[macroIndex].back().lock();
+    if (curr.size() != 1)
+        std::rotate(curr.begin(), curr.begin() + 1, curr.end());
+    return curr.back().lock();
 }
 
 std::array<uint8_t, 8>
