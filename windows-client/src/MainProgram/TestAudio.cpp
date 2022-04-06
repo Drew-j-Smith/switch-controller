@@ -51,7 +51,7 @@ void TestAudio() {
     }
 
     recorder.stop();
-    std::vector<uint8_t> *data;
+    std::vector<uint8_t> data;
     audioSink->getData(data);
 
     std::cout << "Enter the output filename:\n";
@@ -60,5 +60,5 @@ void TestAudio() {
     std::getline(std::cin, audioFilename);
 
     std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
-    outfile.write((const char *)data->data(), data->size());
+    outfile.write((const char *)data.data(), data.size());
 }

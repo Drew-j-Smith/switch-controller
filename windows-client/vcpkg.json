@@ -7,7 +7,6 @@
     "boost-asio",
     "boost-endian",
     "boost-circular-buffer",
-    "boost-lockfree",
     "fftw3",
     "ffmpeg"
   ]

@@ -18,8 +18,10 @@ void TestVideo() {
     recorder.start();
 
     videoSink->waitForInit();
-    std::vector<uint8_t> *data;
+    std::vector<uint8_t> data;
     long long lastFrame = videoSink->getData(data);
+    cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(),
+                          CV_8UC3, data.data());
 
     std::atomic<bool> running = true;
     std::string title = std::to_string(
@@ -27,10 +29,7 @@ void TestVideo() {
 
     std::thread t([&]() {
         while (running.load()) {
-            videoSink->returnPointer(data);
             lastFrame = videoSink->getNextData(data, lastFrame);
-            cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(),
-                                  CV_8UC3, data->data());
             cv::imshow(title, mat);
             cv::waitKey(1);
         }

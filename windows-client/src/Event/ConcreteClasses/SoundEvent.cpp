@@ -91,10 +91,10 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
     ffmpegRecorder.join();
     ffmpegRecorder.stop();
 
-    std::vector<uint8_t> *rawData;
+    std::vector<uint8_t> rawData;
     audioSink->getData(rawData);
-    matchAudio = std::vector<float>(
-        (float *)rawData->data(), (float *)(rawData->data() + rawData->size()));
+    matchAudio = std::vector<float>((float *)rawData.data(),
+                                    (float *)(rawData.data() + rawData.size()));
 
     fftwSize = (int)matchAudio.size();
     fftwIn.resize(fftwSize);
@@ -107,10 +107,10 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
 
 uint8_t SoundEvent::value() const {
 
-    std::vector<uint8_t> *data;
+    std::vector<uint8_t> data; // TODO create class instance
     audioFrameSink->getData(data);
-    std::vector<float> soundData((float *)data->data(),
-                                 (float *)(data->data() + data->size()));
+    std::vector<float> soundData((float *)data.data(),
+                                 (float *)(data.data() + data.size()));
 
     auto testFrequencies = findFrequencies(soundData);
 
@@ -125,8 +125,6 @@ uint8_t SoundEvent::value() const {
     double error =
         1 - dotProduct(vectorSubtraction(testFrequencies, expected)) /
                 dotProduct(vectorSubtraction(testFrequencies, mean));
-
-    audioFrameSink->returnPointer(data);
 
     return error > matchThreshold;
     // std::cout << "Least Square Approx.: " << vectorScale << " * original

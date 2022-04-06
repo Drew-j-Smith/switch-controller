@@ -14,12 +14,12 @@ ImageEvent::ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
 uint8_t ImageEvent::value() const {
 
     this->videoFrameSink->waitForInit();
-    std::vector<uint8_t> *data;
+    std::vector<uint8_t> data; // TODO create class instance
     this->videoFrameSink->getData(data);
 
     cv::Mat screenshot =
         cv::Mat(this->videoFrameSink->getHeight(),
-                this->videoFrameSink->getWidth(), CV_8UC3, data->data());
+                this->videoFrameSink->getWidth(), CV_8UC3, data.data());
 
     cv::Rect rectCrop = cv::Rect(minX, minY, maxX - minX, maxY - minY);
     cv::Mat submat = cv::Mat(screenshot, rectCrop);
@@ -65,8 +65,6 @@ uint8_t ImageEvent::value() const {
     cv::imshow(name + "-2", result);
     cv::waitKey(1);
 #endif
-
-    videoFrameSink->returnPointer(data);
 
     if (matchMethod == cv::TM_SQDIFF || matchMethod == cv::TM_SQDIFF_NORMED) {
         return critalMatchVal < matchThreshold;

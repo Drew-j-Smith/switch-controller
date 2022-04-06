@@ -24,14 +24,14 @@ private:
     std::mutex mutex;
 
     struct SwsContext *swsContext;
+    std::vector<uint8_t> data;
     int linesize[4];
-    int vectorSize;
 
     AVPixelFormat outputPixelFormat = AV_PIX_FMT_BGR24;
     int outputWidth = 1920;
     int outputHeight = 1080;
 
-    void init(AVCodecContext *decoderContext) override {
+    void virtualInit(AVCodecContext *decoderContext) override {
         width = decoderContext->width;
         height = decoderContext->height;
         pixelFormat = decoderContext->pix_fmt;
@@ -55,21 +55,20 @@ private:
                 "Error getting plane size in VideoFrameSink: " +
                 std::string(error));
         }
-        vectorSize = res;
+        data.resize(res);
 
         swsContext = sws_getCachedContext(
             nullptr, width, height, pixelFormat, outputWidth, outputHeight,
             outputPixelFormat, 0, nullptr, nullptr, nullptr);
     }
 
-    void getDataVirtual(AVFrame *frame, std::vector<uint8_t> &data) override {
+    void virtualOutputFrame(AVFrame *frame) override {
         if (frame->width != width || frame->height != height ||
             frame->format != pixelFormat) {
             throw std::runtime_error(
                 "Cannot support changing input format in VideoFrameSink");
         }
 
-        data.resize(vectorSize);
         uint8_t *dataPointer = data.data();
         int res = sws_scale(swsContext, frame->data, frame->linesize, 0, height,
                             &dataPointer, linesize);
@@ -80,6 +79,11 @@ private:
                 "Error converting image in VideoFrameSink: " +
                 std::string(error));
         }
+    }
+
+    void getDataWithoutLock(std::vector<uint8_t> &dataCopy) override {
+        dataCopy.resize(this->data.size());
+        std::copy(this->data.begin(), this->data.end(), dataCopy.begin());
     }
 
 public:

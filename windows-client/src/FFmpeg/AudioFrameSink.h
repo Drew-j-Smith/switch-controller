@@ -24,7 +24,7 @@ private:
     bool loopRecording = false;
     boost::circular_buffer<uint8_t> circularData;
 
-    void init(AVCodecContext *decoderContext) override {
+    void virtualInit(AVCodecContext *decoderContext) override {
         // getting the channel layout or setting it to default
         uint64_t channel_layout = decoderContext->channel_layout;
         if (channel_layout == 0) {
@@ -50,8 +50,7 @@ private:
         }
     }
 
-    void getDataVirtual(AVFrame *frame,
-                        std::vector<uint8_t> &dataCopy) override {
+    void virtualOutputFrame(AVFrame *frame) override {
         int64_t out_samples = av_rescale_rnd(
             swr_get_delay(swr, frame->sample_rate) + frame->nb_samples, 48000,
             frame->sample_rate, AV_ROUND_UP);
@@ -82,6 +81,11 @@ private:
 
         if (loopRecording) {
             circularData.insert(circularData.end(), data.begin(), data.end());
+        }
+    }
+
+    void getDataWithoutLock(std::vector<uint8_t> &dataCopy) override {
+        if (loopRecording) {
             dataCopy.resize(this->circularData.size());
             std::copy(this->circularData.begin(), this->circularData.end(),
                       dataCopy.begin());

@@ -20,84 +20,58 @@ extern "C" {
 
 #include "pch.h"
 
-#include <boost/lockfree/queue.hpp>
-
 class FFmpegFrameSink {
 private:
+    mutable std::mutex initMutex;
+    std::condition_variable initCV;
     bool initialized = false;
-    mutable std::mutex mutex;
-    std::condition_variable conditionVariable;
+
+    mutable std::mutex dataMutex;
+    std::condition_variable dataCV;
     long long lastFrame = 0;
 
-    std::vector<std::shared_ptr<std::vector<uint8_t>>> dataArr;
-    std::map<std::vector<uint8_t> *, std::shared_ptr<std::atomic<uint64_t>>>
-        dataCount;
-    std::vector<uint8_t> *previousData;
-    boost::lockfree::queue<std::vector<uint8_t> *,
-                           boost::lockfree::capacity<10>>
-        availablePointers;
-
-    long long getDataInternal(std::vector<uint8_t> *&data) const {
-        data = previousData;
-        dataCount.at(previousData)->fetch_add(1);
-        return lastFrame;
-    }
-
 protected:
-    virtual void getDataVirtual(AVFrame *frame, std::vector<uint8_t> &data) = 0;
+    virtual void virtualInit(AVCodecContext *decoderContext) = 0;
+    virtual void virtualOutputFrame(AVFrame *frame) = 0;
+    virtual void getDataWithoutLock(std::vector<uint8_t> &data) = 0;
 
 public:
     virtual ~FFmpegFrameSink() {}
 
-    virtual void init(AVCodecContext *decoderContext) = 0;
+    void init(AVCodecContext *decoderContext) {
+        virtualInit(decoderContext);
+        std::lock_guard<std::mutex> lock(initMutex);
+        this->initialized = true;
+        initCV.notify_all();
+    }
 
     void waitForInit() {
-        std::unique_lock<std::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(initMutex);
         while (!initialized) {
-            conditionVariable.wait(lock);
+            initCV.wait(lock);
         }
     }
 
     void outputFrame(AVFrame *frame) {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        if (initialized) {
-            returnPointer(previousData);
-        } else {
-            // ensuring that previousData is never null
-            initialized = true;
-        }
-
-        if (!availablePointers.pop(previousData)) {
-            dataArr.push_back(std::make_shared<std::vector<uint8_t>>());
-            previousData = dataArr.back().get();
-            dataCount[previousData] = std::make_shared<std::atomic<uint64_t>>();
-        }
-
-        dataCount[previousData]->store(1);
+        std::lock_guard<std::mutex> lock(dataMutex);
+        virtualOutputFrame(frame);
         lastFrame++;
-        getDataVirtual(frame, *previousData);
-        conditionVariable.notify_all();
+        dataCV.notify_all();
     }
 
-    void returnPointer(std::vector<uint8_t> *data) {
-        if (dataCount.at(data)->fetch_sub(1) == 1) {
-            availablePointers.push(data);
-        }
+    long long getData(std::vector<uint8_t> &data) {
+        std::lock_guard<std::mutex> lock(dataMutex);
+        getDataWithoutLock(data);
+        return lastFrame;
     }
 
-    long long getData(std::vector<uint8_t> *&data) {
-        std::lock_guard<std::mutex> lock(mutex);
-        return getDataInternal(data);
-    }
-
-    long long getNextData(std::vector<uint8_t> *&data,
-                          long long lastFrameSeen) {
-        std::unique_lock<std::mutex> lock(mutex);
+    long long getNextData(std::vector<uint8_t> &data, long long lastFrameSeen) {
+        std::unique_lock<std::mutex> lock(dataMutex);
         while (this->lastFrame == lastFrameSeen) {
-            conditionVariable.wait(lock);
+            dataCV.wait(lock);
         }
-        return getDataInternal(data);
+        getDataWithoutLock(data);
+        return this->lastFrame;
     }
 
     virtual AVMediaType getType() const = 0;
