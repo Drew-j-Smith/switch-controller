@@ -3,7 +3,7 @@
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 std::unique_ptr<boost::asio::serial_port>
 initializeSerialPort(std::string serialPort, unsigned int baud,
