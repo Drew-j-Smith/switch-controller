@@ -106,11 +106,10 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
 }
 
 uint8_t SoundEvent::value() const {
-
-    std::vector<uint8_t> data; // TODO create class instance
-    audioFrameSink->getData(data);
-    std::vector<float> soundData((float *)data.data(),
-                                 (float *)(data.data() + data.size()));
+    audioFrameSink->getData(audioData);
+    std::vector<float> soundData(
+        (float *)audioData.data(),
+        (float *)(audioData.data() + audioData.size()));
 
     auto testFrequencies = findFrequencies(soundData);
 

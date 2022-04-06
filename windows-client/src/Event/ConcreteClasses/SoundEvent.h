@@ -14,6 +14,7 @@ private:
     std::vector<float> matchAudio;
 
     std::shared_ptr<AudioFrameSink> audioFrameSink;
+    mutable std::vector<uint8_t> audioData;
 
     // fftw
     mutable std::vector<float> fftwIn;

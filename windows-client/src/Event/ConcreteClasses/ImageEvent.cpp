@@ -14,12 +14,11 @@ ImageEvent::ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
 uint8_t ImageEvent::value() const {
 
     this->videoFrameSink->waitForInit();
-    std::vector<uint8_t> data; // TODO create class instance
-    this->videoFrameSink->getData(data);
+    this->videoFrameSink->getData(videoData);
 
     cv::Mat screenshot =
         cv::Mat(this->videoFrameSink->getHeight(),
-                this->videoFrameSink->getWidth(), CV_8UC3, data.data());
+                this->videoFrameSink->getWidth(), CV_8UC3, videoData.data());
 
     cv::Rect rectCrop = cv::Rect(minX, minY, maxX - minX, maxY - minY);
     cv::Mat submat = cv::Mat(screenshot, rectCrop);

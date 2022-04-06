@@ -34,6 +34,7 @@ private:
     int maxY;
 
     std::shared_ptr<VideoFrameSink> videoFrameSink;
+    mutable std::vector<uint8_t> videoData;
 };
 
 #endif
