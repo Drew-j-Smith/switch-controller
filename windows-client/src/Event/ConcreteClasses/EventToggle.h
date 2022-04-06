@@ -17,9 +17,9 @@
 class EventToggle : public Event {
 private:
     int cooldown;
-    bool active = false;
+    mutable bool active = false;
     std::shared_ptr<Event> event;
-    std::chrono::steady_clock::time_point lastActivation =
+    mutable std::chrono::steady_clock::time_point lastActivation =
         std::chrono::steady_clock::now();
 
 public:
@@ -27,7 +27,10 @@ public:
                                             std::make_shared<ConstantEvent>())
         : cooldown(cooldown), event(event) {}
 
-    void update() override {
+    void update() override {}
+
+    uint8_t value() const override {
+        // TODO? acepting that this can change almost at random
         if (event->value() &&
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - lastActivation)
@@ -35,9 +38,8 @@ public:
             active = !active;
             lastActivation = std::chrono::steady_clock::now();
         }
-    }
-
-    uint8_t value() const override { return active; };
+        return active;
+    };
 };
 
 #endif
