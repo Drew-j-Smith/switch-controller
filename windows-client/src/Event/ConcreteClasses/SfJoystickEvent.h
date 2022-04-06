@@ -23,7 +23,6 @@ private:
         unsigned int button;
         sf::Joystick::Axis axis;
     };
-    static constexpr double SCALING = 1.4;
 
 public:
     SfJoystickEvent(unsigned int joystickIndex = 0,
@@ -43,34 +42,25 @@ public:
     }
 
     uint8_t value() const override {
-        uint8_t res = type == Stick ? 128 : 0;
-
-        if (!sf::Joystick::isConnected(joystickIndex))
-            return res;
-
         switch (type) {
         case Stick: {
-            if (sf::Joystick::hasAxis(joystickIndex, axis))
-                break;
+            double pos = sf::Joystick::getAxisPosition(joystickIndex, axis);
             // SFML works on a [-100, 100] scale
             // this scales it to [0, 255] scale
-            int scaled = (int)((100 + sf::Joystick::getAxisPosition(
-                                          joystickIndex, axis) *
-                                          SCALING) /
-                               200.0 * 255.0);
+            const double SFML_RATIO = 255.0 / 200.0;
+            const double SCALE_FACTOR = 1.4;
+            const double SCALE = SCALE_FACTOR * SFML_RATIO;
+            const int OFFSET = 128;
 
-            res = (uint8_t)std::clamp(scaled, 0, 255);
-            break;
+            int scaled = (int)(pos * SCALE + OFFSET);
+            return (uint8_t)std::clamp(scaled, 0, 255);
         }
         case Button: {
-            if (sf::Joystick::getButtonCount(joystickIndex) < button)
-                break;
-
-            res = sf::Joystick::isButtonPressed(joystickIndex, button);
-            break;
+            return sf::Joystick::isButtonPressed(joystickIndex, button);
         }
+        default:
+            return 0;
         }
-        return res;
     }
 
     void update() override {}
