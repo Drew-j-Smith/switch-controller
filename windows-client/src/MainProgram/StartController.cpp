@@ -56,9 +56,7 @@ void StartController() {
 
         send = inputCollection.getData();
 
-        macroCollection.activateMacros();
-        if (macroCollection.isMacroActive() &&
-            inputCollection.getStopEventValue()) {
+        if (inputCollection.getStopEventValue()) {
             macroCollection.deactivateMacros();
         }
         if (macroCollection.isMacroActive()) {
