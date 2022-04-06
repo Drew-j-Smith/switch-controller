@@ -31,7 +31,9 @@ std::shared_ptr<Macro> Macro::getNextMacro() {
     int macroIndex = decider->value(); // TODO
     if (nextMacroLists.size() == 0)
         return nullptr;
-    if (nextMacroLists[macroIndex].size() == 0) // TODO index check
+    if (macroIndex < 0 || macroIndex >= nextMacroLists.size())
+        return nullptr;
+    if (nextMacroLists[macroIndex].size() == 0)
         return nullptr;
     if (nextMacroLists[macroIndex].size() != 1)
         std::rotate(nextMacroLists[macroIndex].begin(),
