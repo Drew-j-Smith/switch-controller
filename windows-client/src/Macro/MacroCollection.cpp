@@ -9,9 +9,9 @@ MacroCollection::getData(const std::array<uint8_t, 8> &dataToMerge) {
         std::vector<std::shared_ptr<Macro>> toRemove;
 
         for (auto it : activeMacros) {
-            unsigned long long time =
-                std::chrono::duration_cast<std::chrono::milliseconds>(now -
-                                                                      it.second)
+            auto diff = now - it.second;
+            uint64_t time =
+                std::chrono::duration_cast<std::chrono::milliseconds>(diff)
                     .count();
             res = it.first->getDataframe(time, res);
 
