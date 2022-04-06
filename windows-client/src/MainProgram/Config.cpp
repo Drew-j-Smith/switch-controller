@@ -1,8 +1,5 @@
 
-#include "pch.h"
-
-#include "Event/Event.h"
-#include "Macro/Macro.h"
+#include "MainProgram.h"
 
 #include "Event/ConcreteClasses/EventCollection.h"
 #include "Event/ConcreteClasses/EventToggle.h"
@@ -10,10 +7,6 @@
 #include "Event/ConcreteClasses/SfJoystickEvent.h"
 #include "Event/ConcreteClasses/SfKeyboardEvent.h"
 #include "Event/ConcreteClasses/SoundEvent.h"
-
-#include "FFmpeg/AudioFrameSink.h"
-#include "FFmpeg/FFmpegRecorder.h"
-#include "FFmpeg/VideoFrameSink.h"
 
 using std::make_shared;
 using std::shared_ptr;

@@ -13,21 +13,6 @@
 #include "Macro/MacroCollection.h"
 #include "Utility/SerialPort.h"
 
-#include "FFmpeg/AudioFrameSink.h"
-#include "FFmpeg/FFmpegRecorder.h"
-#include "FFmpeg/VideoFrameSink.h"
-
-void initializeGameCapture(std::shared_ptr<FFmpegRecorder> &recorder,
-                           std::shared_ptr<VideoFrameSink> &videoSink,
-                           std::shared_ptr<AudioFrameSink> &audioSink);
-
-void getConfig(std::string &serialPortName,
-               std::map<std::string, std::shared_ptr<Event>> &events,
-               std::vector<std::shared_ptr<Event>> &createdEvents,
-               std::vector<std::shared_ptr<Macro>> &macros,
-               std::shared_ptr<VideoFrameSink> videoSink,
-               std::shared_ptr<AudioFrameSink> audioSink);
-
 void StartController() {
     std::cout << "Initializing...\n";
     std::cout << "Loading config files.\n";
