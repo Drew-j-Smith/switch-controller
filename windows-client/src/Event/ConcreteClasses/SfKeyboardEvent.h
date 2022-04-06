@@ -2,10 +2,7 @@
 #define SF_KEYBOARD_EVENT_H
 
 /**
- * @file SfKeyboardEvent.h
  * @brief The SfKeyboardEvent class is used to capture keyboard events from SFML
- * @date 2022-03-27
- *
  */
 
 #include "pch.h"
