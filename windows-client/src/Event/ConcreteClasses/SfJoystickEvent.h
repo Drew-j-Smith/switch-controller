@@ -62,8 +62,6 @@ public:
             return 0;
         }
     }
-
-    void update() override {}
 };
 
 #endif

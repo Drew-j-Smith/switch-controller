@@ -27,8 +27,6 @@ public:
                                             std::make_shared<ConstantEvent>())
         : cooldown(cooldown), event(event) {}
 
-    void update() override {}
-
     uint8_t value() const override {
         // TODO? acepting that this can change almost at random
         if (event->value() &&

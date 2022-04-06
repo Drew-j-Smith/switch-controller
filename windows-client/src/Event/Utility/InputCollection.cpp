@@ -3,9 +3,8 @@
 #include "Event/ConcreteClasses/ConstantEvent.h"
 
 InputCollection::InputCollection(
-    const std::map<std::string, std::shared_ptr<Event>> &map,
-    const std::vector<std::shared_ptr<Event>> &events)
-    : map(map), events(events) {
+    const std::map<std::string, std::shared_ptr<Event>> &map)
+    : map(map) {
 
     auto recordEventIt = map.find("record");
     std::shared_ptr<Event> recordEvent = std::make_shared<ConstantEvent>();
@@ -100,11 +99,4 @@ unsigned char InputCollection::getDpadData(bool up, bool right, bool down,
             result = 7; // up left
     }
     return result;
-}
-
-void InputCollection::update() {
-    for (auto event : events) {
-        event->update();
-    }
-    recorder->update(getData());
 }

@@ -22,8 +22,6 @@ public:
     SfKeyboardEvent(sf::Keyboard::Key key = sf::Keyboard::Unknown) : key(key){};
 
     uint8_t value() const override { return sf::Keyboard::isKeyPressed(key); }
-
-    void update() override {}
 };
 
 #endif

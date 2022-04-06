@@ -22,7 +22,6 @@ void initializeGameCapture(std::shared_ptr<FFmpegRecorder> &recorder,
 
 void getConfig(std::string &serialPortName,
                std::map<std::string, std::shared_ptr<Event>> &events,
-               std::vector<std::shared_ptr<Event>> &createdEvents,
                std::vector<std::shared_ptr<Macro>> &macros,
                std::shared_ptr<VideoFrameSink> videoSink,
                std::shared_ptr<AudioFrameSink> audioSink);

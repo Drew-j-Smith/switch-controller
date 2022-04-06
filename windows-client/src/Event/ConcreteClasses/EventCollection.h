@@ -53,8 +53,6 @@ public:
 
         return res;
     };
-
-    virtual void update() override {}
 };
 
 #endif

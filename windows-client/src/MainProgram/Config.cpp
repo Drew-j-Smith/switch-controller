@@ -19,8 +19,6 @@ using std::string;
         shared_ptr<Event> collectionTemp = make_shared<EventCollection>(       \
             std::vector<shared_ptr<Event>>{invertedToggle, joystickTemp},      \
             EventCollection::And);                                             \
-        createdEvents.push_back(joystickTemp);                                 \
-        createdEvents.push_back(collectionTemp);                               \
         eventMap.insert({name, collectionTemp});                               \
     }
 
@@ -28,7 +26,6 @@ using std::string;
     {                                                                          \
         shared_ptr<Event> joystickTemp =                                       \
             make_shared<SfJoystickEvent>(0, (sf::Joystick::Axis)stick);        \
-        createdEvents.push_back(joystickTemp);                                 \
         eventMap.insert({name, joystickTemp});                                 \
     }
 
@@ -56,7 +53,6 @@ void initializeGameCapture(shared_ptr<FFmpegRecorder> &recorder,
 
 void getConfig(std::string &serialPortName,
                std::map<std::string, std::shared_ptr<Event>> &eventMap,
-               std::vector<std::shared_ptr<Event>> &createdEvents,
                std::vector<std::shared_ptr<Macro>> &macros,
                shared_ptr<VideoFrameSink> videoSink,
                shared_ptr<AudioFrameSink> audioSink) {
@@ -64,18 +60,15 @@ void getConfig(std::string &serialPortName,
 
     // Events
     eventMap = {};
-    createdEvents = {};
 
     // The following layout has only been test for the nintendo switch pro
     // controller on windows
 
     // capture button
     shared_ptr<Event> toggle = make_shared<SfJoystickEvent>(0, 13);
-    createdEvents.push_back(toggle);
 
     shared_ptr<Event> invertedToggle = std::make_shared<EventCollection>(
         std::vector<std::shared_ptr<Event>>{toggle}, EventCollection::Not);
-    createdEvents.push_back(invertedToggle);
 
     AC_ADD_EVENT_BUTTON(1, "a");
     AC_ADD_EVENT_BUTTON(0, "b");
@@ -112,10 +105,8 @@ void getConfig(std::string &serialPortName,
     auto haanitDecider = make_shared<ImageEvent>(
         cv::imread("data/haanit.png"), cv::imread("data/haanit mask.png"), 3,
         .97, 0, 0, 500, 500, videoSink);
-    createdEvents.push_back(haanitDecider);
     auto animalCrossingDecider =
         make_shared<SoundEvent>("data/test3.wav", .5, audioSink);
-    createdEvents.push_back(animalCrossingDecider);
 
     // TODO
     // Macros

@@ -32,14 +32,10 @@ private:
     const int JOYSTICK_DEADZONE = 30;
 
     std::map<std::string, std::shared_ptr<Event>> map;
-    std::vector<std::shared_ptr<Event>> events;
     std::shared_ptr<MacroRecorder> recorder;
 
 public:
-    InputCollection(const std::map<std::string, std::shared_ptr<Event>> &map,
-                    const std::vector<std::shared_ptr<Event>> &events);
-
-    void update();
+    InputCollection(const std::map<std::string, std::shared_ptr<Event>> &map);
 
     int getStopEventValue() const { return getInputValue("stopMacros"); };
     std::shared_ptr<MacroRecorder> getRecorder() { return recorder; }

@@ -34,8 +34,6 @@ public:
 
     ~SoundEvent() override { fftwf_destroy_plan(fftwPlan); }
 
-    void update() override {}
-
     uint8_t value() const override;
 };
 

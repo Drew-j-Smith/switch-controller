@@ -17,8 +17,6 @@ public:
     virtual ~Event() {}
 
     virtual uint8_t value() const = 0;
-
-    virtual void update() = 0;
 };
 
 #endif

@@ -19,8 +19,6 @@ public:
                const int minX, const int minY, const int maxX, const int maxY,
                const std::shared_ptr<VideoFrameSink> &videoFrameSink);
 
-    void update() override {}
-
     uint8_t value() const override;
 
 private:

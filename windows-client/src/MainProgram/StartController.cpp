@@ -24,12 +24,10 @@ void StartController() {
 
     std::string serialPortName;
     std::map<std::string, std::shared_ptr<Event>> events;
-    std::vector<std::shared_ptr<Event>> createdEvents;
     std::vector<std::shared_ptr<Macro>> macros;
-    getConfig(serialPortName, events, createdEvents, macros, videoSink,
-              audioSink);
+    getConfig(serialPortName, events, macros, videoSink, audioSink);
 
-    InputCollection inputCollection(events, createdEvents);
+    InputCollection inputCollection(events);
 
     MacroCollection macroCollection(macros);
 
@@ -52,8 +50,6 @@ void StartController() {
 
     while (true) {
         sf::Joystick::update();
-
-        inputCollection.update();
 
         // code used to time an iteration
         // auto begin = std::chrono::steady_clock::now();

@@ -22,8 +22,6 @@ public:
     ConstantEvent(uint8_t eventValue = 0) : eventValue(eventValue){};
 
     uint8_t value() const override { return eventValue; }
-
-    void update() override {}
 };
 
 #endif
