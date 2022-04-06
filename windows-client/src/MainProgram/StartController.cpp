@@ -31,8 +31,9 @@ void StartController() {
 
     MacroCollection macroCollection(macros);
 
-    macroCollection.pushBackMacro(
-        inputCollection.getRecorder()->getLastRecordedMacro());
+    std::shared_ptr<MacroRecorder> macroRecorder =
+        inputCollection.getRecorder();
+    macroCollection.pushBackMacro(macroRecorder->getLastRecordedMacro());
 
     std::cout << "Config loaded.\n";
 
@@ -55,6 +56,7 @@ void StartController() {
         // auto begin = std::chrono::steady_clock::now();
 
         send = inputCollection.getData();
+        macroRecorder->update(send);
 
         if (inputCollection.getStopEventValue()) {
             macroCollection.deactivateMacros();
