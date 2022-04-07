@@ -3,59 +3,6 @@
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
 
-static double dotProduct(const std::vector<float> &v) {
-    double total = 0.0f;
-    for (int i = 0; i < (int)v.size(); i++) {
-        total += v[i] * v[i];
-    }
-    return total;
-}
-
-static double dotProduct(const std::vector<float> &v1,
-                         const std::vector<float> &v2) {
-    double total = 0.0;
-    int max = (int)(v1.size() < v2.size() ? v1.size() : v2.size());
-    for (int i = 0; i < max; i++) {
-        total += v1[i] * v2[i];
-    }
-    return total;
-}
-
-static std::vector<float> scalarMultiplication(const std::vector<float> &v,
-                                               const double scale) {
-    std::vector<float> v2(v.size());
-    for (int i = 0; i < (int)v.size(); i++) {
-        v2[i] = (float)(v[i] * scale);
-    }
-    return v2;
-}
-
-static std::vector<float> vectorSubtraction(const std::vector<float> &v1,
-                                            const std::vector<float> &v2) {
-    std::vector<float> v3(v1.size() < v2.size() ? v1.size() : v2.size());
-    for (int i = 0; i < (int)v3.size(); i++) {
-        v3[i] = v1[i] - v2[i];
-    }
-    return v3;
-}
-
-static std::vector<float> vectorSubtraction(const std::vector<float> &v,
-                                            const double scalar) {
-    std::vector<float> v3(v.size());
-    for (int i = 0; i < (int)v3.size(); i++) {
-        v3[i] = (float)(v[i] - scalar);
-    }
-    return v3;
-}
-
-static double vectorMean(const std::vector<float> &v) {
-    double sum = 0;
-    for (int i = 0; i < (int)v.size(); i++) {
-        sum += v[i];
-    }
-    return sum / v.size();
-}
-
 std::vector<float>
 SoundEvent::findFrequencies(const std::vector<float> &samples) const {
     for (long long i = 0; i < fftwSize; i++) {
@@ -113,19 +60,52 @@ uint8_t SoundEvent::value() const {
 
     auto testFrequencies = findFrequencies(soundData);
 
-    // least square approx.
-    double vectorScale = dotProduct(matchFrequencies, testFrequencies) /
-                         dotProduct(matchFrequencies);
-    std::vector<float> expected =
-        scalarMultiplication(matchFrequencies, vectorScale);
+    // let w be a subspace of reals^len(matchFrequencies)
+    // defined by the basis vector: matchFrequencies.
+    // The following algorithm finds the closest vector
+    // to testFrequencies in the subspace w
+    // using least square approximation
 
-    // error calculation (R squared)
-    double mean = vectorMean(testFrequencies);
-    double error =
-        1 - dotProduct(vectorSubtraction(testFrequencies, expected)) /
-                dotProduct(vectorSubtraction(testFrequencies, mean));
+    std::vector<float> temp;
+    std::transform(matchFrequencies.begin(), matchFrequencies.end(),
+                   testFrequencies.begin(), temp.begin(),
+                   [](float f1, float f2) { return f1 * f2; });
+    float matchDotProductTest = std::accumulate(temp.begin(), temp.end(), 0.f);
 
-    return error > matchThreshold;
+    float matchDotProductMatch =
+        std::reduce(matchFrequencies.begin(), matchFrequencies.end(), 0.f,
+                    [](float f1, float f2) { return f1 + f2 * f2; });
+
+    float vectorScale = matchDotProductTest / matchDotProductMatch;
+
+    std::vector<float> leastSquareApprox;
+    std::transform(matchFrequencies.begin(), matchFrequencies.end(),
+                   leastSquareApprox.begin(),
+                   [&](float f) { return f * vectorScale; });
+
+    // R squared comparing leastSquareApprox to testFrequencies
+
+    std::transform(testFrequencies.begin(), testFrequencies.end(),
+                   leastSquareApprox.begin(), temp.begin(),
+                   [](float f1, float f2) {
+                       float diff = f1 - f2;
+                       return diff * diff;
+                   });
+    float testMinusApprox = std::accumulate(temp.begin(), temp.end(), 0.f);
+
+    float mean = std::reduce(
+        testFrequencies.begin(), testFrequencies.end(), 0.f,
+        [&](float f1, float f2) { return f1 + f2 / testFrequencies.size(); });
+
+    std::transform(testFrequencies.begin(), testFrequencies.end(), temp.begin(),
+                   [&](float f) {
+                       float diff = f - mean;
+                       return diff * diff;
+                   });
+    float testMinusMean = std::accumulate(temp.begin(), temp.end(), 0.f);
+    float rSquaredError = 1 - testMinusApprox / testMinusMean;
+
+    return rSquaredError > matchThreshold;
     // std::cout << "Least Square Approx.: " << vectorScale << " * original
     // vector" << std::endl; std::cout << "R Squared: " << error << std::endl;
 }

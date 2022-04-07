@@ -14,6 +14,7 @@
 #include <complex>
 #include <cstring>
 #include <map>
+#include <numeric>
 #include <set>
 #include <sstream>
 #include <string>
