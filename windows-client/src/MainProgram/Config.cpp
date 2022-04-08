@@ -12,22 +12,22 @@ using std::make_shared;
 using std::shared_ptr;
 using std::string;
 
-#define AC_ADD_EVENT_BUTTON(button, name)                                      \
-    {                                                                          \
-        shared_ptr<Event> joystickTemp =                                       \
-            make_shared<SfJoystickEvent>(0, button);                           \
-        shared_ptr<Event> collectionTemp = make_shared<EventCollection>(       \
-            std::vector<shared_ptr<Event>>{invertedToggle, joystickTemp},      \
-            EventCollection::And);                                             \
-        eventMap.insert({name, collectionTemp});                               \
-    }
+static void add_event_button(const int &button, const string &name,
+                             const shared_ptr<Event> &invertedToggle,
+                             std::map<string, shared_ptr<Event>> &eventMap) {
+    shared_ptr<Event> joystickTemp = make_shared<SfJoystickEvent>(0, button);
+    shared_ptr<Event> collectionTemp = make_shared<EventCollection>(
+        std::vector<shared_ptr<Event>>{invertedToggle, joystickTemp},
+        EventCollection::And);
+    eventMap.insert({name, collectionTemp});
+}
 
-#define AC_ADD_EVENT_STICK(stick, name)                                        \
-    {                                                                          \
-        shared_ptr<Event> joystickTemp =                                       \
-            make_shared<SfJoystickEvent>(0, (sf::Joystick::Axis)stick);        \
-        eventMap.insert({name, joystickTemp});                                 \
-    }
+static void add_event_stick(const int &stick, const string &name,
+                            std::map<string, shared_ptr<Event>> &eventMap) {
+    shared_ptr<Event> joystickTemp =
+        make_shared<SfJoystickEvent>(0, (sf::Joystick::Axis)stick);
+    eventMap.insert({name, joystickTemp});
+}
 
 void initializeGameCapture(shared_ptr<FFmpegRecorder> &recorder,
                            shared_ptr<VideoFrameSink> &videoSink,
@@ -70,33 +70,30 @@ void getConfig(std::string &serialPortName,
     shared_ptr<Event> invertedToggle = std::make_shared<EventCollection>(
         std::vector<std::shared_ptr<Event>>{toggle}, EventCollection::Not);
 
-    AC_ADD_EVENT_BUTTON(1, "a");
-    AC_ADD_EVENT_BUTTON(0, "b");
-    AC_ADD_EVENT_BUTTON(3, "x");
-    AC_ADD_EVENT_BUTTON(2, "y");
-    AC_ADD_EVENT_BUTTON(4, "l");
-    AC_ADD_EVENT_BUTTON(5, "r");
-    AC_ADD_EVENT_BUTTON(6, "xl");
-    AC_ADD_EVENT_BUTTON(7, "xr");
-    AC_ADD_EVENT_BUTTON(8, "select");
-    AC_ADD_EVENT_BUTTON(9, "start");
-    AC_ADD_EVENT_BUTTON(10, "lClick");
-    AC_ADD_EVENT_BUTTON(11, "rClick");
-    AC_ADD_EVENT_BUTTON(12, "home");
+    add_event_button(1, "a", invertedToggle, eventMap);
+    add_event_button(0, "b", invertedToggle, eventMap);
+    add_event_button(3, "x", invertedToggle, eventMap);
+    add_event_button(2, "y", invertedToggle, eventMap);
+    add_event_button(4, "l", invertedToggle, eventMap);
+    add_event_button(5, "r", invertedToggle, eventMap);
+    add_event_button(6, "xl", invertedToggle, eventMap);
+    add_event_button(7, "xr", invertedToggle, eventMap);
+    add_event_button(8, "select", invertedToggle, eventMap);
+    add_event_button(9, "start", invertedToggle, eventMap);
+    add_event_button(10, "lClick", invertedToggle, eventMap);
+    add_event_button(11, "rClick", invertedToggle, eventMap);
+    add_event_button(12, "home", invertedToggle, eventMap);
 
-    AC_ADD_EVENT_STICK(0, "leftStickX");
-    AC_ADD_EVENT_STICK(1, "leftStickY");
-    AC_ADD_EVENT_STICK(4, "rightStickX");
-    AC_ADD_EVENT_STICK(5, "rightStickY");
-    AC_ADD_EVENT_STICK(6, "dpadX");
-    AC_ADD_EVENT_STICK(7, "dpadY");
+    add_event_stick(0, "leftStickX", eventMap);
+    add_event_stick(1, "leftStickY", eventMap);
+    add_event_stick(4, "rightStickX", eventMap);
+    add_event_stick(5, "rightStickY", eventMap);
+    add_event_stick(6, "dpadX", eventMap);
+    add_event_stick(7, "dpadY", eventMap);
 
-    // These events use the opposite of the toggle
-    invertedToggle = toggle;
-
-    AC_ADD_EVENT_BUTTON(1, "record");
-    AC_ADD_EVENT_BUTTON(0, "playLastRecorded");
-    AC_ADD_EVENT_BUTTON(3, "stopMacros");
+    add_event_button(1, "record", toggle, eventMap);
+    add_event_button(0, "playLastRecorded", toggle, eventMap);
+    add_event_button(3, "stopMacros", toggle, eventMap);
 
     // TODO
     // AC_ADD_EVENT_BUTTON(2, "turboButtonToggle");
