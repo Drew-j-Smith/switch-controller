@@ -19,7 +19,14 @@ private:
     // fftw
     mutable std::vector<float> fftwIn;
     mutable std::vector<std::complex<float>> fftwOut;
-    fftwf_plan fftwPlan;
+    struct fftwf_deleter {
+        void operator()(fftwf_plan *f) const noexcept {
+            fftwf_destroy_plan(*f);
+            delete f;
+        };
+    };
+    std::unique_ptr<fftwf_plan, fftwf_deleter> fftwPlan{new fftwf_plan(),
+                                                        fftwf_deleter()};
     int fftwSize;
 
     std::vector<float> matchFrequencies;
@@ -31,8 +38,6 @@ private:
 public:
     SoundEvent(const std::string &filename, double matchThreshold,
                std::shared_ptr<AudioFrameSink> audioFrameSink);
-
-    ~SoundEvent() override { fftwf_destroy_plan(fftwPlan); }
 
     uint8_t value() const override;
 };

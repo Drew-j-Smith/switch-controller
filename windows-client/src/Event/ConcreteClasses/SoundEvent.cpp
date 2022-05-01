@@ -9,7 +9,7 @@ SoundEvent::findFrequencies(const std::vector<float> &samples) const {
         fftwIn[i] = samples[i];
     }
 
-    fftwf_execute(fftwPlan);
+    fftwf_execute(*fftwPlan);
 
     std::vector<float> frequencies(fftwSize / 2 + 1);
     for (unsigned long long i = 0; i < frequencies.size(); i++) {
@@ -46,7 +46,7 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
     fftwSize = (int)matchAudio.size();
     fftwIn.resize(fftwSize);
     fftwOut.resize(fftwSize / 2 + 1);
-    fftwPlan = fftwf_plan_dft_r2c_1d(
+    *fftwPlan = fftwf_plan_dft_r2c_1d(
         fftwSize, fftwIn.data(), (fftwf_complex *)fftwOut.data(), FFTW_MEASURE);
     matchFrequencies = findFrequencies(matchAudio);
     matchValue.store(0);
