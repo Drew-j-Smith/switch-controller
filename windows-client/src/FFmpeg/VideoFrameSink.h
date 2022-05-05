@@ -21,8 +21,6 @@ private:
     int height = 0;
     AVPixelFormat pixelFormat;
 
-    std::mutex mutex;
-
     struct swsContextDeleter {
         void operator()(SwsContext *s) const noexcept { sws_freeContext(s); }
     };
