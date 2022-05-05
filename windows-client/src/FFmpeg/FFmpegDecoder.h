@@ -3,6 +3,8 @@
 
 #include "FFmpegFrameSink.h"
 
+#include "Util/Delter.h"
+
 #include "pch.h"
 
 extern "C" {
@@ -12,13 +14,7 @@ extern "C" {
 class FFmpegDecoder {
 private:
     AVFormatContext *formatContext;
-    struct CodecContextDeleter {
-        CodecContextDeleter() {}
-        void operator()(AVCodecContext *c) const noexcept {
-            avcodec_free_context(&c);
-        }
-    };
-    std::unique_ptr<AVCodecContext, CodecContextDeleter> decoderContext;
+    unique_ptr_w_deleter<AVCodecContext> decoderContext;
     std::shared_ptr<FFmpegFrameSink> sink;
     int streamIndex;
 
