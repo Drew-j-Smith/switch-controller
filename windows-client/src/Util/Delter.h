@@ -3,18 +3,18 @@
 
 #include "pch.h"
 
-template <class T> struct PointerDeleter {
-    std::function<void(T *)> deleterFunction;
-    PointerDeleter() {}
-    PointerDeleter(std::function<void(T *)> f) : deleterFunction(f) {}
-    void operator()(T *t) const noexcept { deleterFunction(t); }
+template <class T, void (*F)(T *)> struct PointerDeleter {
+    void operator()(T *t) const noexcept { F(t); }
 };
 
-template <class T>
-using unique_ptr_w_deleter = std::unique_ptr<T, PointerDeleter<T>>;
+template <class T, void (*F)(T *)>
+using unique_ptr_w_deleter = std::unique_ptr<T, PointerDeleter<T, F>>;
 
-template <class T> std::function<void(T *)> deref(std::function<void(T **)> f) {
-    return [&f](T *t) { f(&t); };
-}
+template <class T, void (*F)(T **)> struct DoublePointerDeleter {
+    void operator()(T *t) const noexcept { F(&t); }
+};
+
+template <class T, void (*F)(T **)>
+using unique_dbl_ptr_w_deleter = std::unique_ptr<T, DoublePointerDeleter<T, F>>;
 
 #endif

@@ -14,7 +14,8 @@ extern "C" {
 class FFmpegDecoder {
 private:
     AVFormatContext *formatContext;
-    unique_ptr_w_deleter<AVCodecContext> decoderContext;
+    unique_dbl_ptr_w_deleter<AVCodecContext, avcodec_free_context>
+        decoderContext;
     std::shared_ptr<FFmpegFrameSink> sink;
     int streamIndex;
 
