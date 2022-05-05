@@ -31,7 +31,8 @@ void FFmpegDecoder::openCodecContext() {
     }
 
     // Allocate a codec context for the decoder
-    this->decoderContext = avcodec_alloc_context3(decoder);
+    this->decoderContext = {avcodec_alloc_context3(decoder),
+                            CodecContextDeleter()};
     if (!this->decoderContext) {
         throw std::runtime_error(
             "Failed to allocate the " +
@@ -40,8 +41,8 @@ void FFmpegDecoder::openCodecContext() {
     }
 
     // Copy codec parameters from input stream to output codec context
-    if (avcodec_parameters_to_context(this->decoderContext, stream->codecpar) <
-        0) {
+    if (avcodec_parameters_to_context(this->decoderContext.get(),
+                                      stream->codecpar) < 0) {
         throw std::runtime_error(
             "Failed to copy " +
             std::string(av_get_media_type_string(this->sink->getType())) +
@@ -49,7 +50,7 @@ void FFmpegDecoder::openCodecContext() {
     }
 
     // Init the decoders
-    if (avcodec_open2(this->decoderContext, decoder, nullptr) < 0) {
+    if (avcodec_open2(this->decoderContext.get(), decoder, nullptr) < 0) {
         throw std::runtime_error(
             "Failed to open " +
             std::string(av_get_media_type_string(this->sink->getType())) +
@@ -62,14 +63,14 @@ FFmpegDecoder::FFmpegDecoder(AVFormatContext *formatContext,
     this->formatContext = formatContext;
     this->sink = sink;
     openCodecContext();
-    sink->init(this->decoderContext);
+    sink->init(this->decoderContext.get());
 }
 
 void FFmpegDecoder::decodePacket(const AVPacket *packet, AVFrame *frame) {
     int ret = 0;
 
     // submit the packet to the decoder
-    ret = avcodec_send_packet(decoderContext, packet);
+    ret = avcodec_send_packet(decoderContext.get(), packet);
     if (ret < 0) {
         char error[AV_ERROR_MAX_STRING_SIZE];
         av_make_error_string(error, AV_ERROR_MAX_STRING_SIZE, ret);
@@ -79,7 +80,7 @@ void FFmpegDecoder::decodePacket(const AVPacket *packet, AVFrame *frame) {
 
     // get all the available frames from the decoder
     while (ret >= 0) {
-        ret = avcodec_receive_frame(decoderContext, frame);
+        ret = avcodec_receive_frame(decoderContext.get(), frame);
         if (ret < 0) {
             // those two return values are special and mean there is no output
             // frame available, but there were no errors during decoding

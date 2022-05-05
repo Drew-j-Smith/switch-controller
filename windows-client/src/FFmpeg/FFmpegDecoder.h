@@ -12,14 +12,19 @@ extern "C" {
 class FFmpegDecoder {
 private:
     AVFormatContext *formatContext;
-    AVCodecContext *decoderContext;
+    struct CodecContextDeleter {
+        CodecContextDeleter() {}
+        void operator()(AVCodecContext *c) const noexcept {
+            avcodec_free_context(&c);
+        }
+    };
+    std::unique_ptr<AVCodecContext, CodecContextDeleter> decoderContext;
     std::shared_ptr<FFmpegFrameSink> sink;
     int streamIndex;
 
 public:
     FFmpegDecoder(AVFormatContext *formatContext,
                   std::shared_ptr<FFmpegFrameSink> sink);
-    ~FFmpegDecoder() { avcodec_free_context(&decoderContext); };
 
     void decodePacket(const AVPacket *packet, AVFrame *frame);
     int getStreamIndex() const { return streamIndex; }
