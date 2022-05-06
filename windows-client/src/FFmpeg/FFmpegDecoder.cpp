@@ -31,9 +31,8 @@ void FFmpegDecoder::openCodecContext() {
     }
 
     // Allocate a codec context for the decoder
-    this->decoderContext = {
-        avcodec_alloc_context3(decoder),
-        DoublePointerDeleter<AVCodecContext, avcodec_free_context>()};
+    this->decoderContext = {avcodec_alloc_context3(decoder),
+                            CodecContextDeleter()};
     if (!this->decoderContext) {
         throw std::runtime_error(
             "Failed to allocate the " +
