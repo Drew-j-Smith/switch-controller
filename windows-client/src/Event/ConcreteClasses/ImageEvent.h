@@ -16,8 +16,7 @@ class ImageEvent : public Event {
 public:
     ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
                const int matchMethod, const double matchThreshold,
-               const cv::Rect imageCrop,
-               const std::shared_ptr<VideoFrameSink> &videoFrameSink);
+               const cv::Rect imageCrop, VideoFrameSink *videoFrameSink);
 
     uint8_t value() const override;
 
@@ -28,7 +27,7 @@ private:
     const double matchThreshold;
     const cv::Rect imageCrop;
 
-    std::shared_ptr<VideoFrameSink> videoFrameSink;
+    VideoFrameSink *videoFrameSink;
     mutable std::vector<uint8_t> videoData;
 };
 

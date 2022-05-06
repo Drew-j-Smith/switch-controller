@@ -16,12 +16,12 @@ private:
         void operator()(AVCodecContext *s) { avcodec_free_context(&s); }
     };
     std::unique_ptr<AVCodecContext, CodecContextDeleter> decoderContext;
-    std::shared_ptr<FFmpegFrameSink> sink;
+    FFmpegFrameSink *sink;
     int streamIndex;
 
 public:
     FFmpegDecoder(AVFormatContext *formatContext,
-                  std::shared_ptr<FFmpegFrameSink> sink);
+                  std::unique_ptr<FFmpegFrameSink> &sink);
 
     void decodePacket(const AVPacket *packet, AVFrame *frame);
     int getStreamIndex() const { return streamIndex; }

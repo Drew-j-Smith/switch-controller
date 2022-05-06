@@ -14,10 +14,11 @@ extern "C" {
 FFmpegRecorder::FFmpegRecorder(
     std::string inputFormat, std::string deviceName,
     std::map<std::string, std::string> options,
-    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks) {
+    std::vector<std::unique_ptr<FFmpegFrameSink>> &&sinks)
+    : sinks(std::move(sinks)) {
     std::set<AVMediaType> types;
     bool overlap = false;
-    for (auto sink : sinks) {
+    for (auto &sink : sinks) {
         if (types.find(sink->getType()) == types.end()) {
             types.insert(sink->getType());
         } else {
@@ -28,14 +29,13 @@ FFmpegRecorder::FFmpegRecorder(
         throw std::invalid_argument(
             "Only one frame sink of each type may be used");
     }
-    if (sinks.size() == 0) {
+    if (this->sinks.size() == 0) {
         throw std::invalid_argument("The sink size must be greater than 0");
     }
 
     this->inputFormatStr = inputFormat;
     this->deviceNameStr = deviceName;
     this->options = options;
-    this->sinks = sinks;
 }
 
 void FFmpegRecorder::openStream() {
@@ -64,10 +64,11 @@ void FFmpegRecorder::openStream() {
     }
 
     // open stream ctx for each frame sink
-    for (auto sink : sinks) {
-        std::shared_ptr<FFmpegDecoder> decoder =
-            std::make_shared<FFmpegDecoder>(formatContext, sink);
-        decoders.insert({decoder->getStreamIndex(), decoder});
+    for (auto &sink : sinks) {
+        std::unique_ptr<FFmpegDecoder> decoder =
+            std::make_unique<FFmpegDecoder>(formatContext, sink);
+        int streamIndex = decoder->getStreamIndex();
+        decoders.insert({streamIndex, std::move(decoder)});
     }
 
     if (decoders.size() == 0) {
@@ -96,20 +97,19 @@ void FFmpegRecorder::start() {
                    av_read_frame(formatContext, &pkt) >= 0) {
                 // check if the pack goes to a frame sink
                 if (decoders.find(pkt.stream_index) != decoders.end()) {
-                    auto decoder = decoders.at(pkt.stream_index);
+                    auto &decoder = decoders.at(pkt.stream_index);
                     decoder->decodePacket(&pkt, frame);
                 }
                 av_packet_unref(&pkt);
             }
 
             // flushing decoders
-            for (auto it : decoders) {
+            for (auto &it : decoders) {
                 it.second->decodePacket(nullptr, frame);
             }
 
             // need to call these methods here... for some reason
             // if these methods aren't called in this thread it crashes
-            decoders.clear();
             avformat_close_input(&formatContext);
             av_frame_free(&frame);
 
@@ -119,4 +119,8 @@ void FFmpegRecorder::start() {
             throw;
         }
     });
+
+    for (auto &sink : sinks) {
+        sink->waitForInit();
+    }
 }

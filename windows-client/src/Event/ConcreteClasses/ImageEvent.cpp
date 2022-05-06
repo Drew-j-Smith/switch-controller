@@ -4,8 +4,7 @@
 
 ImageEvent::ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
                        const int matchMethod, const double matchThreshold,
-                       const cv::Rect imageCrop,
-                       const std::shared_ptr<VideoFrameSink> &videoFrameSink)
+                       const cv::Rect imageCrop, VideoFrameSink *videoFrameSink)
     : templatePic(templatePic), maskPic(maskPic), matchMethod(matchMethod),
       matchThreshold(matchThreshold), imageCrop(imageCrop),
       videoFrameSink(videoFrameSink) {}

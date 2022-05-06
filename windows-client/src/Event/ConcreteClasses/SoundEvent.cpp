@@ -20,23 +20,22 @@ SoundEvent::findFrequencies(const std::vector<float> &samples) const {
 }
 
 SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
-                       std::shared_ptr<AudioFrameSink> audioFrameSink) {
+                       AudioFrameSink *audioFrameSink) {
     this->matchThreshold = matchThreshold;
     this->audioFrameSink = audioFrameSink;
 
-    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-    std::shared_ptr<AudioFrameSink> audioSink =
-        std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16,
-                                         48000);
-    sinks.push_back(audioSink);
+    std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
+    auto tempSink = std::make_unique<AudioFrameSink>(AV_CH_LAYOUT_MONO,
+                                                     AV_SAMPLE_FMT_S16, 48000);
+    auto audioSink = tempSink.get();
+    sinks.push_back(std::move(tempSink));
 
     av_log_set_level(AV_LOG_QUIET);
 
-    FFmpegRecorder ffmpegRecorder("", filename, {}, sinks);
+    FFmpegRecorder ffmpegRecorder("", filename, {}, std::move(sinks));
     ffmpegRecorder.start();
-    audioSink->waitForInit();
     ffmpegRecorder.join();
-    ffmpegRecorder.stop();
+    ffmpegRecorder.stop(); // TODO fix ordering
 
     std::vector<uint8_t> rawData;
     audioSink->getData(rawData);

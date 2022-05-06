@@ -13,7 +13,7 @@ class SoundEvent : public Event {
 private:
     std::vector<float> matchAudio;
 
-    std::shared_ptr<AudioFrameSink> audioFrameSink;
+    AudioFrameSink *audioFrameSink;
     mutable std::vector<uint8_t> audioData;
 
     // fftw
@@ -37,7 +37,7 @@ private:
 
 public:
     SoundEvent(const std::string &filename, double matchThreshold,
-               std::shared_ptr<AudioFrameSink> audioFrameSink);
+               AudioFrameSink *audioFrameSink);
 
     uint8_t value() const override;
 };

@@ -7,17 +7,17 @@ void TestVideo() {
     std::string deviceName = "video=Game Capture HD60 S (2)";
     std::map<std::string, std::string> ffmpegOptions = {
         {"pixel_format", "bgr24"}};
-    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-    std::shared_ptr<VideoFrameSink> videoSink =
-        std::make_shared<VideoFrameSink>();
-    sinks.push_back(videoSink);
+    std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
+    auto tempSink = std::make_unique<VideoFrameSink>();
+    auto videoSink = tempSink.get();
+    sinks.push_back(std::move(tempSink));
 
     av_log_set_level(AV_LOG_QUIET);
 
-    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
+    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions,
+                            std::move(sinks));
     recorder.start();
 
-    videoSink->waitForInit();
     std::vector<uint8_t> data;
     long long lastFrame = videoSink->getData(data);
     cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(),

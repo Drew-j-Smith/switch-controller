@@ -32,17 +32,17 @@ void TestAudio() {
     }
 
     std::map<std::string, std::string> ffmpegOptions = {};
-    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
-    std::shared_ptr<AudioFrameSink> audioSink =
-        std::make_shared<AudioFrameSink>(AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16,
-                                         48000, loopRecord == 'y',
-                                         48000 * bufferSize);
-    sinks.push_back(audioSink);
+    std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
+    auto tempSink = std::make_unique<AudioFrameSink>(
+        AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, loopRecord == 'y',
+        48000 * bufferSize);
+    auto audioSink = tempSink.get();
+    sinks.push_back(std::move(tempSink));
 
-    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
+    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions,
+                            std::move(sinks));
     recorder.start();
 
-    audioSink->waitForInit();
     if (recordTimeStr.length() > 0) {
         std::this_thread::sleep_for(
             std::chrono::seconds(std::stoi(recordTimeStr)));
@@ -50,7 +50,7 @@ void TestAudio() {
         recorder.join();
     }
 
-    recorder.stop();
+    recorder.stop(); // TODO fix ordering
     std::vector<uint8_t> data;
     audioSink->getData(data);
 

@@ -17,10 +17,7 @@ void StartController() {
     // Updating joysticks to see if they are connected
     sf::Joystick::update();
 
-    std::shared_ptr<FFmpegRecorder> recorder;
-    std::shared_ptr<VideoFrameSink> videoSink;
-    std::shared_ptr<AudioFrameSink> audioSink;
-    initializeGameCapture(recorder, videoSink, audioSink);
+    auto [videoSink, audioSink, recorder] = initializeGameCapture();
 
     std::string serialPortName;
     std::map<std::string, std::shared_ptr<Event>> events;

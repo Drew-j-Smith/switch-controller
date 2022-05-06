@@ -14,9 +14,9 @@ class FFmpegRecorder {
 private:
     AVFormatContext *formatContext = nullptr;
     AVFrame *frame = nullptr;
-    std::map<int, std::shared_ptr<FFmpegDecoder>> decoders;
+    std::map<int, std::unique_ptr<FFmpegDecoder>> decoders;
 
-    std::vector<std::shared_ptr<FFmpegFrameSink>> sinks;
+    std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
     std::string inputFormatStr;
     std::string deviceNameStr;
     std::map<std::string, std::string> options;
@@ -29,7 +29,7 @@ private:
 public:
     FFmpegRecorder(std::string inputFormat, std::string deviceName,
                    std::map<std::string, std::string> options,
-                   std::vector<std::shared_ptr<FFmpegFrameSink>> sinks);
+                   std::vector<std::unique_ptr<FFmpegFrameSink>> &&sinks);
     ~FFmpegRecorder() {
         stop();
         decoders.clear();

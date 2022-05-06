@@ -11,6 +11,7 @@
 using std::make_shared;
 using std::shared_ptr;
 using std::string;
+using std::unique_ptr;
 
 static void add_event_button(const int &button, const string &name,
                              const shared_ptr<Event> &invertedToggle,
@@ -29,33 +30,36 @@ static void add_event_stick(const int &stick, const string &name,
     eventMap.insert({name, joystickTemp});
 }
 
-void initializeGameCapture(shared_ptr<FFmpegRecorder> &recorder,
-                           shared_ptr<VideoFrameSink> &videoSink,
-                           shared_ptr<AudioFrameSink> &audioSink) {
+std::tuple<VideoFrameSink *, AudioFrameSink *,
+           std::unique_ptr<FFmpegRecorder> &&>
+initializeGameCapture() {
     string inputFormat = "dshow";
     string deviceName =
         "video=Game Capture HD60 S:audio=Game Capture HD60 S Audio";
     std::map<string, string> ffmpegOptions = {{"pixel_format", "bgr24"}};
 
-    std::vector<shared_ptr<FFmpegFrameSink>> sinks;
-    videoSink = std::make_shared<VideoFrameSink>();
-    sinks.push_back(videoSink);
-    audioSink = std::make_shared<AudioFrameSink>(
+    std::vector<unique_ptr<FFmpegFrameSink>> sinks;
+    auto tempVideoSink = std::make_unique<VideoFrameSink>();
+    auto videoSink = tempVideoSink.get();
+    sinks.push_back(std::move(tempVideoSink));
+    auto tempAudioSink = std::make_unique<AudioFrameSink>(
         AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, true, 48000);
-    sinks.push_back(audioSink);
+    auto audioSink = tempAudioSink.get();
+    sinks.push_back(std::move(tempAudioSink));
 
     av_log_set_level(AV_LOG_QUIET);
 
-    recorder = make_shared<FFmpegRecorder>(inputFormat, deviceName,
-                                           ffmpegOptions, sinks);
+    auto recorder = std::make_unique<FFmpegRecorder>(
+        inputFormat, deviceName, ffmpegOptions, std::move(sinks));
     recorder->start();
+    return {videoSink, audioSink, std::move(recorder)};
 }
 
 void getConfig(std::string &serialPortName,
                std::map<std::string, std::shared_ptr<Event>> &eventMap,
                std::vector<std::shared_ptr<Macro>> &macros,
-               shared_ptr<VideoFrameSink> videoSink,
-               shared_ptr<AudioFrameSink> audioSink) {
+               [[maybe_unused]] VideoFrameSink *videoSink,
+               [[maybe_unused]] AudioFrameSink *audioSink) {
     serialPortName = "COM3";
 
     // Events
@@ -100,6 +104,7 @@ void getConfig(std::string &serialPortName,
 
     // Deciders
     cv::Rect rectCrop(0, 0, 500, 500);
+    // TODO fix
     auto haanitDecider = make_shared<ImageEvent>(
         cv::imread("data/haanit.png"), cv::imread("data/haanit mask.png"), 3,
         .97, rectCrop, videoSink);

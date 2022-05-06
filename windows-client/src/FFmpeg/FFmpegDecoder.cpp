@@ -59,9 +59,9 @@ void FFmpegDecoder::openCodecContext() {
 }
 
 FFmpegDecoder::FFmpegDecoder(AVFormatContext *formatContext,
-                             std::shared_ptr<FFmpegFrameSink> sink) {
+                             std::unique_ptr<FFmpegFrameSink> &sink) {
     this->formatContext = formatContext;
-    this->sink = sink;
+    this->sink = sink.get();
     openCodecContext();
     sink->init(this->decoderContext.get());
 }
