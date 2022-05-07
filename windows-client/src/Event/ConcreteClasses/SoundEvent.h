@@ -25,8 +25,7 @@ private:
             delete f;
         };
     };
-    std::unique_ptr<fftwf_plan, fftwf_deleter> fftwPlan{new fftwf_plan(),
-                                                        fftwf_deleter()};
+    std::unique_ptr<fftwf_plan, fftwf_deleter> fftwPlan;
     int fftwSize;
 
     std::vector<float> matchFrequencies;
