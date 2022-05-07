@@ -18,7 +18,7 @@ FFmpegRecorder::FFmpegRecorder(
     : sinks(std::move(sinks)) {
     std::set<AVMediaType> types;
     bool overlap = false;
-    for (auto &sink : sinks) {
+    for (auto &sink : this->sinks) {
         if (types.find(sink->getType()) == types.end()) {
             types.insert(sink->getType());
         } else {
@@ -36,6 +36,48 @@ FFmpegRecorder::FFmpegRecorder(
     this->inputFormatStr = inputFormat;
     this->deviceNameStr = deviceName;
     this->options = options;
+
+    recording.store(true);
+
+    recordingThread = std::thread([&]() {
+        try {
+            auto formatContext = openStream();
+
+            AVPacket pkt;
+
+            constexpr auto FrameDeleter = [](AVFrame *f) { av_frame_free(&f); };
+            auto frame = std::unique_ptr<AVFrame, decltype(FrameDeleter)>{
+                av_frame_alloc(), FrameDeleter};
+
+            if (!frame) {
+                throw std::runtime_error("Could not allocate frame");
+            }
+            // read until there are no more frames or canceled
+            while (recording.load() &&
+                   av_read_frame(formatContext.get(), &pkt) >= 0) {
+                // check if the pack goes to a frame sink
+                if (decoders.find(pkt.stream_index) != decoders.end()) {
+                    auto &decoder = decoders.at(pkt.stream_index);
+                    decoder->decodePacket(&pkt, frame.get());
+                }
+                av_packet_unref(&pkt);
+            }
+
+            // flushing decoders
+            for (auto &it : decoders) {
+                it.second->decodePacket(nullptr, frame.get());
+            }
+
+        } catch (std::exception &e) {
+            std::cerr << "Uncaught exception in FFmpeg Recorder: " +
+                             std::string(e.what()) + "\n";
+            throw;
+        }
+    });
+
+    for (auto &sink : this->sinks) {
+        sink->waitForInit();
+    }
 }
 
 std::unique_ptr<AVFormatContext, decltype(FFmpegRecorder::formatContextDeleter)>
@@ -87,48 +129,4 @@ FFmpegRecorder::openStream() {
     // av_dump_format(formatContext, 0, deviceName.c_str(), 0);
 
     return formatContext;
-}
-
-void FFmpegRecorder::start() {
-    recording.store(true);
-
-    recordingThread = std::thread([&]() {
-        try {
-            auto formatContext = openStream();
-
-            AVPacket pkt;
-
-            constexpr auto FrameDeleter = [](AVFrame *f) { av_frame_free(&f); };
-            auto frame = std::unique_ptr<AVFrame, decltype(FrameDeleter)>{
-                av_frame_alloc(), FrameDeleter};
-
-            if (!frame) {
-                throw std::runtime_error("Could not allocate frame");
-            }
-            // read until there are no more frames or canceled
-            while (recording.load() &&
-                   av_read_frame(formatContext.get(), &pkt) >= 0) {
-                // check if the pack goes to a frame sink
-                if (decoders.find(pkt.stream_index) != decoders.end()) {
-                    auto &decoder = decoders.at(pkt.stream_index);
-                    decoder->decodePacket(&pkt, frame.get());
-                }
-                av_packet_unref(&pkt);
-            }
-
-            // flushing decoders
-            for (auto &it : decoders) {
-                it.second->decodePacket(nullptr, frame.get());
-            }
-
-        } catch (std::exception &e) {
-            std::cerr << "Uncaught exception in FFmpeg Recorder: " +
-                             std::string(e.what()) + "\n";
-            throw;
-        }
-    });
-
-    for (auto &sink : sinks) {
-        sink->waitForInit();
-    }
 }

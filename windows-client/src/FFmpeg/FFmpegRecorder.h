@@ -33,7 +33,6 @@ public:
                    std::map<std::string, std::string> options,
                    std::vector<std::unique_ptr<FFmpegFrameSink>> &&sinks);
     ~FFmpegRecorder() { stop(); };
-    void start();
     void stop() {
         recording.store(false);
         join();

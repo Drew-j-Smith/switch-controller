@@ -16,7 +16,6 @@ void TestVideo() {
 
     FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions,
                             std::move(sinks));
-    recorder.start();
 
     std::vector<uint8_t> data;
     long long lastFrame = videoSink->getData(data);

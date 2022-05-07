@@ -33,7 +33,6 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
     av_log_set_level(AV_LOG_QUIET);
 
     FFmpegRecorder ffmpegRecorder("", filename, {}, std::move(sinks));
-    ffmpegRecorder.start();
     ffmpegRecorder.join();
     ffmpegRecorder.stop(); // TODO fix ordering
 

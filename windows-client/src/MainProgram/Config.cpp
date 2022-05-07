@@ -51,7 +51,6 @@ initializeGameCapture() {
 
     auto recorder = std::make_unique<FFmpegRecorder>(
         inputFormat, deviceName, ffmpegOptions, std::move(sinks));
-    recorder->start();
     return {videoSink, audioSink, std::move(recorder)};
 }
 

@@ -41,7 +41,6 @@ void TestAudio() {
 
     FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions,
                             std::move(sinks));
-    recorder.start();
 
     if (recordTimeStr.length() > 0) {
         std::this_thread::sleep_for(
