@@ -85,11 +85,8 @@ createFFmpegRecorder(const std::string &inputFormat,
         throw std::invalid_argument("The sink size must be greater than 0");
     }
 
-    auto res = std::unique_ptr<
-        std::tuple<std::thread, std::unique_ptr<std::atomic_bool>>,
-        FFmpegRecorderThreadDeleter>{
-        new std::tuple<std::thread, std::unique_ptr<std::atomic_bool>>,
-        FFmpegRecorderThreadDeleter()};
+    auto res = FFmpegRecorder{new FFmpegRecorder::element_type,
+                              FFmpegRecorderThreadDeleter()};
 
     auto &[recordingThread, recording] = *res;
 
