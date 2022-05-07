@@ -8,14 +8,13 @@ void TestVideo() {
     std::map<std::string, std::string> ffmpegOptions = {
         {"pixel_format", "bgr24"}};
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
-    auto tempSink = std::make_unique<VideoFrameSink>();
-    auto videoSink = tempSink.get();
-    sinks.push_back(std::move(tempSink));
+    sinks.push_back(std::make_unique<VideoFrameSink>());
+    auto videoSink = dynamic_cast<VideoFrameSink *>(sinks[0].get());
 
     av_log_set_level(AV_LOG_QUIET);
 
-    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions,
-                            std::move(sinks));
+    auto recorder =
+        createFFmpegRecorder(inputFormat, deviceName, ffmpegOptions, sinks);
 
     std::vector<uint8_t> data;
     long long lastFrame = videoSink->getData(data);

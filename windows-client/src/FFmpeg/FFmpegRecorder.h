@@ -44,4 +44,23 @@ public:
     }
 };
 
+struct FFmpegRecorderThreadDeleter {
+    void
+    operator()(std::tuple<std::thread, std::unique_ptr<std::atomic_bool>> *t) {
+        auto &[thread, recording] = *t;
+        recording->store(false);
+        if (thread.joinable()) {
+            thread.join();
+        }
+        delete t;
+    }
+};
+
+std::unique_ptr<std::tuple<std::thread, std::unique_ptr<std::atomic_bool>>,
+                FFmpegRecorderThreadDeleter>
+createFFmpegRecorder(const std::string &inputFormat,
+                     const std::string &deviceName,
+                     const std::map<std::string, std::string> &options,
+                     std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks);
+
 #endif
