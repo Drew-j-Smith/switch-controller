@@ -12,8 +12,6 @@ extern "C" {
 
 class FFmpegRecorder {
 private:
-    AVFormatContext *formatContext = nullptr;
-    AVFrame *frame = nullptr;
     std::map<int, std::unique_ptr<FFmpegDecoder>> decoders;
 
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
@@ -24,18 +22,17 @@ private:
     std::atomic<bool> recording;
     std::thread recordingThread;
 
-    void openStream();
+    constexpr static auto formatContextDeleter = [](AVFormatContext *c) {
+        avformat_close_input(&c);
+    };
+    std::unique_ptr<AVFormatContext, decltype(formatContextDeleter)>
+    openStream();
 
 public:
     FFmpegRecorder(std::string inputFormat, std::string deviceName,
                    std::map<std::string, std::string> options,
                    std::vector<std::unique_ptr<FFmpegFrameSink>> &&sinks);
-    ~FFmpegRecorder() {
-        stop();
-        decoders.clear();
-        avformat_close_input(&formatContext);
-        av_frame_free(&frame);
-    };
+    ~FFmpegRecorder() { stop(); };
     void start();
     void stop() {
         recording.store(false);

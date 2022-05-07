@@ -38,7 +38,8 @@ FFmpegRecorder::FFmpegRecorder(
     this->options = options;
 }
 
-void FFmpegRecorder::openStream() {
+std::unique_ptr<AVFormatContext, decltype(FFmpegRecorder::formatContextDeleter)>
+FFmpegRecorder::openStream() {
     avdevice_register_all();
 
     // finding input format and setting options dict
@@ -52,13 +53,19 @@ void FFmpegRecorder::openStream() {
     }
 
     // open input file, and allocate format context
-    if (avformat_open_input(&formatContext, deviceNameStr.c_str(), inputFormat,
-                            &optionsDic) < 0) {
+    AVFormatContext *formatContextPtr = nullptr;
+    if (avformat_open_input(&formatContextPtr, deviceNameStr.c_str(),
+                            inputFormat, &optionsDic) < 0) {
         throw std::runtime_error("Could not open stream " + deviceNameStr);
     }
 
+    auto formatContext =
+        std::unique_ptr<AVFormatContext,
+                        decltype(FFmpegRecorder::formatContextDeleter)>{
+            formatContextPtr, formatContextDeleter};
+
     // retrieve stream information
-    if (avformat_find_stream_info(formatContext, nullptr) < 0) {
+    if (avformat_find_stream_info(formatContext.get(), nullptr) < 0) {
         throw std::runtime_error("Could not find stream information for " +
                                  deviceNameStr);
     }
@@ -66,7 +73,7 @@ void FFmpegRecorder::openStream() {
     // open stream ctx for each frame sink
     for (auto &sink : sinks) {
         std::unique_ptr<FFmpegDecoder> decoder =
-            std::make_unique<FFmpegDecoder>(formatContext, sink);
+            std::make_unique<FFmpegDecoder>(formatContext.get(), sink);
         int streamIndex = decoder->getStreamIndex();
         decoders.insert({streamIndex, std::move(decoder)});
     }
@@ -78,6 +85,8 @@ void FFmpegRecorder::openStream() {
 
     // print stream info
     // av_dump_format(formatContext, 0, deviceName.c_str(), 0);
+
+    return formatContext;
 }
 
 void FFmpegRecorder::start() {
@@ -85,33 +94,32 @@ void FFmpegRecorder::start() {
 
     recordingThread = std::thread([&]() {
         try {
-            openStream();
+            auto formatContext = openStream();
 
             AVPacket pkt;
-            frame = av_frame_alloc();
+
+            constexpr auto FrameDeleter = [](AVFrame *f) { av_frame_free(&f); };
+            auto frame = std::unique_ptr<AVFrame, decltype(FrameDeleter)>{
+                av_frame_alloc(), FrameDeleter};
+
             if (!frame) {
                 throw std::runtime_error("Could not allocate frame");
             }
             // read until there are no more frames or canceled
             while (recording.load() &&
-                   av_read_frame(formatContext, &pkt) >= 0) {
+                   av_read_frame(formatContext.get(), &pkt) >= 0) {
                 // check if the pack goes to a frame sink
                 if (decoders.find(pkt.stream_index) != decoders.end()) {
                     auto &decoder = decoders.at(pkt.stream_index);
-                    decoder->decodePacket(&pkt, frame);
+                    decoder->decodePacket(&pkt, frame.get());
                 }
                 av_packet_unref(&pkt);
             }
 
             // flushing decoders
             for (auto &it : decoders) {
-                it.second->decodePacket(nullptr, frame);
+                it.second->decodePacket(nullptr, frame.get());
             }
-
-            // need to call these methods here... for some reason
-            // if these methods aren't called in this thread it crashes
-            avformat_close_input(&formatContext);
-            av_frame_free(&frame);
 
         } catch (std::exception &e) {
             std::cerr << "Uncaught exception in FFmpeg Recorder: " +
