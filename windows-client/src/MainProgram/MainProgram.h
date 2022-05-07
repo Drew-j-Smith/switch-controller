@@ -17,8 +17,8 @@ void StartController();
 void TestVideo();
 void TestAudio();
 
-std::tuple<VideoFrameSink *, AudioFrameSink *,
-           std::unique_ptr<FFmpegRecorder> &&>
+std::tuple<VideoFrameSink *, AudioFrameSink *, FFmpegRecorder,
+           std::vector<std::unique_ptr<FFmpegFrameSink>>>
 initializeGameCapture();
 
 void getConfig(std::string &serialPortName,

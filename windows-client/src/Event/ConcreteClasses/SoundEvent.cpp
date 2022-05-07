@@ -25,16 +25,15 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
     this->audioFrameSink = audioFrameSink;
 
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
-    auto tempSink = std::make_unique<AudioFrameSink>(AV_CH_LAYOUT_MONO,
-                                                     AV_SAMPLE_FMT_S16, 48000);
-    auto audioSink = tempSink.get();
-    sinks.push_back(std::move(tempSink));
+    sinks.push_back(std::make_unique<AudioFrameSink>(AV_CH_LAYOUT_MONO,
+                                                     AV_SAMPLE_FMT_S16, 48000));
+    auto audioSink = sinks[0].get();
 
     av_log_set_level(AV_LOG_QUIET);
 
-    FFmpegRecorder ffmpegRecorder("", filename, {}, std::move(sinks));
-    ffmpegRecorder.join();
-    ffmpegRecorder.stop(); // TODO fix ordering
+    auto recorder = createFFmpegRecorder("", filename, {}, sinks);
+    auto &[recordingThread, recordingFlag] = *recorder;
+    recordingThread.join();
 
     std::vector<uint8_t> rawData;
     audioSink->getData(rawData);

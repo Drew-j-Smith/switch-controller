@@ -30,8 +30,8 @@ static void add_event_stick(const int &stick, const string &name,
     eventMap.insert({name, joystickTemp});
 }
 
-std::tuple<VideoFrameSink *, AudioFrameSink *,
-           std::unique_ptr<FFmpegRecorder> &&>
+std::tuple<VideoFrameSink *, AudioFrameSink *, FFmpegRecorder,
+           std::vector<std::unique_ptr<FFmpegFrameSink>>>
 initializeGameCapture() {
     string inputFormat = "dshow";
     string deviceName =
@@ -39,19 +39,17 @@ initializeGameCapture() {
     std::map<string, string> ffmpegOptions = {{"pixel_format", "bgr24"}};
 
     std::vector<unique_ptr<FFmpegFrameSink>> sinks;
-    auto tempVideoSink = std::make_unique<VideoFrameSink>();
-    auto videoSink = tempVideoSink.get();
-    sinks.push_back(std::move(tempVideoSink));
-    auto tempAudioSink = std::make_unique<AudioFrameSink>(
-        AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, true, 48000);
-    auto audioSink = tempAudioSink.get();
-    sinks.push_back(std::move(tempAudioSink));
+    sinks.push_back(std::make_unique<VideoFrameSink>());
+    auto videoSink = dynamic_cast<VideoFrameSink *>(sinks[0].get());
+    sinks.push_back(std::make_unique<AudioFrameSink>(
+        AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, true, 48000));
+    auto audioSink = dynamic_cast<AudioFrameSink *>(sinks[1].get());
 
     av_log_set_level(AV_LOG_QUIET);
 
-    auto recorder = std::make_unique<FFmpegRecorder>(
-        inputFormat, deviceName, ffmpegOptions, std::move(sinks));
-    return {videoSink, audioSink, std::move(recorder)};
+    auto recorder =
+        createFFmpegRecorder(inputFormat, deviceName, ffmpegOptions, sinks);
+    return {videoSink, audioSink, std::move(recorder), std::move(sinks)};
 }
 
 void getConfig(std::string &serialPortName,
