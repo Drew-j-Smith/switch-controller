@@ -73,16 +73,11 @@ createFFmpegRecorder(const std::string &inputFormat,
                      const std::string &deviceName,
                      const std::map<std::string, std::string> &options,
                      std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks) {
-    std::set<AVMediaType> types;
-    bool overlap = false;
-    for (auto &sink : sinks) {
-        if (types.find(sink->getType()) == types.end()) {
-            types.insert(sink->getType());
-        } else {
-            overlap = true;
-        }
-    }
-    if (overlap) {
+    if (std::unique(sinks.begin(), sinks.end(),
+                    [](const std::unique_ptr<FFmpegFrameSink> &p1,
+                       const std::unique_ptr<FFmpegFrameSink> &p2) {
+                        return p1->getType() == p2->getType();
+                    }) != sinks.end()) {
         throw std::invalid_argument(
             "Only one frame sink of each type may be used");
     }
