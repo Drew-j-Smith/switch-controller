@@ -10,8 +10,11 @@ class MacroRecorder {
 private:
     const int RECORDING_BUTTON_COOLDOWN = 1000;
 
-    std::shared_ptr<Macro> currentRecordingMacro = std::make_shared<Macro>();
-    std::shared_ptr<Macro> lastRecordedMacro = std::make_shared<Macro>();
+    std::function<bool()> playEvent;
+
+    ActionRecord currentRecording;
+    constexpr static auto zeroFunction = []() -> std::size_t { return 0; };
+    std::shared_ptr<Macro> lastRecordedMacro;
     std::shared_ptr<Event> record;
 
     std::chrono::steady_clock::time_point activationTime =
@@ -20,10 +23,11 @@ private:
 
 public:
     MacroRecorder(std::shared_ptr<Event> recordEvent,
-                  const std::function<bool()> &playEvent) {
-        lastRecordedMacro->activateEvent = playEvent; // TODO
-        record = recordEvent;
-    }
+
+                  const std::function<bool()> &playEvent)
+        : playEvent(playEvent), lastRecordedMacro(std::make_shared<Macro>(
+                                    Macro{{}, playEvent, zeroFunction, {}})),
+          record(recordEvent) {}
 
     void update(const std::array<uint8_t, 8> &data) {
         auto now = std::chrono::steady_clock::now();
@@ -40,18 +44,15 @@ public:
                 std::cout << "Saved recording to \"RecordedMacros/" << str
                           << "\"" << std::endl;
 
-                // TODO
-                saveActionVector("RecordedMacros/" + str,
-                                 currentRecordingMacro->actionVector);
-                lastRecordedMacro->actionVector =
-                    currentRecordingMacro->actionVector;
-                currentRecordingMacro->actionVector = {};
+                saveActionVector("RecordedMacros/" + str, currentRecording);
+                *lastRecordedMacro =
+                    Macro(currentRecording, playEvent, zeroFunction, {});
+                currentRecording = {};
             }
             recording = !recording;
         }
         if (recording) {
-            // TODO
-            currentRecordingMacro->actionVector.push_back(
+            currentRecording.push_back(
                 {(uint64_t)
                      std::chrono::duration_cast<std::chrono::milliseconds>(
                          now - activationTime)
