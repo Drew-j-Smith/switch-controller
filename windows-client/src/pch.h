@@ -15,6 +15,7 @@
 #include <cstring>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>

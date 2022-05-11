@@ -16,10 +16,9 @@ std::array<uint8_t, 8> MacroCollection::getData(
             uint64_t time =
                 std::chrono::duration_cast<std::chrono::milliseconds>(diff)
                     .count();
-            res = mergeFunction(res, it.first->getDataframe(time));
-
-            // TODO
-            if (it.first->actionVector.back().time < time) {
+            if (auto data = it.first->getDataframe(time)) {
+                res = mergeFunction(res, data.value());
+            } else {
                 toAdd.push_back(it.first->getNextMacro());
                 toRemove.push_back(it.first);
             }

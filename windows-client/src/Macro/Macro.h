@@ -24,7 +24,7 @@ public:
 
     std::shared_ptr<Macro> getNextMacro();
 
-    std::array<uint8_t, 8> getDataframe(uint64_t time) const;
+    std::optional<std::array<uint8_t, 8>> getDataframe(uint64_t time) const;
 };
 
 #endif
