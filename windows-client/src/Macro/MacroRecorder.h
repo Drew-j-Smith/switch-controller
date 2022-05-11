@@ -3,7 +3,6 @@
 
 #include "pch.h"
 
-#include "Event/Event.h"
 #include "Macro.h"
 
 class MacroRecorder {
@@ -14,19 +13,18 @@ private:
 
     ActionRecord currentRecording;
     std::shared_ptr<Macro> lastRecordedMacro;
-    std::shared_ptr<Event> record;
+    std::function<bool()> recordEvent;
 
     std::chrono::steady_clock::time_point activationTime =
         std::chrono::steady_clock::now();
     bool recording = false;
 
 public:
-    MacroRecorder(std::shared_ptr<Event> recordEvent,
-
+    MacroRecorder(const std::function<bool()> &recordEvent,
                   const std::function<bool()> &playEvent)
         : playEvent(playEvent),
           lastRecordedMacro(std::make_shared<Macro>(Macro{{}, playEvent, {}})),
-          record(recordEvent) {}
+          recordEvent(recordEvent) {}
 
     void update(const std::array<uint8_t, 8> &data) {
         auto now = std::chrono::steady_clock::now();
@@ -35,7 +33,7 @@ public:
                 now - activationTime)
                 .count());
 
-        if (record->value() && timeDiff > RECORDING_BUTTON_COOLDOWN) {
+        if (recordEvent() && timeDiff > RECORDING_BUTTON_COOLDOWN) {
             activationTime = now;
             if (recording) {
                 std::string str =
