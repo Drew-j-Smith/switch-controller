@@ -13,7 +13,6 @@ private:
     std::function<bool()> playEvent;
 
     ActionRecord currentRecording;
-    constexpr static auto zeroFunction = []() -> std::size_t { return 0; };
     std::shared_ptr<Macro> lastRecordedMacro;
     std::shared_ptr<Event> record;
 
@@ -25,8 +24,8 @@ public:
     MacroRecorder(std::shared_ptr<Event> recordEvent,
 
                   const std::function<bool()> &playEvent)
-        : playEvent(playEvent), lastRecordedMacro(std::make_shared<Macro>(
-                                    Macro{{}, playEvent, zeroFunction, {}})),
+        : playEvent(playEvent),
+          lastRecordedMacro(std::make_shared<Macro>(Macro{{}, playEvent, {}})),
           record(recordEvent) {}
 
     void update(const std::array<uint8_t, 8> &data) {
@@ -45,8 +44,7 @@ public:
                           << "\"" << std::endl;
 
                 saveActionVector("RecordedMacros/" + str, currentRecording);
-                *lastRecordedMacro =
-                    Macro(currentRecording, playEvent, zeroFunction, {});
+                *lastRecordedMacro = Macro(currentRecording, playEvent, {});
                 currentRecording = {};
             }
             recording = !recording;

@@ -36,8 +36,7 @@ std::array<uint8_t, 8> MacroCollection::getData(
 
 void MacroCollection::activateMacros() {
     for (auto m : macros) {
-        if (activeMacros.find(m) == activeMacros.end() &&
-            m->getActivateEvent()) { // TODO
+        if (activeMacros.find(m) == activeMacros.end() && m->active()) { // TODO
             activeMacros.insert({m, std::chrono::steady_clock::now()});
         }
     }

@@ -10,31 +10,30 @@ public:
     Macro() {} // TODO? potentially remove default constructor
     Macro(const std::vector<Action> &actionVector,
           const std::function<bool()> &activateEvent,
-          const std::function<std::size_t()> &decider,
-          const std::vector<std::vector<std::weak_ptr<Macro>>> &nextMacroLists)
+          const std::function<std::weak_ptr<Macro>()> &decider)
         : actionVector(actionVector), activateEvent(activateEvent),
-          decider(decider), nextMacroLists(nextMacroLists) {}
+          decider(decider) {}
 
     Macro(const Macro &other) = delete;
 
     Macro(const Macro &&other)
         : actionVector(std::move(other.actionVector)),
           activateEvent(std::move(other.activateEvent)),
-          decider(std::move(other.decider)),
-          nextMacroLists(std::move(other.nextMacroLists)) {}
+          decider(std::move(other.decider)) {}
     Macro operator=(const Macro &&other) { return Macro(std::move(other)); }
 
-    std::shared_ptr<Macro> getNextMacro();
+    std::shared_ptr<Macro> getNextMacro() const {
+        return decider ? decider().lock() : nullptr;
+    }
 
     std::optional<std::array<uint8_t, 8>> getDataframe(uint64_t time) const;
 
-    const std::function<bool()> &getActivateEvent() { return activateEvent; }
+    bool active() const { return activateEvent ? activateEvent() : false; }
 
 private:
     std::vector<Action> actionVector;
     std::function<bool()> activateEvent;
-    std::function<std::size_t()> decider;
-    std::vector<std::vector<std::weak_ptr<Macro>>> nextMacroLists;
+    std::function<std::weak_ptr<Macro>()> decider;
 };
 
 #endif
