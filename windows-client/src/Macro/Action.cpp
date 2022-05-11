@@ -21,9 +21,8 @@ std::vector<Action> loadActionVector(const std::string &filename) {
         std::cerr << "Could not open file " + filename + "\n";
         return {};
     }
-    while (!infile.eof()) {
-        Action action;
-        infile.read((char *)&action, sizeof(action));
+    Action action;
+    while (infile.readsome((char *)&action, sizeof(action)) == sizeof(action)) {
         boost::endian::little_to_native_inplace(action.time);
         res.push_back(action);
     }
