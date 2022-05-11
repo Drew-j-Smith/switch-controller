@@ -1,7 +1,5 @@
 #include "MainProgram.h"
 
-#include "SFML/SFMLRenderer.h"
-
 #include <opencv2/core/utils/logger.hpp>
 
 const std::string options =
@@ -14,9 +12,6 @@ const std::string options =
 )";
 
 int main() {
-
-    // SFMLRenderer renderer;
-    // renderer.start();
 
     cv::utils::logging::setLogLevel(
         cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
