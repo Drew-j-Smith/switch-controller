@@ -13,8 +13,7 @@ void TestVideo() {
 
     av_log_set_level(AV_LOG_QUIET);
 
-    auto recorder =
-        createFFmpegRecorder(inputFormat, deviceName, ffmpegOptions, sinks);
+    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
 
     std::vector<uint8_t> data;
     long long lastFrame = videoSink->getData(data);

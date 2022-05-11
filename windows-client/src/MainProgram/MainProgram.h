@@ -17,7 +17,7 @@ void StartController();
 void TestVideo();
 void TestAudio();
 
-std::tuple<VideoFrameSink *, AudioFrameSink *, FFmpegRecorder,
+std::tuple<VideoFrameSink *, AudioFrameSink *, std::unique_ptr<FFmpegRecorder>,
            std::vector<std::unique_ptr<FFmpegFrameSink>>>
 initializeGameCapture();
 

@@ -31,9 +31,8 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
 
     av_log_set_level(AV_LOG_QUIET);
 
-    auto recorder = createFFmpegRecorder("", filename, {}, sinks);
-    auto &[recordingThread, recordingFlag] = *recorder;
-    recordingThread.join();
+    FFmpegRecorder recorder("", filename, {}, sinks);
+    recorder.joinThread();
 
     std::vector<uint8_t> rawData;
     audioSink->getData(rawData);

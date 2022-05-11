@@ -10,26 +10,26 @@ extern "C" {
 
 #include "pch.h"
 
-struct FFmpegRecorderThreadDeleter {
-    void
-    operator()(std::tuple<std::thread, std::unique_ptr<std::atomic_bool>> *t) {
-        auto &[thread, recording] = *t;
-        recording->store(false);
-        if (thread.joinable()) {
-            thread.join();
+class FFmpegRecorder {
+public:
+    FFmpegRecorder(const std::string &inputFormat,
+                   const std::string &deviceName,
+                   const std::map<std::string, std::string> &options,
+                   std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks);
+    ~FFmpegRecorder() {
+        m_recording.store(false);
+        if (m_thread.joinable()) {
+            m_thread.join();
         }
-        delete t;
     }
+    FFmpegRecorder(FFmpegRecorder &other) = delete;
+    FFmpegRecorder(FFmpegRecorder &&other) = delete;
+
+    void joinThread() { m_thread.join(); }
+
+private:
+    std::thread m_thread;
+    std::atomic_bool m_recording;
 };
-
-using FFmpegRecorder =
-    std::unique_ptr<std::tuple<std::thread, std::unique_ptr<std::atomic_bool>>,
-                    FFmpegRecorderThreadDeleter>;
-
-FFmpegRecorder
-createFFmpegRecorder(const std::string &inputFormat,
-                     const std::string &deviceName,
-                     const std::map<std::string, std::string> &options,
-                     std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks);
 
 #endif

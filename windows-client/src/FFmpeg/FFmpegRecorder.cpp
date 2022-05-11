@@ -68,11 +68,11 @@ static auto openStream(const std::string &inputFormatStr,
     return std::make_tuple(std::move(formatContext), std::move(decoders));
 }
 
-FFmpegRecorder
-createFFmpegRecorder(const std::string &inputFormat,
-                     const std::string &deviceName,
-                     const std::map<std::string, std::string> &options,
-                     std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks) {
+FFmpegRecorder::FFmpegRecorder(
+    const std::string &inputFormat, const std::string &deviceName,
+    const std::map<std::string, std::string> &options,
+    std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks)
+    : m_recording(true) {
     if (std::unique(sinks.begin(), sinks.end(),
                     [](const std::unique_ptr<FFmpegFrameSink> &p1,
                        const std::unique_ptr<FFmpegFrameSink> &p2) {
@@ -85,17 +85,8 @@ createFFmpegRecorder(const std::string &inputFormat,
         throw std::invalid_argument("The sink size must be greater than 0");
     }
 
-    auto res = FFmpegRecorder{new FFmpegRecorder::element_type,
-                              FFmpegRecorderThreadDeleter()};
-
-    auto &[recordingThread, recording] = *res;
-
-    recording = std::make_unique<std::atomic_bool>(true);
-
-    recordingThread = std::thread([&]() {
+    m_thread = std::thread([&]() {
         try {
-            auto &[recordingThread_thread_local, recording_thread_local] = *res;
-
             auto [formatContext, decoders] =
                 openStream(inputFormat, deviceName, options, sinks);
 
@@ -109,7 +100,7 @@ createFFmpegRecorder(const std::string &inputFormat,
                 throw std::runtime_error("Could not allocate frame");
             }
             // read until there are no more frames or canceled
-            while (recording_thread_local->load() &&
+            while (m_recording.load() &&
                    av_read_frame(formatContext.get(), &pkt) >= 0) {
                 // check if the pack goes to a frame sink
                 if (decoders.find(pkt.stream_index) != decoders.end()) {
@@ -134,6 +125,4 @@ createFFmpegRecorder(const std::string &inputFormat,
     for (auto &sink : sinks) {
         sink->waitForInit();
     }
-
-    return res;
 }

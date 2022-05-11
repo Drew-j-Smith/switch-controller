@@ -30,7 +30,7 @@ static void add_event_stick(const int &stick, const string &name,
     eventMap.insert({name, joystickTemp});
 }
 
-std::tuple<VideoFrameSink *, AudioFrameSink *, FFmpegRecorder,
+std::tuple<VideoFrameSink *, AudioFrameSink *, std::unique_ptr<FFmpegRecorder>,
            std::vector<std::unique_ptr<FFmpegFrameSink>>>
 initializeGameCapture() {
     string inputFormat = "dshow";
@@ -47,8 +47,8 @@ initializeGameCapture() {
 
     av_log_set_level(AV_LOG_QUIET);
 
-    auto recorder =
-        createFFmpegRecorder(inputFormat, deviceName, ffmpegOptions, sinks);
+    auto recorder = std::make_unique<FFmpegRecorder>(inputFormat, deviceName,
+                                                     ffmpegOptions, sinks);
     return {videoSink, audioSink, std::move(recorder), std::move(sinks)};
 }
 

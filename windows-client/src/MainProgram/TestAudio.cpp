@@ -38,18 +38,16 @@ void TestAudio() {
         48000 * bufferSize));
     auto audioSink = sinks[0].get();
 
-    auto recorder =
-        createFFmpegRecorder(inputFormat, deviceName, ffmpegOptions, sinks);
+    {
+        FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
 
-    if (recordTimeStr.length() > 0) {
-        std::this_thread::sleep_for(
-            std::chrono::seconds(std::stoi(recordTimeStr)));
-    } else {
-        auto &[recordThread, recordFlag] = *recorder.get();
-        recordThread.join();
+        if (recordTimeStr.length() > 0) {
+            std::this_thread::sleep_for(
+                std::chrono::seconds(std::stoi(recordTimeStr)));
+        } else {
+            recorder.joinThread();
+        }
     }
-
-    recorder.release();
 
     std::vector<uint8_t> data;
     audioSink->getData(data);
