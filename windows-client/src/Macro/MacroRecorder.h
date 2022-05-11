@@ -31,16 +31,16 @@ public:
 
     void update(const std::array<uint8_t, 8> &data) {
         auto now = std::chrono::steady_clock::now();
-
-        if (record->value() &&
+        auto timeDiff = static_cast<uint64_t>(
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 now - activationTime)
-                    .count() > RECORDING_BUTTON_COOLDOWN) {
+                .count());
+
+        if (record->value() && timeDiff > RECORDING_BUTTON_COOLDOWN) {
             activationTime = now;
             if (recording) {
-                auto time = std::chrono::steady_clock::now();
                 std::string str =
-                    std::to_string(time.time_since_epoch().count()) + ".hex";
+                    std::to_string(now.time_since_epoch().count()) + ".hex";
                 std::cout << "Saved recording to \"RecordedMacros/" << str
                           << "\"" << std::endl;
 
@@ -52,12 +52,7 @@ public:
             recording = !recording;
         }
         if (recording) {
-            currentRecording.push_back(
-                {(uint64_t)
-                     std::chrono::duration_cast<std::chrono::milliseconds>(
-                         now - activationTime)
-                         .count(),
-                 data});
+            currentRecording.push_back({timeDiff, data});
         }
     }
 
