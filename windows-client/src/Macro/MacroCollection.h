@@ -15,7 +15,11 @@ public:
     MacroCollection(const std::vector<std::shared_ptr<Macro>> &macros)
         : macros(macros){};
 
-    std::array<uint8_t, 8> getData(const std::array<uint8_t, 8> &dataToMerge);
+    std::array<uint8_t, 8>
+    getData(std::array<uint8_t, 8> intitial,
+            const std::function<std::array<uint8_t, 8>(std::array<uint8_t, 8>,
+                                                       std::array<uint8_t, 8>)>
+                mergeFunction);
     void activateMacros();
     bool isMacroActive() const { return activeMacros.size(); }
     void deactivateMacros() { activeMacros.clear(); }

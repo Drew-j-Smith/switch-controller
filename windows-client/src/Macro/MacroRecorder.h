@@ -21,7 +21,7 @@ private:
 public:
     MacroRecorder(std::shared_ptr<Event> recordEvent,
                   std::shared_ptr<Event> playEvent) {
-        lastRecordedMacro->setActivateEvent(playEvent);
+        lastRecordedMacro->activateEvent = playEvent; // TODO
         record = recordEvent;
     }
 
@@ -40,15 +40,18 @@ public:
                 std::cout << "Saved recording to \"RecordedMacros/" << str
                           << "\"" << std::endl;
 
-                currentRecordingMacro->saveData("RecordedMacros/" + str);
-                auto macroData = currentRecordingMacro->getData();
-                lastRecordedMacro->setData(macroData);
-                currentRecordingMacro->setData({});
+                // TODO
+                saveActionVector("RecordedMacros/" + str,
+                                 currentRecordingMacro->actionVector);
+                lastRecordedMacro->actionVector =
+                    currentRecordingMacro->actionVector;
+                currentRecordingMacro->actionVector = {};
             }
             recording = !recording;
         }
         if (recording) {
-            currentRecordingMacro->appendData(
+            // TODO
+            currentRecordingMacro->actionVector.push_back(
                 {(uint64_t)
                      std::chrono::duration_cast<std::chrono::milliseconds>(
                          now - activationTime)

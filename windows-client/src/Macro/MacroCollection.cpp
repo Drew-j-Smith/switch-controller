@@ -1,8 +1,11 @@
 #include "MacroCollection.h"
 
-std::array<uint8_t, 8>
-MacroCollection::getData(const std::array<uint8_t, 8> &dataToMerge) {
-    std::array<uint8_t, 8> res = dataToMerge;
+std::array<uint8_t, 8> MacroCollection::getData(
+    std::array<uint8_t, 8> intitial,
+    const std::function<std::array<uint8_t, 8>(std::array<uint8_t, 8>,
+                                               std::array<uint8_t, 8>)>
+        mergeFunction) {
+    std::array<uint8_t, 8> res = intitial;
     if (activeMacros.size()) {
         auto now = std::chrono::steady_clock::now();
         std::vector<std::shared_ptr<Macro>> toAdd;
@@ -13,9 +16,10 @@ MacroCollection::getData(const std::array<uint8_t, 8> &dataToMerge) {
             uint64_t time =
                 std::chrono::duration_cast<std::chrono::milliseconds>(diff)
                     .count();
-            res = it.first->getDataframe(time, res);
+            res = mergeFunction(res, it.first->getDataframe(time));
 
-            if (it.first->lastTime() < time) {
+            // TODO
+            if (it.first->actionVector.back().time < time) {
                 toAdd.push_back(it.first->getNextMacro());
                 toRemove.push_back(it.first);
             }
@@ -34,7 +38,7 @@ MacroCollection::getData(const std::array<uint8_t, 8> &dataToMerge) {
 void MacroCollection::activateMacros() {
     for (auto m : macros) {
         if (activeMacros.find(m) == activeMacros.end() &&
-            m->getActivateEvent()->value()) {
+            m->activateEvent->value()) { // TODO
             activeMacros.insert({m, std::chrono::steady_clock::now()});
         }
     }

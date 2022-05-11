@@ -59,7 +59,10 @@ void StartController() {
             macroCollection.deactivateMacros();
         }
         if (macroCollection.isMacroActive()) {
-            send = macroCollection.getData(send);
+            constexpr auto mergeFunction =
+                []([[maybe_unused]] std::array<uint8_t, 8> action1,
+                   std::array<uint8_t, 8> action2) { return action2; };
+            send = macroCollection.getData(send, mergeFunction);
         }
 
         boost::asio::write(*port, boost::asio::buffer(send, 8));
