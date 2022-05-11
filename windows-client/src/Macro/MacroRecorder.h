@@ -20,7 +20,7 @@ private:
 
 public:
     MacroRecorder(std::shared_ptr<Event> recordEvent,
-                  std::shared_ptr<Event> playEvent) {
+                  const std::function<bool()> &playEvent) {
         lastRecordedMacro->activateEvent = playEvent; // TODO
         record = recordEvent;
     }

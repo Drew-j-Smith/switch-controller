@@ -19,7 +19,7 @@ std::optional<std::array<uint8_t, 8>> Macro::getDataframe(uint64_t time) const {
 }
 
 std::shared_ptr<Macro> Macro::getNextMacro() {
-    int macroIndex = decider->value(); // TODO
+    std::size_t macroIndex = decider(); // TODO
     if (nextMacroLists.size() == 0)
         return nullptr;
     if (macroIndex < 0 || macroIndex >= nextMacroLists.size())

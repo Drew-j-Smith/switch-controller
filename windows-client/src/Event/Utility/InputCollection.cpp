@@ -16,7 +16,8 @@ InputCollection::InputCollection(
     if (playEventIt != map.end()) {
         playEvent = playEventIt->second;
     }
-    recorder = std::make_shared<MacroRecorder>(recordEvent, playEvent);
+    recorder = std::make_shared<MacroRecorder>(
+        recordEvent, [playEvent] { return playEvent->value(); });
 }
 
 std::array<uint8_t, 8> InputCollection::getData() const {
