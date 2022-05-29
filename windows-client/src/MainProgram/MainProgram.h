@@ -3,8 +3,10 @@
 
 #include "pch.h"
 
-#include "Event/Event.h"
+#include "Event/Utility/InputCollection.h"
 #include "Macro/Macro.h"
+#include "Macro/MacroCollection.h"
+#include "Macro/MacroRecorder.h"
 
 #include "FFmpeg/AudioFrameSink.h"
 #include "FFmpeg/FFmpegRecorder.h"
@@ -21,10 +23,10 @@ std::tuple<VideoFrameSink *, AudioFrameSink *, std::unique_ptr<FFmpegRecorder>,
            std::vector<std::unique_ptr<FFmpegFrameSink>>>
 initializeGameCapture();
 
-void getConfig(std::string &serialPortName,
-               std::map<std::string, std::shared_ptr<Event>> &events,
-               std::vector<std::shared_ptr<Macro>> &macros,
-               VideoFrameSink *videoSink, AudioFrameSink *audioSink);
+std::tuple<std::string /* serialPortName */,
+           std::function<bool()> /* stopMacros */, InputCollection,
+           MacroRecorder, MacroCollection>
+getConfig(VideoFrameSink *videoSink, AudioFrameSink *audioSink);
 
 std::unique_ptr<boost::asio::serial_port>
 initializeSerialPort(std::string serialPort, unsigned int baud,

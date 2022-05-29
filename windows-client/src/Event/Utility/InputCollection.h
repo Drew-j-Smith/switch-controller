@@ -7,38 +7,56 @@
  */
 #include "pch.h"
 
-#include "Event/Event.h"
-#include "Macro/MacroRecorder.h"
-
 class InputCollection {
 private:
-    const int JOYSTICK_DEADZONE = 30;
-
-    std::map<std::string, std::shared_ptr<Event>> map;
-    std::shared_ptr<MacroRecorder> recorder;
+    const std::array<std::function<bool()>, 14> buttons;
+    const std::array<std::function<std::array<uint8_t, 2>()>, 3> sticks;
 
 public:
-    InputCollection(const std::map<std::string, std::shared_ptr<Event>> &map);
+    enum buttonIndicies {
+        y,
+        b,
+        a,
+        x,
+        l,
+        r,
+        xl,
+        xr,
+        select,
+        start,
+        lClick,
+        rClick,
+        home,
+        capture
+    };
 
-    int getStopEventValue() const { return getInputValue("stopMacros"); };
-    std::shared_ptr<MacroRecorder> getRecorder() { return recorder; }
+    enum stickIndicies { left, right, hat };
+
+    constexpr static int JOYSTICK_DEADZONE = 30;
+
+    InputCollection(
+        const std::array<std::function<bool()>, 14> &buttons,
+        const std::array<std::function<std::array<uint8_t, 2>()>, 3> &sticks)
+        : buttons(buttons), sticks(sticks){};
+    InputCollection(const InputCollection &other) = delete;
+    InputCollection(InputCollection &&other) = default;
+    InputCollection &operator=(InputCollection &&other) = default;
 
     std::array<uint8_t, 8> getData() const;
 
-private:
-    uint8_t getInputValue(const std::string &key) const {
-        if (map.find(key) != map.end()) {
-            return (uint8_t)map.at(key)->value();
-        }
-        return 0;
+    constexpr static std::array<uint8_t, 2>
+    digtalToAnalogConversion(bool up, bool right, bool down, bool left) {
+        return {uint8_t(128 + 127 * up - 128 * down),
+                uint8_t(128 + 127 * right - 128 * left)};
     }
 
-    void setStickValue(uint8_t &xres, uint8_t &yres, uint8_t xvalue,
-                       uint8_t yvalue) const;
-
-    unsigned char getDpadData() const;
-
-    unsigned char getDpadData(bool up, bool right, bool down, bool left) const;
+    constexpr static std::array<bool, 4>
+    AnalogToDigitalConversion(std::array<uint8_t, 2> sticks) {
+        return {sticks[1] > 128 + JOYSTICK_DEADZONE,
+                sticks[0] > 128 + JOYSTICK_DEADZONE,
+                sticks[1] < 128 - JOYSTICK_DEADZONE,
+                sticks[0] < 128 - JOYSTICK_DEADZONE};
+    }
 };
 
 #endif

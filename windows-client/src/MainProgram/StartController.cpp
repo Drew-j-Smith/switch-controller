@@ -19,18 +19,8 @@ void StartController() {
 
     auto [videoSink, audioSink, recorder, sinks] = initializeGameCapture();
 
-    std::string serialPortName;
-    std::map<std::string, std::shared_ptr<Event>> events;
-    std::vector<std::shared_ptr<Macro>> macros;
-    getConfig(serialPortName, events, macros, videoSink, audioSink);
-
-    InputCollection inputCollection(events);
-
-    MacroCollection macroCollection(macros);
-
-    std::shared_ptr<MacroRecorder> macroRecorder =
-        inputCollection.getRecorder();
-    macroCollection.pushBackMacro(macroRecorder->getLastRecordedMacro());
+    auto [serialPortName, stopMacros, inputCollection, macroRecorder,
+          macroCollection] = getConfig(videoSink, audioSink);
 
     std::cout << "Config loaded.\n";
 
@@ -53,9 +43,9 @@ void StartController() {
         // auto begin = std::chrono::steady_clock::now();
 
         send = inputCollection.getData();
-        macroRecorder->update(send);
+        macroRecorder.update(send);
 
-        if (inputCollection.getStopEventValue()) {
+        if (stopMacros()) {
             macroCollection.deactivateMacros();
         }
         if (macroCollection.isMacroActive()) {
