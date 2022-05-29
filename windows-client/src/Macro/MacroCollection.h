@@ -14,6 +14,9 @@ private:
 public:
     MacroCollection(const std::vector<std::shared_ptr<Macro>> &macros)
         : macros(macros){};
+    MacroCollection(const MacroCollection &other) = delete;
+    MacroCollection(MacroCollection &&other) = default;
+    MacroCollection &operator=(MacroCollection &&other) = default;
 
     std::array<uint8_t, 8>
     getData(std::array<uint8_t, 8> intitial,

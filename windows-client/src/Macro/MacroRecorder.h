@@ -25,6 +25,9 @@ public:
         : playEvent(playEvent),
           lastRecordedMacro(std::make_shared<Macro>(Macro{{}, playEvent, {}})),
           recordEvent(recordEvent) {}
+    MacroRecorder(const MacroRecorder &other) = delete;
+    MacroRecorder(MacroRecorder &&other) = default;
+    MacroRecorder &operator=(MacroRecorder &&other) = default;
 
     void update(const std::array<uint8_t, 8> &data) {
         auto now = std::chrono::steady_clock::now();

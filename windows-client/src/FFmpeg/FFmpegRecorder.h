@@ -22,7 +22,7 @@ public:
             m_thread.join();
         }
     }
-    FFmpegRecorder(FFmpegRecorder &other) = delete;
+    FFmpegRecorder(const FFmpegRecorder &other) = delete;
     FFmpegRecorder(FFmpegRecorder &&other) = delete;
 
     void joinThread() { m_thread.join(); }

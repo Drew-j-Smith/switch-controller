@@ -16,11 +16,8 @@ public:
 
     Macro(const Macro &other) = delete;
 
-    Macro(const Macro &&other)
-        : actionVector(std::move(other.actionVector)),
-          activateEvent(std::move(other.activateEvent)),
-          decider(std::move(other.decider)) {}
-    Macro operator=(const Macro &&other) { return Macro(std::move(other)); }
+    Macro(Macro &&other) = default;
+    Macro &operator=(Macro &&other) = default;
 
     std::shared_ptr<Macro> getNextMacro() const {
         return decider ? decider().lock() : nullptr;
