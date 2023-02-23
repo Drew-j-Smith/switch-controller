@@ -3,7 +3,7 @@ file(GLOB_RECURSE CMAKE_SRC_FILES CONFIGURE_DEPENDS "*.cpp")
 
 add_executable(ArduinoController ${CMAKE_SRC_FILES})
 
-target_include_directories(ArduinoController SYSTEM PUBLIC ${CMAKE_INCLUDE_DIRS})
+target_include_directories(ArduinoController PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_precompile_headers(ArduinoController PUBLIC pch.h)
 
 if(MSVC)

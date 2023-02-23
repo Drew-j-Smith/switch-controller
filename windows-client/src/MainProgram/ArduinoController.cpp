@@ -27,43 +27,43 @@ int main() {
         std::cin >> option;
         std::string tempstr;
         std::getline(std::cin, tempstr);
-        switch (option) {
-        case 1: {
-            try {
+        try {
+            switch (option) {
+            case 1: {
                 StartController();
-            } catch (std::exception &e) {
-                std::cerr << "Uncaught exception in StartController: " +
-                                 std::string(e.what()) + "\n";
-            }
-        } break;
-        case 2: {
-            std::cout << "Enter the port name:\n";
-            std::string portName;
-            std::getline(std::cin, portName);
-            try {
-                boost::asio::io_service io;
-                auto port = initializeSerialPort(portName, 57600, &io);
 
-                // sending a nuetral signal
-                unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
-                unsigned char recieve[1];
+            } break;
+            case 2: {
+                std::cout << "Enter the port name:\n";
+                std::string portName;
+                std::getline(std::cin, portName);
+                try {
+                    boost::asio::io_service io;
+                    auto port = initializeSerialPort(portName, 57600, &io);
 
-                testSerialPort(port, 8, send, 1, recieve, &io);
-            } catch (std::exception &e) {
-                std::cerr << "Failure connecting via serial port.\n" +
-                                 std::string(e.what()) + "\n";
+                    // sending a nuetral signal
+                    unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
+                    unsigned char recieve[1];
+
+                    testSerialPort(port, 8, send, 1, recieve, &io);
+                } catch (std::exception &e) {
+                    std::cerr << "Failure connecting via serial port.\n" +
+                                     std::string(e.what()) + "\n";
+                }
+            } break;
+            case 3: {
+                TestVideo();
+            } break;
+            case 4: {
+                TestAudio();
+            } break;
+            case 5:
+                break;
+            default:
+                spdlog::warn("Unkown option: {}", option);
             }
-        } break;
-        case 3: {
-            TestVideo();
-        } break;
-        case 4: {
-            TestAudio();
-        } break;
-        case 5:
-            break;
-        default:
-            std::cout << "Unkown option: " << option << "\n";
+        } catch (std::exception &e) {
+            spdlog::error("Uncaught exception: {}", e.what());
         }
     }
 

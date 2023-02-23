@@ -31,8 +31,7 @@ bool toggle() { return sf::Joystick::isButtonPressed(0, 13); };
 auto getButtons() {
     std::array<std::function<bool()>, 14> buttons;
     buttons[InputCollection::buttonIndicies::b] = ToggleEvent{
-        [] { return sf::Joystick::isButtonPressed(0, 0) && !toggle(); },
-        1000ms};
+        [] { return sf::Joystick::isButtonPressed(0, 0) && !toggle(); }, 20ms};
     buttons[InputCollection::buttonIndicies::a] = [] {
         return sf::Joystick::isButtonPressed(0, 1) && !toggle();
     };
@@ -54,7 +53,7 @@ auto getButtons() {
     buttons[InputCollection::buttonIndicies::xr] = [] {
         return sf::Joystick::isButtonPressed(0, 7) && !toggle();
     };
-    buttons[InputCollection::buttonIndicies::select] = [] {
+    buttons[InputCollection::buttonIndicies::Select] = [] {
         return sf::Joystick::isButtonPressed(0, 8) && !toggle();
     };
     buttons[InputCollection::buttonIndicies::start] = [] {

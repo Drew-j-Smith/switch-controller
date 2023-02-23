@@ -8,6 +8,7 @@
     "boost-endian",
     "boost-circular-buffer",
     "fftw3",
-    "ffmpeg"
+    "ffmpeg",
+    "spdlog"
   ]
 }

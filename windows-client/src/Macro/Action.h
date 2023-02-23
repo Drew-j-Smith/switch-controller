@@ -12,7 +12,7 @@ void saveActionVector(const std::string &filename,
                       const std::vector<Action> &record) {
     std::ofstream outfile(filename, std::ios::binary);
     if (!outfile.is_open()) {
-        std::cerr << "Could not open file " + filename + "\n";
+        spdlog::error("Could not open file: {}", filename);
         return;
     }
     for (auto action : record) {
@@ -24,7 +24,7 @@ std::vector<Action> loadActionVector(const std::string &filename) {
     std::vector<Action> res;
     std::ifstream infile(filename, std::ios::binary);
     if (!infile.is_open()) {
-        std::cerr << "Could not open file " + filename + "\n";
+        spdlog::error("Could not open file: {}", filename);
         return {};
     }
     Action action;

@@ -114,7 +114,7 @@ uint8_t SoundEvent::value() const {
     float testMinusMean = std::accumulate(temp.begin(), temp.end(), 0.f);
     float rSquaredError = 1 - testMinusApprox / testMinusMean;
 
+    spdlog::debug("Least Square Approx.: {} * original vector\nR Squared: {}",
+                  vectorScale, rSquaredError);
     return rSquaredError > matchThreshold;
-    // std::cout << "Least Square Approx.: " << vectorScale << " * original
-    // vector" << std::endl; std::cout << "R Squared: " << error << std::endl;
 }

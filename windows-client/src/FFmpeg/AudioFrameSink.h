@@ -27,8 +27,12 @@ private:
     boost::circular_buffer<uint8_t> circularData;
 
     void virtualInit(AVCodecContext *decoderContext) override {
+
+        spdlog::info("intitializing AudioFrameSink");
+
         // getting the channel layout or setting it to default
-        uint64_t channel_layout = decoderContext->channel_layout;
+        int64_t channel_layout =
+            static_cast<int64_t>(decoderContext->channel_layout);
         if (channel_layout == 0) {
             channel_layout =
                 av_get_default_channel_layout(decoderContext->channels);
@@ -52,6 +56,7 @@ private:
             throw std::runtime_error("Error Initializing AudioFrameSink " +
                                      std::string(error));
         }
+        spdlog::info("intitialized AudioFrameSink");
     }
 
     void virtualOutputFrame(AVFrame *frame) override {
@@ -62,18 +67,20 @@ private:
         int res;
 
         if (loopRecording) {
-            data.resize(out_samples *
-                        av_get_bytes_per_sample(outputSampleFormat));
+            data.resize(static_cast<std::size_t>(
+                out_samples * av_get_bytes_per_sample(outputSampleFormat)));
             output = data.data();
         } else {
-            data.resize(data.size() + out_samples * av_get_bytes_per_sample(
-                                                        outputSampleFormat));
+            data.resize(
+                data.size() +
+                static_cast<std::size_t>(
+                    out_samples * av_get_bytes_per_sample(outputSampleFormat)));
             output = data.data() + data.size() -
                      out_samples * av_get_bytes_per_sample(outputSampleFormat);
         }
 
-        res = swr_convert(swr.get(), &output, (int)out_samples,
-                          (const uint8_t **)frame->extended_data,
+        res = swr_convert(swr.get(), &output, static_cast<int>(out_samples),
+                          const_cast<const uint8_t **>(frame->extended_data),
                           frame->nb_samples);
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
@@ -109,8 +116,8 @@ public:
           outputSampleFormat(outputSampleFormat), outSampleRate(outSampleRate),
           loopRecording(loopRecording) {
         if (loopRecording) {
-            circularData.resize(loopBufferSize *
-                                av_get_bytes_per_sample(outputSampleFormat));
+            circularData.resize(static_cast<std::size_t>(
+                loopBufferSize * av_get_bytes_per_sample(outputSampleFormat)));
         }
     }
 

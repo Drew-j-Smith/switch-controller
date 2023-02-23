@@ -15,19 +15,25 @@
 #include "Macro/MacroCollection.h"
 
 void StartController() {
-    std::cout << "Initializing...\n";
-    std::cout << "Loading config files.\n";
+    spdlog::info("initializing");
 
     // Updating joysticks to see if they are connected
     sf::Joystick::update();
+    auto joystick_connected = sf::Joystick::isConnected(0);
+    if (!joystick_connected) {
+        spdlog::error("no joystick connected");
+    }
+    spdlog::info("joystick connected");
 
     av_log_set_level(AV_LOG_QUIET);
 
+    spdlog::info("loading input config");
     InputConfig inputConfig;
+    spdlog::info("input config loaded");
+    spdlog::info("loading macros");
     MacroCollection macroCollection = getMacroConfig(inputConfig);
+    spdlog::info("macros loaded");
     std::string serialPortName = "COM4";
-
-    std::cout << "Config loaded.\n";
 
     std::unique_ptr<boost::asio::serial_port> port;
     boost::asio::io_service io;
@@ -39,7 +45,7 @@ void StartController() {
     port = initializeSerialPort(serialPortName, 57600, &io);
     testSerialPort(port, 8, send.data(), 1, recieve, &io);
 
-    std::cout << "Ready.\n";
+    spdlog::info("Ready");
 
     while (true) {
         sf::Joystick::update();

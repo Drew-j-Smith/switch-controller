@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
 
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "")
-endif()
-
 project(ArduinoController)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -16,6 +11,7 @@ find_package(SFML 2 COMPONENTS window graphics REQUIRED)
 find_package(Boost REQUIRED)
 find_package(FFTW3f CONFIG REQUIRED)
 find_package(FFMPEG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 set(CMAKE_LIBS 
 ${OpenCV_LIBS}
@@ -25,15 +21,7 @@ sfml-graphics
 ${Boost_LIBRARIES}
 FFTW3::fftw3f
 ${FFMPEG_LIBRARIES}
-)
-
-set(CMAKE_INCLUDE_DIRS
-${CMAKE_CURRENT_SOURCE_DIR}/src
-${OpenCV_INCLUDE_DIRS}
-${SFML_INCLUDE_DIRS}
-${Boost_INCLUDE_DIRS}
-${FFTW3_INCLUDE_DIRS}
-${FFMPEG_INCLUDE_DIRS}
+spdlog::spdlog
 )
 
 

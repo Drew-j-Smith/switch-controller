@@ -26,3 +26,5 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+
+#include <spdlog/spdlog.h>

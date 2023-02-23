@@ -36,11 +36,10 @@ public:
             timeDiff = 0;
             if (recording) {
                 std::string str =
+                    "RecordedMacros/" +
                     std::to_string(now.time_since_epoch().count()) + ".hex";
-                std::cout << "Saved recording to \"RecordedMacros/" << str
-                          << "\"" << std::endl;
-
-                saveActionVector("RecordedMacros/" + str, currentRecording);
+                spdlog::info("Saving recording to \"{}\"", str);
+                saveActionVector(str, currentRecording);
                 *lastRecordedMacro = Macro(currentRecording, playEvent, {});
                 currentRecording = {};
             }

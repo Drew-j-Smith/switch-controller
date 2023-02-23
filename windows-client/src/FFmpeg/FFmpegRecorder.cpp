@@ -116,9 +116,9 @@ FFmpegRecorder::FFmpegRecorder(
             }
 
         } catch (std::exception &e) {
-            std::cerr << "Uncaught exception in FFmpeg Recorder: " +
-                             std::string(e.what()) + "\n";
-            throw;
+            spdlog::error("Uncaught exception in FFmpeg Recorder: {}",
+                          e.what());
+            std::terminate();
         }
     });
 

@@ -55,7 +55,7 @@ private:
                 "Error getting plane size in VideoFrameSink: " +
                 std::string(error));
         }
-        data.resize(res);
+        data.resize(static_cast<std::size_t>(res));
 
         swsContext = {sws_getCachedContext(nullptr, width, height, pixelFormat,
                                            outputWidth, outputHeight,

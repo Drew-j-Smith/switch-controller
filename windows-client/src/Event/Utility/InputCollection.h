@@ -21,7 +21,7 @@ public:
         r,
         xl,
         xr,
-        select,
+        Select,
         start,
         lClick,
         rClick,
