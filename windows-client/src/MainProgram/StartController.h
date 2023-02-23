@@ -1,8 +1,12 @@
+#pragma once
 
 #include <SFML/Window/Joystick.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
-#include "MainProgram.h"
+#include "GameCaptureConfig.h"
+#include "InputConfig.h"
+#include "MacroConfig.h"
+#include "SerialPort.h"
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
@@ -17,10 +21,11 @@ void StartController() {
     // Updating joysticks to see if they are connected
     sf::Joystick::update();
 
-    auto [videoSink, audioSink, recorder, sinks] = initializeGameCapture();
+    av_log_set_level(AV_LOG_QUIET);
 
-    auto [serialPortName, stopMacros, inputCollection, macroRecorder,
-          macroCollection] = getConfig(videoSink, audioSink);
+    InputConfig inputConfig;
+    MacroCollection macroCollection = getMacroConfig(inputConfig);
+    std::string serialPortName = "COM4";
 
     std::cout << "Config loaded.\n";
 
@@ -42,10 +47,10 @@ void StartController() {
         // code used to time an iteration
         // auto begin = std::chrono::steady_clock::now();
 
-        send = inputCollection.getData();
-        macroRecorder.update(send);
+        send = inputConfig.inputCollection.getData();
+        inputConfig.macroRecorder.update(send);
 
-        if (stopMacros()) {
+        if (inputConfig.stopMacros()) {
             macroCollection.deactivateMacros();
         }
         macroCollection.activateMacros();

@@ -1,7 +1,10 @@
+#pragma once
 
-#include "MainProgram.h"
+#include "pch.h"
 
+#include <boost/asio/io_service.hpp>
 #include <boost/asio/read.hpp>
+#include <boost/asio/serial_port.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/bind/bind.hpp>
 

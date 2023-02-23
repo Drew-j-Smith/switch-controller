@@ -1,5 +1,4 @@
-#ifndef FFMPEG_FRAME_SINK_H
-#define FFMPEG_FRAME_SINK_H
+#pragma once
 
 // TODO
 // FFmpeg has a lot of warnings
@@ -76,5 +75,3 @@ public:
 
     virtual AVMediaType getType() const = 0;
 };
-
-#endif

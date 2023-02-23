@@ -1,5 +1,4 @@
-#ifndef INPUT_MANAGER_H
-#define INPUT_MANAGER_H
+#pragma once
 
 /**
  * @brief The InputCollection class takes inputs and converts them into a
@@ -55,5 +54,3 @@ public:
                 sticks[0] < 128 - JOYSTICK_DEADZONE};
     }
 };
-
-#endif

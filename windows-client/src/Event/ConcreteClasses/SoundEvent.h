@@ -1,15 +1,12 @@
-#ifndef SOUND_EVENT_H
-#define SOUND_EVENT_H
+#pragma once
 
 #include "pch.h"
-
-#include "Event/Event.h"
 
 #include "FFmpeg/AudioFrameSink.h"
 
 #include <fftw3.h>
 
-class SoundEvent : public Event {
+class SoundEvent {
 private:
     std::vector<float> matchAudio;
 
@@ -38,7 +35,5 @@ public:
     SoundEvent(const std::string &filename, double matchThreshold,
                AudioFrameSink *audioFrameSink);
 
-    uint8_t value() const override;
+    uint8_t value() const;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MACRO_H
-#define MACRO_H
+#pragma once
 
 #include "pch.h"
 
@@ -23,7 +22,20 @@ public:
         return decider ? decider().lock() : nullptr;
     }
 
-    std::optional<std::array<uint8_t, 8>> getDataframe(uint64_t time) const;
+    std::optional<std::array<uint8_t, 8>> getDataframe(uint64_t time) const {
+        if (time >= actionVector.back().time) {
+            return {};
+        }
+
+        Action searchAction = {time, {}};
+        auto predicate = [](const Action &a, const Action &b) {
+            return a.time < b.time;
+        };
+        // round up
+        auto res = std::upper_bound(actionVector.begin(), actionVector.end(),
+                                    searchAction, predicate);
+        return res->data;
+    }
 
     bool active() const { return activateEvent ? activateEvent() : false; }
 
@@ -32,5 +44,3 @@ private:
     std::function<bool()> activateEvent;
     std::function<std::weak_ptr<Macro>()> decider;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef AUDIO_FRAME_SINK_H
-#define AUDIO_FRAME_SINK_H
+#pragma once
 
 #include "FFmpegFrameSink.h"
 
@@ -117,5 +116,3 @@ public:
 
     AVMediaType getType() const override { return AVMEDIA_TYPE_AUDIO; }
 };
-
-#endif

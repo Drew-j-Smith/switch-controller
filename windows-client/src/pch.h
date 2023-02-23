@@ -1,7 +1,4 @@
-#ifndef PCH_H
-#define PCH_H
-
-#pragma warning(disable : 5054)
+#pragma once
 
 #include <cstdlib>
 #include <fstream>
@@ -29,5 +26,3 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-
-#endif

@@ -1,39 +1,17 @@
+#pragma once
 
-#include "MainProgram.h"
+#include "pch.h"
+
+#include "GameCaptureConfig.h"
 
 #include <SFML/Window/Joystick.hpp>
 
 #include "Event/ConcreteClasses/EventToggle.h"
+#include "Event/Utility/InputCollection.h"
+#include "Macro/MacroRecorder.h"
 
-#include "Event/ConcreteClasses/ImageEvent.h"
-#include "Event/ConcreteClasses/SoundEvent.h"
-
-using std::make_shared;
-using std::shared_ptr;
-using std::string;
-using std::unique_ptr;
-
-std::tuple<VideoFrameSink *, AudioFrameSink *, std::unique_ptr<FFmpegRecorder>,
-           std::vector<std::unique_ptr<FFmpegFrameSink>>>
-initializeGameCapture() {
-    string inputFormat = "dshow";
-    string deviceName =
-        "video=Game Capture HD60 S:audio=Game Capture HD60 S Audio";
-    std::map<string, string> ffmpegOptions = {{"pixel_format", "bgr24"}};
-
-    std::vector<unique_ptr<FFmpegFrameSink>> sinks;
-    sinks.push_back(std::make_unique<VideoFrameSink>());
-    auto videoSink = dynamic_cast<VideoFrameSink *>(sinks[0].get());
-    sinks.push_back(std::make_unique<AudioFrameSink>(
-        AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, true, 48000));
-    auto audioSink = dynamic_cast<AudioFrameSink *>(sinks[1].get());
-
-    av_log_set_level(AV_LOG_QUIET);
-
-    auto recorder = std::make_unique<FFmpegRecorder>(inputFormat, deviceName,
-                                                     ffmpegOptions, sinks);
-    return {videoSink, audioSink, std::move(recorder), std::move(sinks)};
-}
+// The following layout has only been test for the nintendo switch pro
+// controller on windows
 
 constexpr static auto convertSFML_Axis(float pos) {
     // SFML works on a [-100, 100] scale
@@ -48,20 +26,9 @@ constexpr static auto convertSFML_Axis(float pos) {
 }
 
 // capture button
-constexpr static auto toggle = [] {
-    return sf::Joystick::isButtonPressed(0, 13);
-};
+bool toggle() { return sf::Joystick::isButtonPressed(0, 13); };
 
-std::tuple<std::string /* serialPortName */,
-           std::function<bool()> /* stopMacros */, InputCollection,
-           MacroRecorder, MacroCollection>
-getConfig([[maybe_unused]] VideoFrameSink *videoSink,
-          [[maybe_unused]] AudioFrameSink *audioSink) {
-    std::string serialPortName = "COM4";
-
-    // The following layout has only been test for the nintendo switch pro
-    // controller on windows
-
+auto getButtons() {
     std::array<std::function<bool()>, 14> buttons;
     buttons[InputCollection::buttonIndicies::b] = ToggleEvent{
         [] { return sf::Joystick::isButtonPressed(0, 0) && !toggle(); },
@@ -105,7 +72,10 @@ getConfig([[maybe_unused]] VideoFrameSink *videoSink,
     buttons[InputCollection::buttonIndicies::capture] = [] {
         return sf::Joystick::isButtonPressed(0, 13) && !toggle();
     };
+    return buttons;
+}
 
+auto getSticks() {
     std::array<std::function<std::array<uint8_t, 2>()>, 3> sticks;
     sticks[InputCollection::stickIndicies::left] = [] {
         return std::array<uint8_t, 2>{
@@ -128,47 +98,19 @@ getConfig([[maybe_unused]] VideoFrameSink *videoSink,
             convertSFML_Axis(
                 sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY))};
     };
-
-    InputCollection inputCollection(buttons, sticks);
-
-    MacroRecorder macroRecorder(
-        [] { return sf::Joystick::isButtonPressed(0, 1) && toggle(); },
-        [] { return sf::Joystick::isButtonPressed(0, 0) && toggle(); });
-
-    constexpr auto stopMacros = [] {
-        return sf::Joystick::isButtonPressed(0, 3) && toggle();
-    };
-
-    // TODO
-    // AC_ADD_EVENT_BUTTON(2, "turboButtonToggle");
-
-    // Deciders
-    cv::Rect rectCrop(0, 0, 500, 500);
-    // TODO fix
-    auto haanitDecider = make_shared<ImageEvent>(
-        cv::imread("data/haanit.png"), cv::imread("data/haanit mask.png"), 3,
-        .97, rectCrop, videoSink);
-    auto animalCrossingDecider =
-        make_shared<SoundEvent>("data/test3.wav", .5, audioSink);
-
-    // TODO
-    // Macros
-    // clang-format off
-    // auto macro1Event = make_shared<SfKeyboardEvent>(sf::Keyboard::B);
-    // auto macro1 =
-    //     make_shared<Macro>("data/test6.txt", macro1Event, animalCrossingDecider,
-    //                        Macro::inputPriority);
-    // auto macro2 =
-    //     make_shared<Macro>("data/test5.txt", make_shared<ConstantEvent>(),
-    //                        make_shared<DefaultDecider>(), Macro::inputPriority);
-
-    // macro1->setNextMacroLists(
-    //     std::vector<std::vector<std::weak_ptr<Macro>>>{{macro1}, {macro2}});
-
-    // macros = {macro1, macro2};
-    // clang-format on
-    MacroCollection macroCollection({macroRecorder.getLastRecordedMacro()});
-
-    return {serialPortName, stopMacros, std::move(inputCollection),
-            std::move(macroRecorder), std::move(macroCollection)};
+    return sticks;
 }
+
+struct InputConfig {
+    bool stopMacros() {
+        return sf::Joystick::isButtonPressed(0, 3) && toggle();
+    }
+    GameCaptureConfig gameCaptureConfig;
+    InputCollection inputCollection;
+    MacroRecorder macroRecorder;
+    InputConfig()
+        : gameCaptureConfig{}, inputCollection{getButtons(), getSticks()},
+          macroRecorder{
+              [] { return sf::Joystick::isButtonPressed(0, 1) && toggle(); },
+              [] { return sf::Joystick::isButtonPressed(0, 0) && toggle(); }} {}
+};

@@ -1,5 +1,4 @@
-#ifndef VIDEO_FRAME_SINK_H
-#define VIDEO_FRAME_SINK_H
+#pragma once
 
 #include "FFmpegFrameSink.h"
 
@@ -97,5 +96,3 @@ public:
     int getWidth() const { return outputWidth; }
     int getHeight() const { return outputHeight; }
 };
-
-#endif

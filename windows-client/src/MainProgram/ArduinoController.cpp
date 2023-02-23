@@ -1,4 +1,8 @@
-#include "MainProgram.h"
+
+#include "SerialPort.h"
+#include "StartController.h"
+#include "TestAudio.h"
+#include "TestVideo.h"
 
 #include <opencv2/core/utils/logger.hpp>
 

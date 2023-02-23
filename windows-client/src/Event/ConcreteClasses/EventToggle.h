@@ -1,5 +1,4 @@
-#ifndef EVENT_TOGGLE_H
-#define EVENT_TOGGLE_H
+#pragma once
 
 #include "pch.h"
 
@@ -34,5 +33,3 @@ public:
         return diff / delay % 2 ? decltype(val){} : val;
     }
 };
-
-#endif

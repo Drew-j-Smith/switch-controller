@@ -1,5 +1,4 @@
-#ifndef IMAGE_EVENT_H
-#define IMAGE_EVENT_H
+#pragma once
 
 #include "pch.h"
 
@@ -10,15 +9,13 @@
 
 #include "FFmpeg/VideoFrameSink.h"
 
-#include "Event/Event.h"
-
-class ImageEvent : public Event {
+class ImageEvent {
 public:
     ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
                const int matchMethod, const double matchThreshold,
                const cv::Rect imageCrop, VideoFrameSink *videoFrameSink);
 
-    uint8_t value() const override;
+    uint8_t value() const;
 
 private:
     const cv::Mat templatePic;
@@ -30,5 +27,3 @@ private:
     VideoFrameSink *videoFrameSink;
     mutable std::vector<uint8_t> videoData;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef FFMPEG_RECORDER_H
-#define FFMPEG_RECORDER_H
+#pragma once
 
 #include "FFmpegDecoder.h"
 #include "FFmpegFrameSink.h"
@@ -31,5 +30,3 @@ private:
     std::thread m_thread;
     std::atomic_bool m_recording;
 };
-
-#endif

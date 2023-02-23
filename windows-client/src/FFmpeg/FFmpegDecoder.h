@@ -1,5 +1,4 @@
-#ifndef FFMPEG_DECODER_H
-#define FFMPEG_DECODER_H
+#pragma once
 
 #include "FFmpegFrameSink.h"
 
@@ -29,5 +28,3 @@ public:
 private:
     void openCodecContext();
 };
-
-#endif

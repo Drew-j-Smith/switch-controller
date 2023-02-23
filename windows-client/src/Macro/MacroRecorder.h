@@ -1,5 +1,4 @@
-#ifndef MACRO_RECORDER_H
-#define MACRO_RECORDER_H
+#pragma once
 
 #include "pch.h"
 
@@ -11,7 +10,7 @@ private:
 
     std::function<bool()> playEvent;
 
-    ActionRecord currentRecording;
+    std::vector<Action> currentRecording;
     std::shared_ptr<Macro> lastRecordedMacro;
     std::function<bool()> recordEvent;
 
@@ -57,4 +56,4 @@ public:
     }
 };
 
-#endif
+#pragma once

@@ -1,6 +1,10 @@
-#include "MainProgram.h"
+#pragma once
 
 #include "pch.h"
+
+#include "FFmpeg/AudioFrameSink.h"
+#include "FFmpeg/FFmpegRecorder.h"
+#include "FFmpeg/VideoFrameSink.h"
 
 void TestAudio() {
     std::string inputFormat;
