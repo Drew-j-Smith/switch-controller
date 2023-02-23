@@ -48,6 +48,7 @@ void StartController() {
         if (stopMacros()) {
             macroCollection.deactivateMacros();
         }
+        macroCollection.activateMacros();
         if (macroCollection.isMacroActive()) {
             constexpr auto mergeFunction =
                 []([[maybe_unused]] std::array<uint8_t, 8> action1,

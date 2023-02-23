@@ -1,33 +1,38 @@
 #ifndef EVENT_TOGGLE_H
 #define EVENT_TOGGLE_H
 
-/**
- * @brief The Event Toggle class will take an event, and while it is active,
- * toggle between 0 and 1 with an specified interval
- */
-
 #include "pch.h"
 
-#include "ConstantEvent.h"
-#include "Event/Event.h"
+using namespace std::chrono_literals;
 
-class EventToggle : public Event {
+template <typename Callable> class ToggleEvent {
 private:
-    int cooldown;
-    std::shared_ptr<Event> event;
+    Callable callable;
+    bool active{};
+    std::chrono::steady_clock::time_point start{};
+    std::chrono::milliseconds delay;
 
 public:
-    EventToggle(const int cooldown = 0, const std::shared_ptr<Event> event =
-                                            std::make_shared<ConstantEvent>())
-        : cooldown(cooldown), event(event) {}
+    constexpr ToggleEvent(Callable &&callable,
+                          const std::chrono::milliseconds &delay)
+        : callable(callable), delay(delay) {}
+    constexpr ToggleEvent(const ToggleEvent &) = default;
+    constexpr ToggleEvent(ToggleEvent &&) = default;
 
-    uint8_t value() const override {
-        return event->value() &&
-               std::chrono::duration_cast<std::chrono::milliseconds>(
-                   std::chrono::steady_clock::now().time_since_epoch())
-                       .count() /
-                   cooldown % 2;
-    };
+    constexpr auto operator()() {
+        auto val = callable();
+        if (!val) {
+            active = false;
+            return decltype(val){};
+        }
+        auto now = std::chrono::steady_clock::now();
+        if (!active) {
+            active = true;
+            start = now;
+        }
+        auto diff = now - start;
+        return diff / delay % 2 ? decltype(val){} : val;
+    }
 };
 
 #endif

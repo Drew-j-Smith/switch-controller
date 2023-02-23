@@ -4,7 +4,7 @@
 
 void TestVideo() {
     std::string inputFormat = "dshow";
-    std::string deviceName = "video=Game Capture HD60 S (2)";
+    std::string deviceName = "video=Game Capture HD60 S";
     std::map<std::string, std::string> ffmpegOptions = {
         {"pixel_format", "bgr24"}};
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;

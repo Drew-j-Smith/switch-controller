@@ -25,19 +25,16 @@ public:
         : playEvent(playEvent),
           lastRecordedMacro(std::make_shared<Macro>(Macro{{}, playEvent, {}})),
           recordEvent(recordEvent) {}
-    MacroRecorder(const MacroRecorder &other) = delete;
-    MacroRecorder(MacroRecorder &&other) = default;
-    MacroRecorder &operator=(MacroRecorder &&other) = default;
 
     void update(const std::array<uint8_t, 8> &data) {
         auto now = std::chrono::steady_clock::now();
-        auto timeDiff = static_cast<uint64_t>(
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                now - activationTime)
-                .count());
+        auto timeDiff = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            now - activationTime)
+                            .count();
 
         if (recordEvent() && timeDiff > RECORDING_BUTTON_COOLDOWN) {
             activationTime = now;
+            timeDiff = 0;
             if (recording) {
                 std::string str =
                     std::to_string(now.time_since_epoch().count()) + ".hex";
@@ -51,7 +48,7 @@ public:
             recording = !recording;
         }
         if (recording) {
-            currentRecording.push_back({timeDiff, data});
+            currentRecording.push_back({static_cast<uint64_t>(timeDiff), data});
         }
     }
 

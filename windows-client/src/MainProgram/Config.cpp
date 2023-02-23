@@ -3,6 +3,8 @@
 
 #include <SFML/Window/Joystick.hpp>
 
+#include "Event/ConcreteClasses/EventToggle.h"
+
 #include "Event/ConcreteClasses/ImageEvent.h"
 #include "Event/ConcreteClasses/SoundEvent.h"
 
@@ -55,15 +57,15 @@ std::tuple<std::string /* serialPortName */,
            MacroRecorder, MacroCollection>
 getConfig([[maybe_unused]] VideoFrameSink *videoSink,
           [[maybe_unused]] AudioFrameSink *audioSink) {
-    std::string serialPortName = "COM3";
+    std::string serialPortName = "COM4";
 
     // The following layout has only been test for the nintendo switch pro
     // controller on windows
 
     std::array<std::function<bool()>, 14> buttons;
-    buttons[InputCollection::buttonIndicies::b] = [] {
-        return sf::Joystick::isButtonPressed(0, 0) && !toggle();
-    };
+    buttons[InputCollection::buttonIndicies::b] = ToggleEvent{
+        [] { return sf::Joystick::isButtonPressed(0, 0) && !toggle(); },
+        1000ms};
     buttons[InputCollection::buttonIndicies::a] = [] {
         return sf::Joystick::isButtonPressed(0, 1) && !toggle();
     };
