@@ -41,8 +41,8 @@ constexpr static auto convertSFML_Axis(float pos) {
     float SCALE = SCALE_FACTOR * SFML_RATIO;
     int OFFSET = 128;
 
-    int scaled = (int)(pos * SCALE + OFFSET);
-    return (uint8_t)std::clamp(scaled, 0, 255);
+    int scaled = static_cast<int>(pos * SCALE) + OFFSET;
+    return static_cast<uint8_t>(std::clamp(scaled, 0, 255));
 }
 
 // capture button

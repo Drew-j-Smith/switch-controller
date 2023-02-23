@@ -11,7 +11,7 @@ void saveActionVector(const std::string &filename,
     }
     for (auto action : record) {
         boost::endian::native_to_little_inplace(action.time);
-        outfile.write((char *)&action, sizeof(action));
+        outfile.write(reinterpret_cast<char *>(&action), sizeof(action));
     }
 }
 std::vector<Action> loadActionVector(const std::string &filename) {
@@ -22,7 +22,8 @@ std::vector<Action> loadActionVector(const std::string &filename) {
         return {};
     }
     Action action;
-    while (infile.readsome((char *)&action, sizeof(action)) == sizeof(action)) {
+    while (infile.readsome(reinterpret_cast<char *>(&action), sizeof(action)) ==
+           sizeof(action)) {
         boost::endian::little_to_native_inplace(action.time);
         res.push_back(action);
     }

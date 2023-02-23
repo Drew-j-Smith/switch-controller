@@ -1,6 +1,8 @@
 #ifndef PCH_H
 #define PCH_H
 
+#pragma warning(disable : 5054)
+
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>

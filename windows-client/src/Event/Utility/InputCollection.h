@@ -38,9 +38,6 @@ public:
         const std::array<std::function<bool()>, 14> &buttons,
         const std::array<std::function<std::array<uint8_t, 2>()>, 3> &sticks)
         : buttons(buttons), sticks(sticks){};
-    InputCollection(const InputCollection &other) = delete;
-    InputCollection(InputCollection &&other) = default;
-    InputCollection &operator=(InputCollection &&other) = default;
 
     std::array<uint8_t, 8> getData() const;
 

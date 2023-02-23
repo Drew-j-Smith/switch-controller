@@ -13,9 +13,9 @@ std::array<uint8_t, 8> MacroCollection::getData(
 
         for (auto it : activeMacros) {
             auto diff = now - it.second;
-            uint64_t time =
+            uint64_t time = static_cast<uint64_t>(
                 std::chrono::duration_cast<std::chrono::milliseconds>(diff)
-                    .count();
+                    .count());
             if (auto data = it.first->getDataframe(time)) {
                 res = mergeFunction(res, data.value());
             } else {

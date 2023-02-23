@@ -28,7 +28,7 @@ static void asyncHandler(const boost::system::error_code &error,
         std::cerr << error.what() << '\n';
         *res = -1;
     }
-    *res += (int)bytes_transferred;
+    *res += static_cast<int>(bytes_transferred);
 };
 
 void testSerialPort(std::unique_ptr<boost::asio::serial_port> &serialPort,

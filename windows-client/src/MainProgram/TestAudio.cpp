@@ -58,5 +58,6 @@ void TestAudio() {
     std::getline(std::cin, audioFilename);
 
     std::ofstream outfile(audioFilename, std::ios::out | std::ios::binary);
-    outfile.write((const char *)data.data(), data.size());
+    outfile.write(reinterpret_cast<char *>(data.data()),
+                  static_cast<std::streamsize>(data.size()));
 }

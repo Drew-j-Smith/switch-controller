@@ -41,10 +41,10 @@ std::array<uint8_t, 8> InputCollection::getData() const {
     res[0] = 85;
     res[1] = 0;
     res[2] = 0;
-    for (int i = 0; i < 8; i++) {
+    for (std::size_t i = 0; i < 8; i++) {
         res[1] |= (buttons[i]() << i);
     }
-    for (int i = 0; i < 6; i++) {
+    for (std::size_t i = 0; i < 6; i++) {
         res[2] |= (buttons[i + 8]() << i);
     }
     auto [leftX, leftY] =

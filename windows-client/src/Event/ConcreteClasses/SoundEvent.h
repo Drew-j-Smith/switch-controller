@@ -26,7 +26,7 @@ private:
         };
     };
     std::unique_ptr<fftwf_plan, fftwf_deleter> fftwPlan;
-    int fftwSize;
+    std::size_t fftwSize;
 
     std::vector<float> matchFrequencies;
     double matchThreshold;

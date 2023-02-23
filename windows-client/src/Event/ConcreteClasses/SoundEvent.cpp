@@ -5,16 +5,17 @@
 
 std::vector<float>
 SoundEvent::findFrequencies(const std::vector<float> &samples) const {
-    for (long long i = 0; i < fftwSize; i++) {
+    for (uint64_t i = 0; i < fftwSize; i++) {
         fftwIn[i] = samples[i];
     }
 
     fftwf_execute(*fftwPlan);
 
     std::vector<float> frequencies(fftwSize / 2 + 1);
-    for (unsigned long long i = 0; i < frequencies.size(); i++) {
+    for (std::size_t i = 0; i < frequencies.size(); i++) {
         // freq gap = 1/(dt*N)
-        frequencies[i] = std::conj(fftwOut[i]).real() / fftwSize;
+        frequencies[i] =
+            std::conj(fftwOut[i]).real() / static_cast<float>(fftwSize);
     }
     return frequencies;
 }
@@ -36,15 +37,20 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
 
     std::vector<uint8_t> rawData;
     audioSink->getData(rawData);
-    matchAudio = std::vector<float>((float *)rawData.data(),
-                                    (float *)(rawData.data() + rawData.size()));
+    matchAudio = {};
+    for (std::size_t i = 0; i < rawData.size(); i += 4) {
+        float f;
+        std::memcpy(&f, &rawData[i], 4);
+        matchAudio.push_back(f);
+    }
 
-    fftwSize = (int)matchAudio.size();
+    fftwSize = matchAudio.size();
     fftwIn.resize(fftwSize);
     fftwOut.resize(fftwSize / 2 + 1);
     auto fftwf_plan_ptr = new fftwf_plan;
     *fftwf_plan_ptr = fftwf_plan_dft_r2c_1d(
-        fftwSize, fftwIn.data(), (fftwf_complex *)fftwOut.data(), FFTW_MEASURE);
+        static_cast<int>(fftwSize), fftwIn.data(),
+        reinterpret_cast<fftwf_complex *>(fftwOut.data()), FFTW_MEASURE);
     fftwPlan = {fftwf_plan_ptr, fftwf_deleter()};
     matchFrequencies = findFrequencies(matchAudio);
     matchValue.store(0);
@@ -52,9 +58,12 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
 
 uint8_t SoundEvent::value() const {
     audioFrameSink->getData(audioData);
-    std::vector<float> soundData(
-        (float *)audioData.data(),
-        (float *)(audioData.data() + audioData.size()));
+    std::vector<float> soundData = {};
+    for (std::size_t i = 0; i < audioData.size(); i += 4) {
+        float f;
+        std::memcpy(&f, &audioData[i], 4);
+        soundData.push_back(f);
+    }
 
     auto testFrequencies = findFrequencies(soundData);
 
@@ -91,9 +100,11 @@ uint8_t SoundEvent::value() const {
                    });
     float testMinusApprox = std::accumulate(temp.begin(), temp.end(), 0.f);
 
-    float mean = std::reduce(
-        testFrequencies.begin(), testFrequencies.end(), 0.f,
-        [&](float f1, float f2) { return f1 + f2 / testFrequencies.size(); });
+    float mean = std::reduce(testFrequencies.begin(), testFrequencies.end(),
+                             0.f, [&](float f1, float f2) {
+                                 return f1 + f2 / static_cast<float>(
+                                                      testFrequencies.size());
+                             });
 
     std::transform(testFrequencies.begin(), testFrequencies.end(), temp.begin(),
                    [&](float f) {
