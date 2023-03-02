@@ -22,7 +22,7 @@ static auto openStream(const std::string &inputFormatStr,
     avdevice_register_all();
 
     // finding input format and setting options dict
-    AVInputFormat *inputFormat = nullptr;
+    const AVInputFormat *inputFormat = nullptr;
     if (inputFormatStr.size() > 0) { // If no input format is set, load a file
         inputFormat = av_find_input_format(inputFormatStr.c_str());
     }

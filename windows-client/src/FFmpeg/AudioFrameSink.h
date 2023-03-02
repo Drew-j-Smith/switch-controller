@@ -19,7 +19,7 @@ private:
     };
     std::unique_ptr<SwrContext, SwrContextDeleter> swr;
 
-    int64_t outChannelLayout = AV_CH_LAYOUT_MONO;
+    AVChannelLayout outChannelLayout = AV_CHANNEL_LAYOUT_MONO;
     AVSampleFormat outputSampleFormat = AV_SAMPLE_FMT_FLT;
     int outSampleRate = 48000;
 
@@ -30,25 +30,19 @@ private:
 
         spdlog::info("intitializing AudioFrameSink");
 
-        // getting the channel layout or setting it to default
-        int64_t channel_layout =
-            static_cast<int64_t>(decoderContext->channel_layout);
-        if (channel_layout == 0) {
-            channel_layout =
-                av_get_default_channel_layout(decoderContext->channels);
-        }
-
-        swr = {swr_alloc_set_opts(nullptr, // we're allocating a new context
-                                  outChannelLayout,           // out_ch_layout
-                                  outputSampleFormat,         // out_sample_fmt
-                                  outSampleRate,              // out_sample_rate
-                                  channel_layout,             // in_ch_layout
-                                  decoderContext->sample_fmt, // in_sample_fmt
-                                  decoderContext->sample_rate, // in_sample_rate
-                                  0,                           // log_offset
-                                  nullptr)                     // log_ctx
-               ,
-               SwrContextDeleter()};
+        av_channel_layout_default(&decoderContext->ch_layout,
+                                  decoderContext->ch_layout.nb_channels);
+        struct SwrContext *temp{nullptr};
+        swr_alloc_set_opts2(&temp,             // we're allocating a new context
+                            &outChannelLayout, // out_ch_layout
+                            outputSampleFormat,          // out_sample_fmt
+                            outSampleRate,               // out_sample_rate
+                            &decoderContext->ch_layout,  // in_ch_layout
+                            decoderContext->sample_fmt,  // in_sample_fmt
+                            decoderContext->sample_rate, // in_sample_rate
+                            0,                           // log_offset
+                            nullptr);                    // log_ctx
+        swr = {temp, SwrContextDeleter()};
         int res = swr_init(swr.get());
         if (res < 0) {
             char error[AV_ERROR_MAX_STRING_SIZE];
@@ -109,9 +103,9 @@ private:
 public:
     AudioFrameSink() {}
 
-    AudioFrameSink(int64_t outChannelLayout, AVSampleFormat outputSampleFormat,
-                   int outSampleRate, bool loopRecording = false,
-                   int64_t loopBufferSize = 0)
+    AudioFrameSink(AVChannelLayout outChannelLayout,
+                   AVSampleFormat outputSampleFormat, int outSampleRate,
+                   bool loopRecording = false, int64_t loopBufferSize = 0)
         : outChannelLayout(outChannelLayout),
           outputSampleFormat(outputSampleFormat), outSampleRate(outSampleRate),
           loopRecording(loopRecording) {

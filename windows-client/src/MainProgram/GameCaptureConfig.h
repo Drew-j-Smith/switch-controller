@@ -21,8 +21,9 @@ struct GameCaptureConfig {
 
     {
         sinks.push_back(std::make_unique<VideoFrameSink>());
+        AVChannelLayout channel_layout = AV_CHANNEL_LAYOUT_MONO;
         sinks.push_back(std::make_unique<AudioFrameSink>(
-            AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, true, 48000));
+            channel_layout, AV_SAMPLE_FMT_S16, 48000, true, 48000));
 
         recorder = {std::make_unique<FFmpegRecorder>(inputFormat, deviceName,
                                                      ffmpegOptions, sinks)};

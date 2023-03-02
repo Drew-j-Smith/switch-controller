@@ -26,7 +26,8 @@ SoundEvent::SoundEvent(const std::string &filename, double matchThreshold,
     this->audioFrameSink = audioFrameSink;
 
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
-    sinks.push_back(std::make_unique<AudioFrameSink>(AV_CH_LAYOUT_MONO,
+    AVChannelLayout channel_layout = AV_CHANNEL_LAYOUT_MONO;
+    sinks.push_back(std::make_unique<AudioFrameSink>(channel_layout,
                                                      AV_SAMPLE_FMT_S16, 48000));
     auto audioSink = sinks[0].get();
 

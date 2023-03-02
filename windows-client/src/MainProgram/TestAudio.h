@@ -37,8 +37,9 @@ void TestAudio() {
 
     std::map<std::string, std::string> ffmpegOptions = {};
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
+    AVChannelLayout channel_layout = AV_CHANNEL_LAYOUT_MONO;
     sinks.push_back(std::make_unique<AudioFrameSink>(
-        AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, 48000, loopRecord == 'y',
+        channel_layout, AV_SAMPLE_FMT_S16, 48000, loopRecord == 'y',
         48000 * bufferSize));
     auto audioSink = sinks[0].get();
 
