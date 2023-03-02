@@ -2,8 +2,6 @@
 
 #include "pch.h"
 
-#include "GameCaptureConfig.h"
-
 #include <SFML/Window/Joystick.hpp>
 
 #include "Event/ConcreteClasses/EventToggle.h"
@@ -104,11 +102,10 @@ struct InputConfig {
     bool stopMacros() {
         return sf::Joystick::isButtonPressed(0, 3) && toggle();
     }
-    GameCaptureConfig gameCaptureConfig;
     InputCollection inputCollection;
     MacroRecorder macroRecorder;
     InputConfig()
-        : gameCaptureConfig{}, inputCollection{getButtons(), getSticks()},
+        : inputCollection{getButtons(), getSticks()},
           macroRecorder{
               [] { return sf::Joystick::isButtonPressed(0, 1) && toggle(); },
               [] { return sf::Joystick::isButtonPressed(0, 0) && toggle(); }} {}

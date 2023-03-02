@@ -3,18 +3,19 @@
 #include <SFML/Window/Joystick.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
-#include "GameCaptureConfig.h"
 #include "InputConfig.h"
 #include "MacroConfig.h"
 #include "SerialPort.h"
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/program_options.hpp>
 
 #include "Event/InputCollection.h"
 #include "Macro/MacroCollection.h"
 
-void StartController() {
+void StartController(boost::program_options::variables_map vm,
+                     const std::map<std::string, std::string> &ffmpegOptions) {
     spdlog::info("initializing");
 
     // Updating joysticks to see if they are connected
@@ -25,19 +26,32 @@ void StartController() {
     }
     spdlog::info("joystick connected");
 
-    av_log_set_level(AV_LOG_QUIET);
+    spdlog::info("intializing ffmpeg");
 
+    std::vector<std::unique_ptr<FFmpegFrameSink>> sinks{};
+    sinks.push_back(std::make_unique<VideoFrameSink>());
+    AVChannelLayout channel_layout = AV_CHANNEL_LAYOUT_MONO;
+    sinks.push_back(std::make_unique<AudioFrameSink>(
+        channel_layout, AV_SAMPLE_FMT_S16, 48000, true, 48000));
+
+    std::unique_ptr<FFmpegRecorder> recorder{std::make_unique<FFmpegRecorder>(
+        vm["inputFormat"].as<std::string>(), vm["deviceName"].as<std::string>(),
+        ffmpegOptions, sinks)};
+
+    spdlog::info("ffmpeg intialized");
     spdlog::info("loading input config");
     InputConfig inputConfig;
     spdlog::info("input config loaded");
     spdlog::info("loading macros");
-    MacroCollection macroCollection = getMacroConfig(inputConfig);
+    MacroCollection macroCollection =
+        getMacroConfig(dynamic_cast<VideoFrameSink *>(sinks[0].get()),
+                       dynamic_cast<AudioFrameSink *>(sinks[0].get()),
+                       {inputConfig.macroRecorder.getLastRecordedMacro()});
     spdlog::info("macros loaded");
-    std::string serialPortName = "COM4";
 
     std::unique_ptr<boost::asio::serial_port> port;
     boost::asio::io_service io;
-    port = initializeSerialPort(serialPortName, 57600, io);
+    port = initializeSerialPort(vm["port"].as<std::string>(), 57600, io);
     testSerialPort(port, io);
 
     std::array<uint8_t, 8> send;

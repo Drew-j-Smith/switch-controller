@@ -32,6 +32,8 @@ private:
     int outputHeight = 1080;
 
     void virtualInit(AVCodecContext *decoderContext) override {
+        spdlog::info("intitializing VideoFrameSink");
+
         width = decoderContext->width;
         height = decoderContext->height;
         pixelFormat = decoderContext->pix_fmt;
@@ -62,6 +64,7 @@ private:
                                            outputPixelFormat, 0, nullptr,
                                            nullptr, nullptr),
                       swsContextDeleter()};
+        spdlog::info("intitialized VideoFrameSink");
     }
 
     void virtualOutputFrame(AVFrame *frame) override {

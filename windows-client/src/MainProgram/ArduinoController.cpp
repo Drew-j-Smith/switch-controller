@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
 
     cv::utils::logging::setLogLevel(
         cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
+    av_log_set_level(AV_LOG_QUIET);
 
     po::variables_map vm;
     try {
@@ -38,7 +39,8 @@ int main(int argc, char **argv) {
     }
     std::map<std::string, std::string> ffmpeg_options{};
     try {
-        auto cfg_file_parsed = po::parse_config_file("config.cfg", desc, true);
+        auto cfg_file_parsed =
+            po::parse_config_file("data/config.cfg", desc, true);
         po::store(cfg_file_parsed, vm);
         auto unrecognized_options = po::collect_unrecognized(
             cfg_file_parsed.options,
@@ -74,7 +76,7 @@ int main(int argc, char **argv) {
         } else if (vm.count("testAudio")) {
             TestAudio(vm, ffmpeg_options);
         } else {
-            StartController();
+            StartController(vm, ffmpeg_options);
         }
     } catch (std::exception &e) {
         spdlog::error("Uncaught exception: {}", e.what());
