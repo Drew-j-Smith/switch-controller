@@ -37,19 +37,9 @@ int main() {
                 std::cout << "Enter the port name:\n";
                 std::string portName;
                 std::getline(std::cin, portName);
-                try {
-                    boost::asio::io_service io;
-                    auto port = initializeSerialPort(portName, 57600, &io);
-
-                    // sending a nuetral signal
-                    unsigned char send[8] = {85, 0, 0, 128, 128, 128, 128, 8};
-                    unsigned char recieve[1];
-
-                    testSerialPort(port, 8, send, 1, recieve, &io);
-                } catch (std::exception &e) {
-                    std::cerr << "Failure connecting via serial port.\n" +
-                                     std::string(e.what()) + "\n";
-                }
+                boost::asio::io_service io;
+                auto port = initializeSerialPort(portName, 57600, io);
+                testSerialPort(port, io);
             } break;
             case 3: {
                 TestVideo();

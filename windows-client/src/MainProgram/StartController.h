@@ -37,13 +37,11 @@ void StartController() {
 
     std::unique_ptr<boost::asio::serial_port> port;
     boost::asio::io_service io;
+    port = initializeSerialPort(serialPortName, 57600, io);
+    testSerialPort(port, io);
 
-    // sending a nuetral signal
-    std::array<uint8_t, 8> send = {85, 0, 0, 128, 128, 128, 128, 8};
+    std::array<uint8_t, 8> send;
     unsigned char recieve[1];
-
-    port = initializeSerialPort(serialPortName, 57600, &io);
-    testSerialPort(port, 8, send.data(), 1, recieve, &io);
 
     spdlog::info("Ready");
 

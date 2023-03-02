@@ -10,18 +10,18 @@
 
 std::unique_ptr<boost::asio::serial_port>
 initializeSerialPort(std::string serialPort, unsigned int baud,
-                     boost::asio::io_service *io) {
+                     boost::asio::io_service &io) {
     try {
         spdlog::info("Intializing serial communication");
-        auto port = std::make_unique<boost::asio::serial_port>(*io);
+        auto port = std::make_unique<boost::asio::serial_port>(io);
         port->open(serialPort);
         port->set_option(boost::asio::serial_port_base::baud_rate(baud));
         spdlog::info("Serial communication intialized");
         return port;
     } catch (const std::exception &e) {
-        throw std::runtime_error("Fatal error opening serial port.\nError: \"" +
+        throw std::runtime_error("Fatal error opening serial port: \"" +
                                  std::string(e.what()) +
-                                 "\"\nDoes the port exist?\n");
+                                 "\" Does the port exist?");
     }
 }
 
@@ -35,11 +35,14 @@ static void asyncHandler(const boost::system::error_code &error,
 };
 
 void testSerialPort(std::unique_ptr<boost::asio::serial_port> &serialPort,
-                    unsigned int writeLen, const unsigned char *writeData,
-                    unsigned int readLen, unsigned char *readData,
-                    boost::asio::io_service *io) {
+                    boost::asio::io_service &io) {
     spdlog::info("Testing serial connection");
 
+    // sending a nuetral signal
+    unsigned char writeData[8] = {85, 0, 0, 128, 128, 128, 128, 8};
+    unsigned char readData[1];
+    auto writeLen = sizeof(writeData);
+    auto readLen = sizeof(readData);
     int writeRes = 0;
     int readRes = 0;
     boost::asio::async_write(*serialPort,
@@ -50,10 +53,10 @@ void testSerialPort(std::unique_ptr<boost::asio::serial_port> &serialPort,
                             boost::bind(&asyncHandler, boost::placeholders::_1,
                                         boost::placeholders::_2, &readRes));
 
-    io->run_for(std::chrono::milliseconds(1000));
+    io.run_for(std::chrono::milliseconds(1000));
     serialPort->cancel();
     if (writeRes <= 0 || readRes <= 0) {
-        throw std::runtime_error("Unable to establish serial connection.\n");
+        throw std::runtime_error("Unable to establish serial connection.");
     }
     spdlog::info("Serial communication established");
 }
