@@ -1,16 +1,12 @@
 
-file(GLOB_RECURSE CMAKE_SRC_FILES CONFIGURE_DEPENDS "*.cpp")
-
-add_executable(ArduinoController ${CMAKE_SRC_FILES})
+add_executable(ArduinoController MainProgram/ArduinoController.cpp
+Event/ConcreteClasses/SoundEvent.cpp
+Event/Utility/InputCollection.cpp
+FFmpeg/FFmpegDecoder.cpp
+FFmpeg/FFmpegRecorder.cpp)
 
 target_include_directories(ArduinoController PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_precompile_headers(ArduinoController PUBLIC pch.h)
-
-if(MSVC)
-  target_compile_options(ArduinoController PUBLIC /W4 /WX)
-else()
-  target_compile_options(ArduinoController PUBLIC -Wall -Wextra -Wpedantic -Werror)
-endif()
 
 target_link_libraries(ArduinoController ${CMAKE_LIBS})
 

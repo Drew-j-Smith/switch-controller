@@ -6,18 +6,19 @@
 #include "FFmpeg/FFmpegRecorder.h"
 #include "FFmpeg/VideoFrameSink.h"
 
-void TestVideo() {
-    std::string inputFormat = "dshow";
-    std::string deviceName = "video=Game Capture HD60 S";
-    std::map<std::string, std::string> ffmpegOptions = {
-        {"pixel_format", "bgr24"}};
+#include <boost/program_options.hpp>
+
+void TestVideo(boost::program_options::variables_map vm,
+               const std::map<std::string, std::string> &ffmpegOptions) {
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
     sinks.push_back(std::make_unique<VideoFrameSink>());
     auto videoSink = dynamic_cast<VideoFrameSink *>(sinks[0].get());
 
     av_log_set_level(AV_LOG_QUIET);
 
-    FFmpegRecorder recorder(inputFormat, deviceName, ffmpegOptions, sinks);
+    FFmpegRecorder recorder(vm["inputFormat"].as<std::string>(),
+                            vm["deviceName"].as<std::string>(), ffmpegOptions,
+                            sinks);
 
     std::vector<uint8_t> data;
     long long lastFrame = videoSink->getData(data);

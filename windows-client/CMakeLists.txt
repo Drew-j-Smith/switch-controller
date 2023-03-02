@@ -8,7 +8,7 @@ add_compile_definitions(_WIN32_WINNT=0x0A00)
 
 find_package(OpenCV REQUIRED)
 find_package(SFML 2 COMPONENTS window graphics REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(FFTW3f CONFIG REQUIRED)
 find_package(FFMPEG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
