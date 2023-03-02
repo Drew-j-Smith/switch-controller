@@ -1,7 +1,6 @@
 
 add_executable(ArduinoController MainProgram/ArduinoController.cpp
 Event/ConcreteClasses/SoundEvent.cpp
-Event/Utility/InputCollection.cpp
 FFmpeg/FFmpegDecoder.cpp
 FFmpeg/FFmpegRecorder.cpp)
 

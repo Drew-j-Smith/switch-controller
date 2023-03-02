@@ -7,7 +7,7 @@
 #include <SFML/Window/Joystick.hpp>
 
 #include "Event/ConcreteClasses/EventToggle.h"
-#include "Event/Utility/InputCollection.h"
+#include "Event/InputCollection.h"
 #include "Macro/MacroRecorder.h"
 
 // The following layout has only been test for the nintendo switch pro

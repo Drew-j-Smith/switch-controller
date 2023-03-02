@@ -11,7 +11,7 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
-#include "Event/Utility/InputCollection.h"
+#include "Event/InputCollection.h"
 #include "Macro/MacroCollection.h"
 
 void StartController() {
