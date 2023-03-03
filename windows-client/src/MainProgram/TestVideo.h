@@ -8,7 +8,7 @@
 
 #include <boost/program_options.hpp>
 
-void TestVideo(boost::program_options::variables_map vm,
+void TestVideo(const boost::program_options::variables_map &vm,
                const std::map<std::string, std::string> &ffmpegOptions) {
     std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
     sinks.push_back(std::make_unique<VideoFrameSink>());

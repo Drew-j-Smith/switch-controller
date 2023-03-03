@@ -8,7 +8,7 @@
 
 #include <boost/program_options.hpp>
 
-void TestAudio(boost::program_options::variables_map vm,
+void TestAudio(const boost::program_options::variables_map &vm,
                const std::map<std::string, std::string> &ffmpegOptions) {
     auto inputFormat = vm["inputFormat"].as<std::string>();
     auto deviceName = vm["deviceName"].as<std::string>();

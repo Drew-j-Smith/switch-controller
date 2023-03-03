@@ -3,7 +3,7 @@
 #include <SFML/Window/Joystick.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
-#include "InputConfig.h"
+#include "Macro/MacroRecorder.h"
 #include "MacroConfig.h"
 #include "SerialPort.h"
 
@@ -23,6 +23,7 @@ void StartController(boost::program_options::variables_map vm,
     auto joystick_connected = sf::Joystick::isConnected(0);
     if (!joystick_connected) {
         spdlog::error("no joystick connected");
+        return;
     }
     spdlog::info("joystick connected");
 
@@ -40,13 +41,22 @@ void StartController(boost::program_options::variables_map vm,
 
     spdlog::info("ffmpeg intialized");
     spdlog::info("loading input config");
-    InputConfig inputConfig;
+    InputCollection inputCollection(vm);
+    MacroRecorder macroRecorder{
+        [] {
+            return sf::Joystick::isButtonPressed(0, 1) &&
+                   sf::Joystick::isButtonPressed(0, 13);
+        },
+        [] {
+            return sf::Joystick::isButtonPressed(0, 0) &&
+                   sf::Joystick::isButtonPressed(0, 13);
+        }};
     spdlog::info("input config loaded");
     spdlog::info("loading macros");
     MacroCollection macroCollection =
         getMacroConfig(dynamic_cast<VideoFrameSink *>(sinks[0].get()),
                        dynamic_cast<AudioFrameSink *>(sinks[0].get()),
-                       {inputConfig.macroRecorder.getLastRecordedMacro()});
+                       {macroRecorder.getLastRecordedMacro()});
     spdlog::info("macros loaded");
 
     std::unique_ptr<boost::asio::serial_port> port;
@@ -65,10 +75,10 @@ void StartController(boost::program_options::variables_map vm,
         // code used to time an iteration
         // auto begin = std::chrono::steady_clock::now();
 
-        send = inputConfig.inputCollection.getData();
-        inputConfig.macroRecorder.update(send);
+        send = inputCollection.getData();
+        macroRecorder.update(send);
 
-        if (inputConfig.stopMacros()) {
+        if (false /*TODO*/) {
             macroCollection.deactivateMacros();
         }
         macroCollection.activateMacros();
