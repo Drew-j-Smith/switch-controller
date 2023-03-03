@@ -6,6 +6,8 @@
 
 #include "Event/ConcreteClasses/EventToggle.h"
 
+using namespace std::literals;
+
 class Controller {
 private:
     const std::array<std::function<bool()>, 14> buttons;
@@ -29,65 +31,56 @@ public:
         capture
     };
 
+    constexpr static auto buttonMapping = std::array{
+        std::pair{"controls.y"sv, y},
+        std::pair{"controls.b"sv, b},
+        std::pair{"controls.a"sv, a},
+        std::pair{"controls.x"sv, x},
+        std::pair{"controls.l"sv, l},
+        std::pair{"controls.r"sv, r},
+        std::pair{"controls.xl"sv, xl},
+        std::pair{"controls.xr"sv, xr},
+        std::pair{"controls.Select"sv, Select},
+        std::pair{"controls.start"sv, start},
+        std::pair{"controls.lClick"sv, lClick},
+        std::pair{"controls.rClick"sv, rClick},
+        std::pair{"controls.home"sv, home},
+        std::pair{"controls.capture"sv, capture},
+    };
+
     enum stickIndicies { left, right, hat };
 
     constexpr static int JOYSTICK_DEADZONE = 30;
 
-    static auto getButtons() {
-        // capture button
-        constexpr auto toggle = [] {
-            return sf::Joystick::isButtonPressed(0, 13);
+    static auto getButtons(const boost::program_options::variables_map &vm) {
+        auto modifierButton =
+            static_cast<unsigned int>(vm["controls.modifier"].as<int>());
+        auto modifier = [modifierButton] {
+            return sf::Joystick::isButtonPressed(0, modifierButton);
         };
-        auto turboToggle = ToggleEvent{toggle, 1000ms};
+        auto turboToggle = ToggleEvent{
+            [modifier, turboButton = static_cast<unsigned int>(
+                           vm["controls.turbo"].as<int>())] {
+                return sf::Joystick::isButtonPressed(0, turboButton) &&
+                       modifier();
+            },
+            1000ms};
 
         std::array<std::function<bool()>, 14> buttons;
-        auto event = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 0) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::b] =
-            [turboToggle, event,
-             turboEvent = TurboEvent{event, 20ms}]() mutable {
-                return turboToggle() ? turboEvent() : event();
-            };
-        buttons[Controller::buttonIndicies::a] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 1) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::y] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 2) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::x] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 3) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::l] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 4) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::r] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 5) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::xl] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 6) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::xr] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 7) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::Select] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 8) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::start] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 9) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::lClick] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 10) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::rClick] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 11) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::home] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 12) && !toggle();
-        };
-        buttons[Controller::buttonIndicies::capture] = [toggle] {
-            return sf::Joystick::isButtonPressed(0, 13) && !toggle();
-        };
+        for (std::size_t i = 0; i < 14; i++) {
+            auto event =
+                [modifier,
+                 button = static_cast<unsigned int>(
+                     vm[std::string{buttonMapping[i].first}].as<int>())] {
+                    return sf::Joystick::isButtonPressed(0, button) &&
+                           !modifier();
+                };
+            buttons[buttonMapping[i].second] =
+                [turboToggle, event,
+                 turboEvent = TurboEvent{event, 20ms}]() mutable {
+                    return turboToggle() ? turboEvent() : event();
+                };
+        }
         return buttons;
     }
 
@@ -130,7 +123,7 @@ public:
     }
 
     Controller(const boost::program_options::variables_map &vm)
-        : buttons(getButtons()), sticks(getSticks()){};
+        : buttons(getButtons(vm)), sticks(getSticks()){};
 
     constexpr static std::array<uint8_t, 2>
     digtalToAnalogConversion(bool up, bool right, bool down, bool left) {

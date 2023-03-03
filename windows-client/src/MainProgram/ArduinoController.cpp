@@ -25,6 +25,30 @@ int main(int argc, char **argv) {
          "input format for ffmpeg") //
         ("deviceName", po::value<std::string>()->required(),
          "device name for ffmpeg");
+    po::options_description controls_desc("Controller options");
+    controls_desc.add_options()                                     //
+        ("controls.y", po::value<int>()->required())                //
+        ("controls.b", po::value<int>()->required())                //
+        ("controls.a", po::value<int>()->required())                //
+        ("controls.x", po::value<int>()->required())                //
+        ("controls.l", po::value<int>()->required())                //
+        ("controls.r", po::value<int>()->required())                //
+        ("controls.xl", po::value<int>()->required())               //
+        ("controls.xr", po::value<int>()->required())               //
+        ("controls.Select", po::value<int>()->required())           //
+        ("controls.start", po::value<int>()->required())            //
+        ("controls.lClick", po::value<int>()->required())           //
+        ("controls.rClick", po::value<int>()->required())           //
+        ("controls.home", po::value<int>()->required())             //
+        ("controls.capture", po::value<int>()->required())          //
+        ("controls.modifier", po::value<int>()->required())         //
+        ("controls.turbo", po::value<int>()->required())            //
+        ("controls.record", po::value<int>()->required())           //
+        ("controls.playLastRecorded", po::value<int>()->required()) //
+        ("controls.stopMacros", po::value<int>()->required())       //
+        ;
+    po::options_description config_file_options;
+    config_file_options.add(desc).add(controls_desc);
 
     cv::utils::logging::setLogLevel(
         cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
@@ -40,7 +64,7 @@ int main(int argc, char **argv) {
     std::map<std::string, std::string> ffmpeg_options{};
     try {
         auto cfg_file_parsed =
-            po::parse_config_file("data/config.cfg", desc, true);
+            po::parse_config_file("data/config.cfg", config_file_options, true);
         po::store(cfg_file_parsed, vm);
         auto unrecognized_options = po::collect_unrecognized(
             cfg_file_parsed.options,

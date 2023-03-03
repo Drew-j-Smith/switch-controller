@@ -42,14 +42,24 @@ void StartController(boost::program_options::variables_map vm,
     spdlog::info("ffmpeg intialized");
     spdlog::info("loading input config");
     Controller controller(vm);
+    auto modifierButton =
+        static_cast<unsigned int>(vm["controls.modifier"].as<int>());
+    auto stopMacros = [modifierButton,
+                       stopButton = static_cast<unsigned int>(
+                           vm["controls.stopMacros"].as<int>())] {
+        return sf::Joystick::isButtonPressed(0, stopButton) &&
+               sf::Joystick::isButtonPressed(0, modifierButton);
+    };
     MacroRecorder macroRecorder{
-        [] {
-            return sf::Joystick::isButtonPressed(0, 1) &&
-                   sf::Joystick::isButtonPressed(0, 13);
+        [modifierButton, recordBtn = static_cast<unsigned int>(
+                             vm["controls.record"].as<int>())] {
+            return sf::Joystick::isButtonPressed(0, recordBtn) &&
+                   sf::Joystick::isButtonPressed(0, modifierButton);
         },
-        [] {
-            return sf::Joystick::isButtonPressed(0, 0) &&
-                   sf::Joystick::isButtonPressed(0, 13);
+        [modifierButton, playBtn = static_cast<unsigned int>(
+                             vm["controls.playLastRecorded"].as<int>())] {
+            return sf::Joystick::isButtonPressed(0, playBtn) &&
+                   sf::Joystick::isButtonPressed(0, modifierButton);
         }};
     spdlog::info("input config loaded");
     spdlog::info("loading macros");
@@ -78,7 +88,7 @@ void StartController(boost::program_options::variables_map vm,
         send = controller.getData();
         macroRecorder.update(send);
 
-        if (false /*TODO*/) {
+        if (stopMacros()) {
             macroCollection.deactivateMacros();
         }
         macroCollection.activateMacros();
