@@ -38,13 +38,17 @@ public:
         constexpr auto toggle = [] {
             return sf::Joystick::isButtonPressed(0, 13);
         };
+        auto turboToggle = ToggleEvent{toggle, 1000ms};
 
         std::array<std::function<bool()>, 14> buttons;
-        buttons[Controller::buttonIndicies::b] = ToggleEvent{
-            [toggle] {
-                return sf::Joystick::isButtonPressed(0, 0) && !toggle();
-            },
-            20ms};
+        auto event = [toggle] {
+            return sf::Joystick::isButtonPressed(0, 0) && !toggle();
+        };
+        buttons[Controller::buttonIndicies::b] =
+            [turboToggle, event,
+             turboEvent = TurboEvent{event, 20ms}]() mutable {
+                return turboToggle() ? turboEvent() : event();
+            };
         buttons[Controller::buttonIndicies::a] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 1) && !toggle();
         };

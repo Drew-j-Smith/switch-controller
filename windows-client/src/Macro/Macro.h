@@ -23,7 +23,7 @@ public:
     }
 
     std::optional<std::array<uint8_t, 8>> getDataframe(uint64_t time) const {
-        if (time >= actionVector.back().time) {
+        if (actionVector.size() == 0 || time >= actionVector.back().time) {
             return {};
         }
 
