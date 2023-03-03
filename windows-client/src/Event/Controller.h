@@ -1,16 +1,12 @@
 #pragma once
 
-/**
- * @brief The InputCollection class takes inputs and converts them into a
- * character array which can be sent to the arduino
- */
 #include "pch.h"
 
 #include <boost/program_options.hpp>
 
 #include "Event/ConcreteClasses/EventToggle.h"
 
-class InputCollection {
+class Controller {
 private:
     const std::array<std::function<bool()>, 14> buttons;
     const std::array<std::function<std::array<uint8_t, 2>()>, 3> sticks;
@@ -44,48 +40,48 @@ public:
         };
 
         std::array<std::function<bool()>, 14> buttons;
-        buttons[InputCollection::buttonIndicies::b] = ToggleEvent{
+        buttons[Controller::buttonIndicies::b] = ToggleEvent{
             [toggle] {
                 return sf::Joystick::isButtonPressed(0, 0) && !toggle();
             },
             20ms};
-        buttons[InputCollection::buttonIndicies::a] = [toggle] {
+        buttons[Controller::buttonIndicies::a] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 1) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::y] = [toggle] {
+        buttons[Controller::buttonIndicies::y] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 2) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::x] = [toggle] {
+        buttons[Controller::buttonIndicies::x] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 3) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::l] = [toggle] {
+        buttons[Controller::buttonIndicies::l] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 4) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::r] = [toggle] {
+        buttons[Controller::buttonIndicies::r] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 5) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::xl] = [toggle] {
+        buttons[Controller::buttonIndicies::xl] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 6) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::xr] = [toggle] {
+        buttons[Controller::buttonIndicies::xr] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 7) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::Select] = [toggle] {
+        buttons[Controller::buttonIndicies::Select] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 8) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::start] = [toggle] {
+        buttons[Controller::buttonIndicies::start] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 9) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::lClick] = [toggle] {
+        buttons[Controller::buttonIndicies::lClick] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 10) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::rClick] = [toggle] {
+        buttons[Controller::buttonIndicies::rClick] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 11) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::home] = [toggle] {
+        buttons[Controller::buttonIndicies::home] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 12) && !toggle();
         };
-        buttons[InputCollection::buttonIndicies::capture] = [toggle] {
+        buttons[Controller::buttonIndicies::capture] = [toggle] {
             return sf::Joystick::isButtonPressed(0, 13) && !toggle();
         };
         return buttons;
@@ -105,21 +101,21 @@ public:
 
     static auto getSticks() {
         std::array<std::function<std::array<uint8_t, 2>()>, 3> sticks;
-        sticks[InputCollection::stickIndicies::left] = [] {
+        sticks[Controller::stickIndicies::left] = [] {
             return std::array<uint8_t, 2>{
                 convertSFML_Axis(
                     sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)),
                 convertSFML_Axis(
                     sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y))};
         };
-        sticks[InputCollection::stickIndicies::right] = [] {
+        sticks[Controller::stickIndicies::right] = [] {
             return std::array<uint8_t, 2>{
                 convertSFML_Axis(
                     sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::U)),
                 convertSFML_Axis(
                     sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::V))};
         };
-        sticks[InputCollection::stickIndicies::hat] = [] {
+        sticks[Controller::stickIndicies::hat] = [] {
             return std::array<uint8_t, 2>{
                 convertSFML_Axis(
                     sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX)),
@@ -129,7 +125,7 @@ public:
         return sticks;
     }
 
-    InputCollection(const boost::program_options::variables_map &vm)
+    Controller(const boost::program_options::variables_map &vm)
         : buttons(getButtons()), sticks(getSticks()){};
 
     constexpr static std::array<uint8_t, 2>
@@ -148,10 +144,10 @@ public:
 
     constexpr static std::array<uint8_t, 2>
     adjustStickValueForDeadzone(std::array<uint8_t, 2> sticks) {
-        if (sticks[0] > 128 - InputCollection::JOYSTICK_DEADZONE &&
-            sticks[0] < 128 + InputCollection::JOYSTICK_DEADZONE &&
-            sticks[1] > 128 - InputCollection::JOYSTICK_DEADZONE &&
-            sticks[1] < 128 + InputCollection::JOYSTICK_DEADZONE) {
+        if (sticks[0] > 128 - Controller::JOYSTICK_DEADZONE &&
+            sticks[0] < 128 + Controller::JOYSTICK_DEADZONE &&
+            sticks[1] > 128 - Controller::JOYSTICK_DEADZONE &&
+            sticks[1] < 128 + Controller::JOYSTICK_DEADZONE) {
             return {128, 128};
         } else {
             return sticks;

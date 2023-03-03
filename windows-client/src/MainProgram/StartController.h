@@ -11,7 +11,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/program_options.hpp>
 
-#include "Event/InputCollection.h"
+#include "Event/Controller.h"
 #include "Macro/MacroCollection.h"
 
 void StartController(boost::program_options::variables_map vm,
@@ -41,7 +41,7 @@ void StartController(boost::program_options::variables_map vm,
 
     spdlog::info("ffmpeg intialized");
     spdlog::info("loading input config");
-    InputCollection inputCollection(vm);
+    Controller controller(vm);
     MacroRecorder macroRecorder{
         [] {
             return sf::Joystick::isButtonPressed(0, 1) &&
@@ -75,7 +75,7 @@ void StartController(boost::program_options::variables_map vm,
         // code used to time an iteration
         // auto begin = std::chrono::steady_clock::now();
 
-        send = inputCollection.getData();
+        send = controller.getData();
         macroRecorder.update(send);
 
         if (false /*TODO*/) {
