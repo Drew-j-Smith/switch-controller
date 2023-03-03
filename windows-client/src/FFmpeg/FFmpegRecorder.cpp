@@ -71,8 +71,7 @@ static auto openStream(const std::string &inputFormatStr,
 FFmpegRecorder::FFmpegRecorder(
     const std::string &inputFormat, const std::string &deviceName,
     const std::map<std::string, std::string> &options,
-    std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks)
-    : m_recording(true) {
+    std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks) {
     if (std::unique(sinks.begin(), sinks.end(),
                     [](const std::unique_ptr<FFmpegFrameSink> &p1,
                        const std::unique_ptr<FFmpegFrameSink> &p2) {
@@ -85,7 +84,7 @@ FFmpegRecorder::FFmpegRecorder(
         throw std::invalid_argument("The sink size must be greater than 0");
     }
 
-    m_thread = std::thread([&]() {
+    m_thread = std::jthread([&](std::stop_token stoken) {
         try {
             auto [formatContext, decoders] =
                 openStream(inputFormat, deviceName, options, sinks);
@@ -100,7 +99,7 @@ FFmpegRecorder::FFmpegRecorder(
                 throw std::runtime_error("Could not allocate frame");
             }
             // read until there are no more frames or canceled
-            while (m_recording.load() &&
+            while (!stoken.stop_requested() &&
                    av_read_frame(formatContext.get(), &pkt) >= 0) {
                 // check if the pack goes to a frame sink
                 if (decoders.find(pkt.stream_index) != decoders.end()) {

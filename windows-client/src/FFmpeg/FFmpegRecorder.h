@@ -15,18 +15,7 @@ public:
                    const std::string &deviceName,
                    const std::map<std::string, std::string> &options,
                    std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks);
-    ~FFmpegRecorder() {
-        m_recording.store(false);
-        if (m_thread.joinable()) {
-            m_thread.join();
-        }
-    }
-    FFmpegRecorder(const FFmpegRecorder &other) = delete;
-    FFmpegRecorder(FFmpegRecorder &&other) = delete;
-
-    void joinThread() { m_thread.join(); }
 
 private:
-    std::thread m_thread;
-    std::atomic_bool m_recording;
+    std::jthread m_thread;
 };
