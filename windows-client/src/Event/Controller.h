@@ -14,38 +14,12 @@ private:
     const std::array<std::function<std::array<uint8_t, 2>()>, 3> sticks;
 
 public:
-    enum buttonIndicies {
-        y,
-        b,
-        a,
-        x,
-        l,
-        r,
-        xl,
-        xr,
-        Select,
-        start,
-        lClick,
-        rClick,
-        home,
-        capture
-    };
-
     constexpr static auto buttonMapping = std::array{
-        std::pair{"controls.y"sv, y},
-        std::pair{"controls.b"sv, b},
-        std::pair{"controls.a"sv, a},
-        std::pair{"controls.x"sv, x},
-        std::pair{"controls.l"sv, l},
-        std::pair{"controls.r"sv, r},
-        std::pair{"controls.xl"sv, xl},
-        std::pair{"controls.xr"sv, xr},
-        std::pair{"controls.Select"sv, Select},
-        std::pair{"controls.start"sv, start},
-        std::pair{"controls.lClick"sv, lClick},
-        std::pair{"controls.rClick"sv, rClick},
-        std::pair{"controls.home"sv, home},
-        std::pair{"controls.capture"sv, capture},
+        "controls.y"sv,     "controls.b"sv,       "controls.a"sv,
+        "controls.x"sv,     "controls.l"sv,       "controls.r"sv,
+        "controls.xl"sv,    "controls.xr"sv,      "controls.Select"sv,
+        "controls.start"sv, "controls.lClick"sv,  "controls.rClick"sv,
+        "controls.home"sv,  "controls.capture"sv,
     };
 
     enum stickIndicies { left, right, hat };
@@ -67,20 +41,20 @@ public:
             1000ms};
 
         std::array<std::function<bool()>, 14> buttons;
-        for (std::size_t i = 0; i < 14; i++) {
-            auto event =
-                [modifier,
-                 button = static_cast<unsigned int>(
-                     vm[std::string{buttonMapping[i].first}].as<int>())] {
-                    return sf::Joystick::isButtonPressed(0, button) &&
-                           !modifier();
-                };
-            buttons[buttonMapping[i].second] =
-                [turboToggle, event,
-                 turboEvent = TurboEvent{event, 20ms}]() mutable {
-                    return turboToggle() ? turboEvent() : event();
-                };
-        }
+        auto transform = [&](auto button_str) {
+            auto button_id = static_cast<unsigned int>(
+                vm[std::string{button_str}].as<int>());
+            auto event = [modifier, button_id] {
+                return sf::Joystick::isButtonPressed(0, button_id) &&
+                       !modifier();
+            };
+            return [turboToggle, event,
+                    turboEvent = TurboEvent{event, 20ms}]() mutable {
+                return turboToggle() ? turboEvent() : event();
+            };
+        };
+        std::transform(buttonMapping.begin(), buttonMapping.end(),
+                       buttons.begin(), transform);
         return buttons;
     }
 
