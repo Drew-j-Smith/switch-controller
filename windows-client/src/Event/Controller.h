@@ -70,34 +70,46 @@ public:
         return static_cast<uint8_t>(std::clamp(scaled, 0, 255));
     }
 
-    static auto getSticks() {
+    static auto getSticks(const boost::program_options::variables_map &vm) {
         std::array<std::function<std::array<uint8_t, 2>()>, 3> sticks;
-        sticks[Controller::stickIndicies::left] = [] {
+
+        auto left_x_axis =
+            static_cast<sf::Joystick::Axis>(vm["controls.leftXAxis"].as<int>());
+        auto left_y_axis =
+            static_cast<sf::Joystick::Axis>(vm["controls.leftYAxis"].as<int>());
+        sticks[Controller::stickIndicies::left] = [=] {
             return std::array<uint8_t, 2>{
+                convertSFML_Axis(sf::Joystick::getAxisPosition(0, left_x_axis)),
                 convertSFML_Axis(
-                    sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)),
-                convertSFML_Axis(
-                    sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y))};
+                    sf::Joystick::getAxisPosition(0, left_y_axis))};
         };
-        sticks[Controller::stickIndicies::right] = [] {
+
+        auto right_x_axis = static_cast<sf::Joystick::Axis>(
+            vm["controls.rightXAxis"].as<int>());
+        auto right_y_axis = static_cast<sf::Joystick::Axis>(
+            vm["controls.rightYAxis"].as<int>());
+        sticks[Controller::stickIndicies::right] = [=] {
             return std::array<uint8_t, 2>{
                 convertSFML_Axis(
-                    sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::U)),
+                    sf::Joystick::getAxisPosition(0, right_x_axis)),
                 convertSFML_Axis(
-                    sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::V))};
+                    sf::Joystick::getAxisPosition(0, right_y_axis))};
         };
-        sticks[Controller::stickIndicies::hat] = [] {
+
+        auto hat_x_axis =
+            static_cast<sf::Joystick::Axis>(vm["controls.hatXAxis"].as<int>());
+        auto hat_y_axis =
+            static_cast<sf::Joystick::Axis>(vm["controls.hatYAxis"].as<int>());
+        sticks[Controller::stickIndicies::hat] = [=] {
             return std::array<uint8_t, 2>{
-                convertSFML_Axis(
-                    sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX)),
-                convertSFML_Axis(sf::Joystick::getAxisPosition(
-                    0, sf::Joystick::Axis::PovY))};
+                convertSFML_Axis(sf::Joystick::getAxisPosition(0, hat_x_axis)),
+                convertSFML_Axis(sf::Joystick::getAxisPosition(0, hat_y_axis))};
         };
         return sticks;
     }
 
     Controller(const boost::program_options::variables_map &vm)
-        : buttons(getButtons(vm)), sticks(getSticks()){};
+        : buttons(getButtons(vm)), sticks(getSticks(vm)){};
 
     constexpr static std::array<uint8_t, 2>
     digtalToAnalogConversion(bool up, bool right, bool down, bool left) {

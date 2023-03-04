@@ -46,6 +46,12 @@ int main(int argc, char **argv) {
         ("controls.record", po::value<int>()->required())           //
         ("controls.playLastRecorded", po::value<int>()->required()) //
         ("controls.stopMacros", po::value<int>()->required())       //
+        ("controls.leftXAxis", po::value<int>()->required())        //
+        ("controls.leftYAxis", po::value<int>()->required())        //
+        ("controls.rightXAxis", po::value<int>()->required())       //
+        ("controls.rightYAxis", po::value<int>()->required())       //
+        ("controls.hatXAxis", po::value<int>()->required())         //
+        ("controls.hatYAxis", po::value<int>()->required())         //
         ;
     po::options_description config_file_options;
     config_file_options.add(desc).add(controls_desc);
