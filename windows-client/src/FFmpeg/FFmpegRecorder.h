@@ -15,7 +15,5 @@ public:
                    const std::string &deviceName,
                    const std::map<std::string, std::string> &options,
                    std::vector<std::unique_ptr<FFmpegFrameSink>> &sinks);
-
-private:
     std::jthread m_thread;
 };
