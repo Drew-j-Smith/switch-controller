@@ -1,0 +1,17 @@
+<map id="src/FFmpeg/FFmpegFrameSink.h" name="src/FFmpeg/FFmpegFrameSink.h">
+<area shape="rect" id="node1" title=" " alt="" coords="465,5,682,31"/>
+<area shape="rect" id="node2" href="$AudioFrameSink_8h.html" title=" " alt="" coords="541,79,744,104"/>
+<area shape="rect" id="node10" href="$FFmpegDecoder_8h.html" title=" " alt="" coords="264,79,467,104"/>
+<area shape="rect" id="node12" href="$FFmpegRecorder_8h.html" title=" " alt="" coords="347,159,554,185"/>
+<area shape="rect" id="node14" href="$VideoFrameSink_8h.html" title=" " alt="" coords="797,79,1000,104"/>
+<area shape="rect" id="node3" href="$SoundEvent_8cpp.html" title=" " alt="" coords="550,240,730,280"/>
+<area shape="rect" id="node4" href="$SoundEvent_8h.html" title=" " alt="" coords="681,152,861,192"/>
+<area shape="rect" id="node5" href="$MacroConfig_8h.html" title=" " alt="" coords="974,247,1181,273"/>
+<area shape="rect" id="node8" href="$TestAudio_8h.html" title=" " alt="" coords="87,247,281,273"/>
+<area shape="rect" id="node9" href="$TestVideo_8h.html" title=" " alt="" coords="755,247,949,273"/>
+<area shape="rect" id="node6" href="$StartController_8h.html" title=" " alt="" coords="928,328,1147,353"/>
+<area shape="rect" id="node7" href="$ArduinoController_8cpp.html" title=" " alt="" coords="728,401,976,427"/>
+<area shape="rect" id="node11" href="$FFmpegDecoder_8cpp.html" title=" " alt="" coords="5,159,221,185"/>
+<area shape="rect" id="node13" href="$FFmpegRecorder_8cpp.html" title=" " alt="" coords="306,247,526,273"/>
+<area shape="rect" id="node15" href="$ImageEvent_8h.html" title=" " alt="" coords="987,152,1167,192"/>
+</map>

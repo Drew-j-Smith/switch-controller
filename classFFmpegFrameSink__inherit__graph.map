@@ -1,0 +1,5 @@
+<map id="FFmpegFrameSink" name="FFmpegFrameSink">
+<area shape="rect" id="node1" title=" " alt="" coords="75,5,233,215"/>
+<area shape="rect" id="node2" href="$classAudioFrameSink.html" title=" " alt="" coords="5,270,143,377"/>
+<area shape="rect" id="node3" href="$classVideoFrameSink.html" title=" " alt="" coords="167,263,304,384"/>
+</map>
