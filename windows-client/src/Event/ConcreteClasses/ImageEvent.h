@@ -7,7 +7,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "FFmpeg/VideoFrameSink.h"
+struct VideoFrameSink {};
 
 #define AC_DISPLAY_IMAGE_MATCH 0
 
@@ -15,19 +15,15 @@ class ImageEvent {
 public:
     ImageEvent(const cv::Mat &templatePic, const cv::Mat &maskPic,
                const int matchMethod, const double matchThreshold,
-               const cv::Rect imageCrop, VideoFrameSink *videoFrameSink)
+               const cv::Rect imageCrop,
+               const std::shared_ptr<cv::VideoCapture> &videoCapture)
         : templatePic(templatePic), maskPic(maskPic), matchMethod(matchMethod),
           matchThreshold(matchThreshold), imageCrop(imageCrop),
-          videoFrameSink(videoFrameSink) {}
+          videoCapture(videoCapture) {}
 
     uint8_t value() const {
-
-        this->videoFrameSink->waitForInit();
-        this->videoFrameSink->getData(videoData);
-
-        cv::Mat screenshot = cv::Mat(this->videoFrameSink->getHeight(),
-                                     this->videoFrameSink->getWidth(), CV_8UC3,
-                                     videoData.data());
+        cv::Mat screenshot;
+        videoCapture->retrieve(screenshot);
 
         cv::Mat submat = cv::Mat(screenshot, imageCrop);
 
@@ -93,6 +89,6 @@ private:
     const double matchThreshold;
     const cv::Rect imageCrop;
 
-    VideoFrameSink *videoFrameSink;
+    std::shared_ptr<cv::VideoCapture> videoCapture;
     mutable std::vector<uint8_t> videoData;
 };

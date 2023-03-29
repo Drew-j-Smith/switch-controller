@@ -2,43 +2,27 @@
 
 #include "pch.h"
 
-#include "FFmpeg/AudioFrameSink.h"
-#include "FFmpeg/FFmpegRecorder.h"
-#include "FFmpeg/VideoFrameSink.h"
-
-#include <boost/program_options.hpp>
-
-void TestVideo(const boost::program_options::variables_map &vm,
-               const std::map<std::string, std::string> &ffmpegOptions) {
-    std::vector<std::unique_ptr<FFmpegFrameSink>> sinks;
-    sinks.push_back(std::make_unique<VideoFrameSink>());
-    auto videoSink = dynamic_cast<VideoFrameSink *>(sinks[0].get());
-
-    av_log_set_level(AV_LOG_QUIET);
-
-    FFmpegRecorder recorder(vm["inputFormat"].as<std::string>(),
-                            vm["deviceName"].as<std::string>(), ffmpegOptions,
-                            sinks);
-
-    std::vector<uint8_t> data;
-    long long lastFrame = videoSink->getData(data);
-    cv::Mat mat = cv::Mat(videoSink->getHeight(), videoSink->getWidth(),
-                          CV_8UC3, data.data());
-
-    std::atomic<bool> running = true;
-    std::string title = std::to_string(
-        std::chrono::steady_clock::now().time_since_epoch().count());
-
-    std::thread t([&]() {
-        while (running.load()) {
-            lastFrame = videoSink->getNextData(data, lastFrame);
-            cv::imshow(title, mat);
-            cv::waitKey(1);
+void TestVideo(const boost::program_options::variables_map &vm) {
+    cv::Mat frame;
+    cv::VideoCapture cap;
+    int deviceID = vm["deviceIndex"].as<int>();
+    int apiID = vm["videoCaptureBackend"].as<int>();
+    cap.open(deviceID, apiID);
+    if (!cap.isOpened()) {
+        spdlog::error("Unable to open video capture");
+        return;
+    }
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
+    for (;;) {
+        cap.grab();
+        cap.retrieve(frame);
+        if (frame.empty()) {
+            spdlog::error("blank frame grabbed");
+            break;
         }
-    });
-
-    std::cout << "Press enter to stop\n";
-    std::cin.get();
-    running.store(false);
-    t.join();
+        cv::imshow("0", frame);
+        if (cv::waitKey(5) >= 0)
+            break;
+    }
 }

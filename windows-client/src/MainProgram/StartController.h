@@ -14,8 +14,7 @@
 #include "Event/Controller.h"
 #include "Macro/MacroCollection.h"
 
-void StartController(boost::program_options::variables_map vm,
-                     const std::map<std::string, std::string> &ffmpegOptions) {
+void StartController(boost::program_options::variables_map vm) {
     spdlog::info("initializing");
 
     // Updating joysticks to see if they are connected
@@ -27,19 +26,20 @@ void StartController(boost::program_options::variables_map vm,
     }
     spdlog::info("joystick connected");
 
-    spdlog::info("intializing ffmpeg");
+    spdlog::info("intializing opencv video capture");
 
-    std::vector<std::unique_ptr<FFmpegFrameSink>> sinks{};
-    sinks.push_back(std::make_unique<VideoFrameSink>());
-    AVChannelLayout channel_layout = AV_CHANNEL_LAYOUT_MONO;
-    sinks.push_back(std::make_unique<AudioFrameSink>(
-        channel_layout, AV_SAMPLE_FMT_S16, 48000, true, 48000));
+    auto cap = std::make_shared<cv::VideoCapture>();
+    int deviceID = vm["deviceIndex"].as<int>();
+    int apiID = vm["videoCaptureBackend"].as<int>();
+    cap->open(deviceID, apiID);
+    if (!cap->isOpened()) {
+        spdlog::error("Unable to open video capture");
+        return;
+    }
+    cap->set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+    cap->set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 
-    std::unique_ptr<FFmpegRecorder> recorder{std::make_unique<FFmpegRecorder>(
-        vm["inputFormat"].as<std::string>(), vm["deviceName"].as<std::string>(),
-        ffmpegOptions, sinks)};
-
-    spdlog::info("ffmpeg intialized");
+    spdlog::info("opencv video capture intialized");
     spdlog::info("loading input config");
     Controller controller(vm);
     auto modifierButton =
@@ -64,9 +64,7 @@ void StartController(boost::program_options::variables_map vm,
     spdlog::info("input config loaded");
     spdlog::info("loading macros");
     MacroCollection macroCollection =
-        getMacroConfig(dynamic_cast<VideoFrameSink *>(sinks[0].get()),
-                       dynamic_cast<AudioFrameSink *>(sinks[0].get()),
-                       {macroRecorder.getLastRecordedMacro()});
+        getMacroConfig(nullptr, {macroRecorder.getLastRecordedMacro()});
     spdlog::info("macros loaded");
 
     std::unique_ptr<boost::asio::serial_port> port;

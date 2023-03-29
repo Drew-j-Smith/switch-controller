@@ -1,7 +1,6 @@
 
 #include "SerialPort.h"
 #include "StartController.h"
-#include "TestAudio.h"
 #include "TestVideo.h"
 
 #include <opencv2/core/utils/logger.hpp>
@@ -11,20 +10,16 @@
 int main(int argc, char **argv) {
     namespace po = boost::program_options;
     po::options_description desc("Allowed options");
-    desc.add_options()                     //
-        ("help,h", "produce help message") //
-        ("testAudio,a", po::value<int>(),
-         "test audio saving (time in seconds to record)") //
-        ("audioLoopTime", po::value<int>()->default_value(-1),
-         "the loop time in audio recording") //
+    desc.add_options()                       //
+        ("help,h", "produce help message")   //
         ("testVideo,v", "test video saving") //
         ("testSerial,s", "test serial port") //
         ("port,p", po::value<std::string>()->required(),
          "Port used for serial communication") //
-        ("inputFormat", po::value<std::string>()->required(),
-         "input format for ffmpeg") //
-        ("deviceName", po::value<std::string>()->required(),
-         "device name for ffmpeg");
+        ("videoCaptureBackend", po::value<int>()->required(),
+         "video capture backend for opencv (see cv::VideoCaptureAPIs)") //
+        ("deviceIndex", po::value<int>()->required(),
+         "video capture device index for opencv");
     po::options_description controls_desc("Controller options");
     controls_desc.add_options()                                     //
         ("controls.y", po::value<int>()->required())                //
@@ -58,7 +53,6 @@ int main(int argc, char **argv) {
 
     cv::utils::logging::setLogLevel(
         cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
-    av_log_set_level(AV_LOG_QUIET);
 
     po::variables_map vm;
     try {
@@ -67,18 +61,10 @@ int main(int argc, char **argv) {
         spdlog::error("{}", e.what());
         return 1;
     }
-    std::map<std::string, std::string> ffmpeg_options{};
     try {
-        auto cfg_file_parsed =
-            po::parse_config_file("data/config.cfg", config_file_options, true);
+        auto cfg_file_parsed = po::parse_config_file(
+            "data/config.cfg", config_file_options, false);
         po::store(cfg_file_parsed, vm);
-        auto unrecognized_options = po::collect_unrecognized(
-            cfg_file_parsed.options,
-            po::collect_unrecognized_mode::include_positional);
-        for (std::size_t i = 0; i + 1 < unrecognized_options.size(); i += 2) {
-            ffmpeg_options[unrecognized_options[i]] =
-                unrecognized_options[i + 1];
-        }
     } catch (std::exception &e) {
         spdlog::warn("{}", e.what());
     }
@@ -102,11 +88,9 @@ int main(int argc, char **argv) {
                 initializeSerialPort(vm["port"].as<std::string>(), 57600, io);
             testSerialPort(port, io);
         } else if (vm.count("testVideo")) {
-            TestVideo(vm, ffmpeg_options);
-        } else if (vm.count("testAudio")) {
-            TestAudio(vm, ffmpeg_options);
+            TestVideo(vm);
         } else {
-            StartController(vm, ffmpeg_options);
+            StartController(vm);
         }
     } catch (std::exception &e) {
         spdlog::error("Uncaught exception: {}", e.what());

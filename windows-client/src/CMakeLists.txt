@@ -1,8 +1,5 @@
 
-add_executable(ArduinoController MainProgram/ArduinoController.cpp
-Event/ConcreteClasses/SoundEvent.cpp
-FFmpeg/FFmpegDecoder.cpp
-FFmpeg/FFmpegRecorder.cpp)
+add_executable(ArduinoController MainProgram/ArduinoController.cpp)
 
 target_include_directories(ArduinoController PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_precompile_headers(ArduinoController PUBLIC pch.h)

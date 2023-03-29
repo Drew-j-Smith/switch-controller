@@ -6,10 +6,7 @@
     "sfml",
     "boost-asio",
     "boost-endian",
-    "boost-circular-buffer",
     "boost-program-options",
-    "fftw3",
-    "ffmpeg",
     "spdlog"
   ]
 }

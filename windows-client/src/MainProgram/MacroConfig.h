@@ -4,25 +4,18 @@
 #include "pch.h"
 
 #include "Event/ConcreteClasses/ImageEvent.h"
-#include "Event/ConcreteClasses/SoundEvent.h"
 #include "Macro/Macro.h"
 #include "Macro/MacroCollection.h"
 
-#include "FFmpeg/AudioFrameSink.h"
-#include "FFmpeg/FFmpegRecorder.h"
-#include "FFmpeg/VideoFrameSink.h"
-
-MacroCollection getMacroConfig(VideoFrameSink *videoFrameSink,
-                               AudioFrameSink *audioFrameSink,
-                               std::vector<std::shared_ptr<Macro>> macros) {
+MacroCollection
+getMacroConfig(const std::shared_ptr<cv::VideoCapture> &videoCapture,
+               std::vector<std::shared_ptr<Macro>> macros) {
     // Deciders
     cv::Rect rectCrop(0, 0, 500, 500);
     // TODO fix
     auto haanitDecider = std::make_shared<ImageEvent>(
         cv::imread("data/haanit.png"), cv::imread("data/haanit mask.png"), 3,
-        .97, rectCrop, videoFrameSink);
-    auto animalCrossingDecider =
-        std::make_shared<SoundEvent>("data/test3.wav", .5, audioFrameSink);
+        .97, rectCrop, videoCapture);
 
     // TODO
     // Macros
