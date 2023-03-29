@@ -14,7 +14,6 @@ private:
     const std::array<std::function<bool()>, 14> buttons;
     const std::array<std::function<std::array<uint8_t, 2>()>, 3> sticks;
 
-public:
     constexpr static auto buttonMapping = std::array{
         "controls.y"sv,     "controls.b"sv,       "controls.a"sv,
         "controls.x"sv,     "controls.l"sv,       "controls.r"sv,
@@ -109,6 +108,7 @@ public:
         return sticks;
     }
 
+public:
     Controller(const boost::program_options::variables_map &vm)
         : buttons(getButtons(vm)), sticks(getSticks(vm)){};
 
