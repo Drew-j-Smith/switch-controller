@@ -4,7 +4,8 @@
 
 #include <boost/program_options.hpp>
 
-#include "Event/ConcreteClasses/EventToggle.h"
+#include "Event/ConcreteClasses/ToggleEvent.h"
+#include "Event/ConcreteClasses/TurboEvent.h"
 
 using namespace std::literals;
 
