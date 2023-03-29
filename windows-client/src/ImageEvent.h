@@ -7,8 +7,6 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-struct VideoFrameSink {};
-
 #define AC_DISPLAY_IMAGE_MATCH 0
 
 class ImageEvent {

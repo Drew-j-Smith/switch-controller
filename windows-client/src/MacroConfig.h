@@ -3,9 +3,9 @@
 
 #include "pch.h"
 
-#include "Event/ConcreteClasses/ImageEvent.h"
-#include "Macro/Macro.h"
-#include "Macro/MacroCollection.h"
+#include "ImageEvent.h"
+#include "Macro.h"
+#include "MacroCollection.h"
 
 MacroCollection
 getMacroConfig(const std::shared_ptr<cv::VideoCapture> &videoCapture,

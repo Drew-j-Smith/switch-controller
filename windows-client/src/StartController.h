@@ -3,16 +3,17 @@
 #include <SFML/Window/Joystick.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
-#include "Macro/MacroRecorder.h"
 #include "MacroConfig.h"
+#include "MacroRecorder.h"
 #include "SerialPort.h"
+
 
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/program_options.hpp>
 
-#include "Event/Controller.h"
-#include "Macro/MacroCollection.h"
+#include "Controller.h"
+#include "MacroCollection.h"
 
 void StartController(boost::program_options::variables_map vm) {
     spdlog::info("initializing");
